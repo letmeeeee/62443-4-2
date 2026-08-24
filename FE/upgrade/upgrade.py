@@ -94,8 +94,8 @@ app = create_app()
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 def main():
-    DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 升级监听程序 (0.0.0.0:9000)")
-    socketio.run(app, host='0.0.0.0', port=9000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
+    DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 升级监听程序 (127.0.0.1:9000)")
+    socketio.run(app, host='127.0.0.1', port=9000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
 
 @socketio.on('connect')
 def on_connect():

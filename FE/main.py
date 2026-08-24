@@ -43,8 +43,8 @@ def main():
     else:
         DPrint(f"[{now_str()}] [MAIN] 成功连接远程 Modbus TCP 服务器")
     # socketio.start_background_task(background_thread)
-    DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 服务器 (0.0.0.0:8000)")
-    socketio.run(app, host='0.0.0.0', port=8000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
+    DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 服务器 (127.0.0.1:8000)")
+    socketio.run(app, host='127.0.0.1', port=8000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
 
 @socketio.on('connect')
 def on_connect():
