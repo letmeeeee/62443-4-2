@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "tems(gdb) 启动",
+            "type": "cppdbg",
+            "request": "launch",
+
+            // 本机带符号的 tems
+            "program": "/home/zlg/logger0616zlg/singlebuslogger/logger/build/tems",
+
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "/home/zlg/logger0616zlg/singlebuslogger/logger/debuglog",
+            "environment": [],
+            "externalConsole": false,
+
+            "MIMode": "gdb",
+
+            "miDebuggerPath": "/usr/bin/gdb-multiarch",
+
+            
+            "miDebuggerServerAddress": "192.168.1.136:23",
+
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

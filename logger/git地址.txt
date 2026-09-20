@@ -1,0 +1,13 @@
+git add .
+git commit -m "修改内容、上传理由"
+git push http://192.168.1.253:8888/wujinjin/LocalController.git baowencong   
+git push https://gitee.com/jonney-bao/lc_base.git baowencong
+账户:baowencong 密码:bwc5719279
+
+#从虚拟机拷贝文件到moxa上
+scp base/tems moxa@192.168.2.4:/home/moxa
+scp base/base_set.ini moxa@192.168.2.4:/home/moxa
+
+#nfs 挂载moxa的文件夹到虚拟机上
+mount -t nfs -o nolock,nfsvers=3 192.168.2.4:/home/moxa /home/normal/trina_code/lc_base/nfs/
+umount /home/normal/trina_code/lc_base/nfs/
