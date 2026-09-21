@@ -8,7 +8,7 @@ import secrets
 import tempfile
 
 
-DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[1] / "instance" / "session_config.json"
+DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "instance" / "session_config.json"
 DEFAULT_SESSION_SECONDS = 1800
 DEFAULT_COOKIE_SECURE = True
 
