@@ -3,12 +3,14 @@ import os, threading
 from pathlib import Path
 from pymodbus.client import ModbusTcpClient
 
+# ================== HTTPS启用开关 ==================
+HTTPS_ENABLE = 1
+
+# ================== 基础初始化 ==================
 SAVE_LOG = True    # 是否写入日志文件
 RETENTION_DAYS = 30
 LOG_FILE = Path("/mnt/nvme/applog")  # 日志文件路径
 LOG_FILE.mkdir(parents=True, exist_ok=True)
-
-# ================== 基础初始化 ==================
 INI_PATH = Path(os.environ.get("LC_INI_PATH", "/home/zlg/lc_data_set.ini"))
 HOST_IP = None
 #remote_client = ModbusTcpClient(HOST_IP, port=1502, keep_alive=True)

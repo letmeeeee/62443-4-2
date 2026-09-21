@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json, threading, shutil
-from flask import request, jsonify
+from flask import request, jsonify, g
 from werkzeug.utils import secure_filename
 import traceback
 import zipfile, tarfile, time
@@ -227,7 +227,7 @@ def set_test_mode():
                 "error": "missing field: testMode"
             }), 400
 
-        operatorName = body["operatorName"]
+        operatorName = g.current_user["username"]
         test_mode = body["testMode"]
 
         if not isinstance(operatorName, str):
@@ -1203,7 +1203,7 @@ def _read_saved_package(firmware, version):
 def upload_upgrade_file():
     """上传、验签并归档升级包；兼容新旧表单字段，此接口不会直接触发升级。"""
     payload = request.get_json(silent=True) or request.form
-    operator_name = (payload.get('operatorName') or '').strip()
+    operator_name = g.current_user["username"]
     task_name = (payload.get('taskName') or '').strip()
     # raw_target = (payload.get('firmwareCategory') or '').strip()
     startup = (payload.get('upgradeEnable') or '').strip()
@@ -1656,7 +1656,7 @@ def _dispatch_pcs_upgrade(job_id, inner_tar_path, device_ids):
 def start_upgrade():
     """按 firmware/version 选择已验签归档包，并启动对应的本地升级脚本。"""
     payload = request.get_json(silent=True) or request.form
-    operator_name = (payload.get('operatorName') or '').strip()
+    operator_name = g.current_user["username"]
     # firmware = (payload.get('firmwareCategory') or '').strip()
     version = (payload.get('version') or '').strip()
     job_id = (payload.get('taskName') or '').strip()
@@ -1789,7 +1789,7 @@ def _legacy_upgrade_file():
     try:
         # —— 打印收到的表单键 ——
         f = request.files.get('firmwareFile')
-        operatorName = (request.form.get('operatorName') or '').strip()
+        operatorName = g.current_user["username"]
         job_name = (request.form.get('taskName') or '').strip()
         # releaseVersion = (request.form.get('releaseVersion') or '').strip()
         raw_target = (request.form.get('firmwareCategory') or '').strip()
@@ -2188,7 +2188,7 @@ def upgrade_startRollback():
         _result = operationLog.OperationResult.FAIL
         remark = ""
         _rollback = False
-        operatorName = (request.form.get('operatorName') or '').strip()
+        operatorName = g.current_user["username"]
         job_name = (request.form.get('taskName') or '').strip()
         objectSPCVersion = (request.form.get('objectSPCVersion') or '').strip()
         if not operatorName:
@@ -2518,12 +2518,12 @@ def modifyConfigDatafromParams():
         # 兼容 form 表单 / json 两种传参方式
         if request.is_json:
             req_data = request.get_json()
-            operatorName = req_data.get("operatorName", "")
+            operatorName = g.current_user["username"]
             deviceid_raw = req_data.get("deviceid", "")
             address_raw = req_data.get("address", "")
             value_raw = req_data.get("value", "")
         else:
-            operatorName = request.form.get('operatorName', '')
+            operatorName = g.current_user["username"]
             deviceid_raw = request.form.get('deviceid', '')
             address_raw = request.form.get('address', '')
             value_raw = request.form.get('value', '')

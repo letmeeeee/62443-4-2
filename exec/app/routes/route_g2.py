@@ -12,7 +12,7 @@ from utils.systemctl import schedule_reboot, _base_ssh_args, run_cmd, _base_scp_
 from utils.utils import DPrint, now_str, jdump
 import utils.method as method
 from utils.ini import read_ini_system_counts, get_ini_path, read_ini_all
-from flask import Blueprint
+from flask import Blueprint, g
 import config
 import utils.operationLog as operationLog
 
@@ -574,10 +574,10 @@ def network_set_ip():
         # 兼容单对象和数组
         if isinstance(payload, dict):
             items = [payload]
-            operatorName = payload.get("operatorName", "unknown")
+            operatorName = g.current_user["username"]
         elif isinstance(payload, list):
             items = payload
-            operatorName = payload[0].get("operatorName", "unknown") if payload else "unknown"
+            operatorName = g.current_user["username"]
         else:
             _result = operationLog.OperationResult.FAIL
             remark = "请求格式错误，必须为对象或对象数组"
@@ -816,7 +816,7 @@ def ini_update():
         return jsonify(msg), 400
 
     try:
-        operatorName = payload.get("operatorName", "unknown")
+        operatorName = g.current_user["username"]
         result = method.update_ini_from_payload(payload)
         verify = method.verify_ini_matches_payload(payload, result["path"])
         if not verify["ok"]:

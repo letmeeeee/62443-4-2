@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, g
 from sqlalchemy import text
 from config import PERM_TABLE, engine
 from utils.method import _ensure_perm_table_in_request, _perm_table_exists, md5_password, generate_salt
 import config
+from utils.auth import establish_session, revoke_session, is_developer_account_disabled
 import utils.operationLog as operationLog
 from datetime import datetime, timedelta
 
@@ -78,7 +79,8 @@ def permission_login():
                         permission,
                         first_login,
                         password_created_at,
-                        password_expire_at
+                        password_expire_at,
+                        username
                     FROM `{PERM_TABLE}`
                     WHERE username=:username
                     LIMIT 1
@@ -95,7 +97,11 @@ def permission_login():
                     "error":"Invalid username or password"
                 }),401
 
-            db_hash, salt, permission, first_login, created_at, expire_at = row
+            db_hash, salt, permission, first_login, created_at, expire_at, username = row
+            operatorName = username
+            if is_developer_account_disabled(username):
+                remark = "Developer account disabled by startup configuration"
+                return jsonify(ok=False, error="Invalid username or password"), 401
             password_warning = False
             password_expired = False
             password_days_left = None
@@ -167,6 +173,7 @@ def permission_login():
                     "error":"Invalid username or password"
                 }),401
 
+        csrf_token = establish_session(username, db_hash, salt)
         _result = operationLog.OperationResult.SUCCESS
 
         # return jsonify({
@@ -178,6 +185,7 @@ def permission_login():
         return jsonify({
             "ok": True,
             "db_status": 1,
+            "csrf_token": csrf_token,
             "username": username,
             "permission": int(permission),
             "first_login": int(first_login),
@@ -206,6 +214,18 @@ def permission_login():
             remark
         )
 
+@permission_bp.route("/permission/session", methods=["GET"])
+def permission_session():
+    return jsonify(ok=True, username=g.current_user["username"],
+                   permission=g.current_user["permission"], csrf_token=g.csrf_token)
+
+
+@permission_bp.route("/permission/logout", methods=["POST"])
+def permission_logout():
+    revoke_session()
+    return jsonify(ok=True)
+
+
 @permission_bp.route("/permission/delete", methods=["POST"])
 def permission_delete():
     """
@@ -216,7 +236,7 @@ def permission_delete():
         return jsonify({"ok": False, "error": f"Permission table initialization failed: {err}"}), 500
 
     data = request.get_json(force=True) or {}
-    operatorName = str(data.get("operatorName", "")).strip()
+    operatorName = g.current_user["username"]
     username = str(data.get("username", "")).strip()
     if not operatorName:
         return jsonify({"ok": False, "error": "Missing operatorName"}), 400
@@ -273,7 +293,7 @@ def permission_add():
         return jsonify({"ok": False, "error": f"Permission table initialization failed: {err}"}), 500
 
     data = request.get_json(force=True) or {}
-    operatorName = str(data.get("operatorName", "")).strip()
+    operatorName = g.current_user["username"]
     username = str(data.get("username", "")).strip()
     permission = data.get("permission")
 
@@ -396,7 +416,7 @@ def permission_update():
         return jsonify({"ok": False, "error": f"Permission table initialization failed: {err}"}), 500
 
     data = request.get_json(force=True) or {}
-    operatorName = str(data.get("operatorName", "")).strip()
+    operatorName = g.current_user["username"]
     username = str(data.get("username", "")).strip()
     if not operatorName:
         return jsonify({"ok": False, "error": "Missing operatorName"}), 400

@@ -5,7 +5,7 @@ root_path = Path(__file__).parent.parent
 sys.path.insert(0, str(root_path))
 from flask import request, jsonify, Flask
 from werkzeug.utils import secure_filename
-from config import FIXED_DEVICE_ID, READ_INPUT_REGISTER, UPGRADE_STATE_MAP
+from config import FIXED_DEVICE_ID, READ_INPUT_REGISTER, UPGRADE_STATE_MAP, HTTPS_ENABLE
 from config import STATUS_DIR, STATE_ERROR, remote_client_lock, HOST_IP
 from utils.utils import DPrint, now_str
 import constent.common as common
@@ -13,7 +13,8 @@ import utils.method as method
 from flask import Blueprint
 from flask_socketio import SocketIO
 import os, json
-from flask_cors import CORS
+from utils.auth import init_auth, authenticate_session
+from script.session_config import configure_session
 
 upgrade = Blueprint("upgrade", __name__)
 
@@ -553,6 +554,9 @@ def create_app():
     DPrint(f"静态前端目录: {static_folder_path}")
     DPrint(f"index.html 是否存在: {os.path.exists(os.path.join(static_folder_path, 'index.html'))}")
     app = Flask(__name__, static_folder=static_folder_path, static_url_path="/")
+    # 与主应用共享持久化密钥和数据库会话，认证不依赖 8000 服务存活。
+    configure_session(app)
+    init_auth(app)
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def serve_spa(path):
@@ -563,15 +567,25 @@ def create_app():
     return app
 
 app = create_app()
-CORS(app) 
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app)
 
 def main():
-    DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 升级监听程序 (0.0.0.0:9000)")
-    socketio.run(app, host='0.0.0.0', port=9000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
+    if HTTPS_ENABLE:
+        # 仅监听回环地址，由 Nginx 提供 HTTPS 入口。
+        socketio.run(app, host='127.0.0.1', port=9000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
+        DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 服务器 (127.0.0.1:9000)")
+    else:
+        socketio.run(app, host='0.0.0.0', port=9000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
+        DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 服务器 (0.0.0.0:9000)")
 
 @socketio.on('connect')
-def on_connect():
+def on_connect(auth=None):
+    try:
+        if not authenticate_session():
+            return False
+    except Exception:
+        app.logger.exception("SocketIO authentication failed")
+        return False
     DPrint(f"[{now_str()}] [SocketIO] 新客户端连接: {request.remote_addr}")
 
 if __name__ == '__main__':

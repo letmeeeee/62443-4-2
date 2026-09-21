@@ -1,7 +1,7 @@
 import io
 from unittest.mock import patch
 
-from flask import Flask
+from flask import Flask, g
 
 from routes import route_g3
 
@@ -9,6 +9,11 @@ from routes import route_g3
 def test_upload_upgrade_file_accepts_legacy_fields(tmp_path):
     app = Flask(__name__)
     app.register_blueprint(route_g3.g3_bp)
+
+    @app.before_request
+    def authenticated_user():
+        # This route unit test supplies the identity normally loaded by init_auth.
+        g.current_user = {"username": "admin", "permission": 4}
 
     route_g3.UPLOAD_DIR = tmp_path / "upload"
     route_g3.UPGRADE_PACKAGE_DIR = route_g3.UPLOAD_DIR / "packages"
