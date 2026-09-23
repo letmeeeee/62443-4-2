@@ -350,7 +350,7 @@ void* Bank_XIE_Read_Task(const char *arg) {
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->bms_ip[bms_num]);
         struct timeval time_out = {0, (200 * 1000)};
         // 创建本地客户端socket
-        if ((socket_Bank = Create_Client_Socket(server_addr, time_out)) == -1) {
+        if ((socket_Bank = Create_Modbus_Client_Socket(server_addr, time_out)) == -1) {
             LOG_INFO("BMS-%d Create read socket failure! ip:%s[port:%d]", bms_num, sys_cfg->bms_ip[bms_num], sys_cfg->bms_port[bms_num]);
             sleep(5);
             if(GET_INPUT(P2P_mode)==1)
@@ -489,7 +489,8 @@ void* Bank_XIE_Read_Task(const char *arg) {
             // BMS通讯异常
             if (read_recv_res < 0) {
                 LOG_INFO("BMS-%d: close the BMS read socket, after receive back data fault", bms_num);
-                close(socket_Bank);
+                Modbus_Close(socket_Bank);
+                socket_Bank = -1;
                 break;
             }
             // BMS通讯正常
@@ -505,7 +506,8 @@ void* Bank_XIE_Read_Task(const char *arg) {
                      bms_num, timeout_cnt);
                     //  Set_PCS_Comm(pcs_num, IsNoFault, FALSE);
 
-                    close(socket_Bank);
+                    Modbus_Close(socket_Bank);
+                    socket_Bank = -1;
                
                     break;
             }
@@ -516,12 +518,14 @@ void* Bank_XIE_Read_Task(const char *arg) {
                 // 多次timeout 或者 invalid data，已经判了超时
                 if (status == IsFault) {
                     LOG_INFO("BMS-%d: close the BMS socket, time out happen", bms_num);
-                    close(socket_Bank);
+                    Modbus_Close(socket_Bank);
+                    socket_Bank = -1;
                  
                     break;
                 } else if (status == IsWarn) { // 超时之前就做4次重选
                     LOG_INFO("BMS-%d: close the BMS socket, time warn happen", bms_num);
-                    close(socket_Bank);
+                    Modbus_Close(socket_Bank);
+                    socket_Bank = -1;
                     usleep(200 * 1000); // 此时间需要和Check_Dev_Timeout取余运算的除数对应，不可随便改
                
                     break;
@@ -536,7 +540,8 @@ void* Bank_XIE_Read_Task(const char *arg) {
             }
         }
     }
-    close(socket_Bank);
+    Modbus_Close(socket_Bank);
+    socket_Bank = -1;
     return;
 }
 void* Rank0_5_XIE_Read_Task(const char *arg) {
@@ -568,7 +573,7 @@ void* Rank0_5_XIE_Read_Task(const char *arg) {
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->bms_ip[bms_num]);
         struct timeval time_out = {0, (200 * 1000)};
         // 创建本地客户端socket
-        if ((socket_Rack0_5 = Create_Client_Socket(server_addr, time_out)) == -1) {
+        if ((socket_Rack0_5 = Create_Modbus_Client_Socket(server_addr, time_out)) == -1) {
             LOG_INFO("BMS-%d Create read socket failure! ip:%s[port:%d]", bms_num, sys_cfg->bms_ip[bms_num], sys_cfg->bms_port[bms_num]);
             sleep(5);
             continue;
@@ -697,7 +702,8 @@ void* Rank0_5_XIE_Read_Task(const char *arg) {
                 // BMS通讯异常
                 if (read_recv_res < 0) {
                     LOG_INFO("BMS-%d: close the BMS read socket, after receive back data fault", bms_num);
-                    close(socket_Rack0_5);
+                    Modbus_Close(socket_Rack0_5);
+                    socket_Rack0_5 = -1;
                     Task_Is_Over = 1;
                     break;
                 }
@@ -714,7 +720,8 @@ void* Rank0_5_XIE_Read_Task(const char *arg) {
                      bms_num, timeout_cnt);
                     //  Set_PCS_Comm(pcs_num, IsNoFault, FALSE);
 
-                    close(socket_Rack0_5);
+                    Modbus_Close(socket_Rack0_5);
+                    socket_Rack0_5 = -1;
                
                     break;
                  }
@@ -725,12 +732,14 @@ void* Rank0_5_XIE_Read_Task(const char *arg) {
                     // 多次timeout 或者 invalid data，已经判了超时
                     if (status == IsFault) {
                         LOG_INFO("BMS-%d: close the BMS socket, time out happen", bms_num);
-                        close(socket_Rack0_5);
+                        Modbus_Close(socket_Rack0_5);
+                        socket_Rack0_5 = -1;
                         Task_Is_Over = 1;
                         break;
                     } else if (status == IsWarn) { // 超时之前就做4次重选
                         LOG_INFO("BMS-%d: close the BMS socket, time warn happen", bms_num);
-                        close(socket_Rack0_5);
+                        Modbus_Close(socket_Rack0_5);
+                        socket_Rack0_5 = -1;
                         usleep(200 * 1000); // 此时间需要和Check_Dev_Timeout取余运算的除数对应，不可随便改
                         Task_Is_Over = 1;
                         break;
@@ -758,7 +767,8 @@ void* Rank0_5_XIE_Read_Task(const char *arg) {
         }
         }
     }
-    close(socket_Rack0_5);
+    Modbus_Close(socket_Rack0_5);
+    socket_Rack0_5 = -1;
     return;
 }
 //读取BMS的6~10簇信息
@@ -790,7 +800,7 @@ void* Rank6_10_XIE_Read_Task(const char *arg) {
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->bms_ip[bms_num]);
         struct timeval time_out = {0, (200 * 1000)};
         // 创建本地客户端socket
-        if ((socket_Rack6_10 = Create_Client_Socket(server_addr, time_out)) == -1)
+        if ((socket_Rack6_10 = Create_Modbus_Client_Socket(server_addr, time_out)) == -1)
         {
             LOG_INFO("BMS-%d Create read socket failure! ip:%s[port:%d]", bms_num, sys_cfg->bms_ip[bms_num], sys_cfg->bms_port[bms_num]);
             sleep(5);
@@ -937,7 +947,8 @@ void* Rank6_10_XIE_Read_Task(const char *arg) {
                 if (read_recv_res < 0)
                 {
                     LOG_INFO("BMS-%d: close the BMS read socket, after receive back data fault", bms_num);
-                    close(socket_Rack6_10);
+                    Modbus_Close(socket_Rack6_10);
+                    socket_Rack6_10 = -1;
 
                     Task_Is_Over = 1;
                     break;
@@ -956,7 +967,8 @@ void* Rank6_10_XIE_Read_Task(const char *arg) {
                      bms_num, timeout_cnt);
                     //  Set_PCS_Comm(pcs_num, IsNoFault, FALSE);
 
-                    close(socket_Rack6_10);
+                    Modbus_Close(socket_Rack6_10);
+                    socket_Rack6_10 = -1;
                
                     break;
                  }
@@ -969,7 +981,8 @@ void* Rank6_10_XIE_Read_Task(const char *arg) {
                     if (status == IsFault)
                     {
                         LOG_INFO("BMS-%d: close the BMS socket, time out happen", bms_num);
-                        close(socket_Rack6_10);
+                        Modbus_Close(socket_Rack6_10);
+                        socket_Rack6_10 = -1;
 
                         Task_Is_Over = 1;
                         break;
@@ -977,7 +990,8 @@ void* Rank6_10_XIE_Read_Task(const char *arg) {
                     else if (status == IsWarn) // 超时之前就做4次重选
                     {
                         LOG_INFO("BMS-%d: close the BMS socket, time warn happen", bms_num);
-                        close(socket_Rack6_10);
+                        Modbus_Close(socket_Rack6_10);
+                        socket_Rack6_10 = -1;
                         usleep(200 * 1000); // 此时间需要和Check_Dev_Timeout取余运算的除数对应，不可随便改
                         Task_Is_Over = 1;
                         break;
@@ -1007,7 +1021,8 @@ void* Rank6_10_XIE_Read_Task(const char *arg) {
 
         }
     }
-close(socket_Rack6_10);
+Modbus_Close(socket_Rack6_10);
+socket_Rack6_10 = -1;
 return;
 }
 }
@@ -1039,7 +1054,7 @@ void* Bank_XIE_HB_Task(const char *arg)
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->bms_ip[bms_num]);
 
         struct timeval time_out = {0, (200 * 1000)};
-        socket_Bank = Create_Client_Socket(server_addr, time_out);
+        socket_Bank = Create_Modbus_Client_Socket(server_addr, time_out);
         if (socket_Bank == -1){
             LOG_INFO("BMS-%d Create HB socket failure! ip:%s[port:%d]",
                      bms_num, sys_cfg->bms_ip[bms_num], sys_cfg->bms_port[bms_num]);
@@ -1064,7 +1079,8 @@ void* Bank_XIE_HB_Task(const char *arg)
         if (!hb_started) {
             if (hb_start(hb, socket_Bank, Bank_id,hb_thread) != 0){
                 LOG_INFO("BMS-%d: hb_start failed", bms_num);
-                close(socket_Bank);
+                Modbus_Close(socket_Bank);
+                socket_Bank = -1;
                 break; // 或者改为 continue 重试
             }
             hb_started = true;
@@ -1092,7 +1108,8 @@ void* Bank_XIE_HB_Task(const char *arg)
             if (bmscommstatus == IsFault)
                 {
                LOG_INFO("BMS-%d: close the BMS socket, time out happen", bms_num);
-                close(socket_Bank);
+                Modbus_Close(socket_Bank);
+                socket_Bank = -1;
                   break;
                 }
 

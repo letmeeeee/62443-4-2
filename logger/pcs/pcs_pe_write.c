@@ -195,7 +195,7 @@ void* Pcs_Pe_Write_Task(const char *arg) {
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->pcs_ip[pcs_num]);
         struct timeval time_out = {0, (200 * 1000)};
         // 创建本地客户端socket
-        if ((socket_Pcs[pcs_num] = Create_Client_Socket(server_addr, time_out)) == -1) {
+        if ((socket_Pcs[pcs_num] = Create_Modbus_Client_Socket(server_addr, time_out)) == -1) {
             LOG_INFO("PCS-%d Create write socket failure! ip:%s[port:%d]", pcs_num, sys_cfg->pcs_ip[pcs_num], sys_cfg->pcs_port[pcs_num]);
             sleep(5);
             continue;
@@ -245,7 +245,8 @@ void* Pcs_Pe_Write_Task(const char *arg) {
       
             if (read_recv_res < 0) {
                 LOG_INFO("PCS-%d: close the PCS read socket, after receive back data fault", pcs_num);
-                close(socket_Pcs[pcs_num]);
+                Modbus_Close(socket_Pcs[pcs_num]);
+                socket_Pcs[pcs_num] = -1;
 
                 break;
             }
@@ -258,12 +259,14 @@ void* Pcs_Pe_Write_Task(const char *arg) {
                 // 多次timeout 或者 invalid data，已经判了超时
                 if (status == IsFault) {
                     LOG_INFO("PCS-%d: close the PCS socket, time out happen", pcs_num);
-                    close(socket_Pcs[pcs_num]);
+                    Modbus_Close(socket_Pcs[pcs_num]);
+                    socket_Pcs[pcs_num] = -1;
 
                     break;
                 } else if (status == IsWarn) { // 超时之前就做4次重选
                     LOG_INFO("PCS-%d: close the PCS socket, time warn happen", pcs_num);
-                    close(socket_Pcs[pcs_num]);
+                    Modbus_Close(socket_Pcs[pcs_num]);
+                    socket_Pcs[pcs_num] = -1;
                     usleep(200 * 1000); // 此时间需要和Check_Dev_Timeout取余运算的除数对应，不可随便改
 
                     break;
@@ -274,6 +277,7 @@ void* Pcs_Pe_Write_Task(const char *arg) {
             }
     }
     }
-    close(socket_Pcs[pcs_num]);
+    Modbus_Close(socket_Pcs[pcs_num]);
+    socket_Pcs[pcs_num] = -1;
     return;
 }

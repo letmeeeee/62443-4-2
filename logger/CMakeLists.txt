@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
-project(tems C CXX)                              # 用 C 和 C++（最终链接走 C++）
 
 # === 交叉编译工具链 ===
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_C_COMPILER "/usr/bin/aarch64-linux-gnu-gcc")
 set(CMAKE_CXX_COMPILER "/usr/bin/aarch64-linux-gnu-g++")   # 让 g++ 负责最终链接
+set(CMAKE_SYSTEM_PROCESSOR aarch64)
+project(tems C CXX)
 
 # === 编译标准与选项 ===
 set(CMAKE_C_STANDARD 99)
@@ -24,6 +25,44 @@ elseif (EXISTS "${MYSQLIB_DIR}/include/mysql/mysql.h")
   set(MYSQL_INCLUDE_DIR "${MYSQLIB_DIR}/include/mysql")
 else()
   message(FATAL_ERROR "mysql.h not found under ${MYSQLIB_DIR}/include")
+endif()
+
+# Keep OpenSSL 1.1 target headers separate from host /usr/include.
+# An explicit SDK takes priority; otherwise use the reproducible local SDK.
+set(MODBUS_OPENSSL_INCLUDE_DIR "" CACHE PATH "Target OpenSSL 1.1 include directory")
+set(_modbus_openssl_include "${MODBUS_OPENSSL_INCLUDE_DIR}")
+if(NOT _modbus_openssl_include AND
+   EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.deps/openssl-arm64/include/openssl/ssl.h")
+  set(_modbus_openssl_include "${CMAKE_CURRENT_SOURCE_DIR}/.deps/openssl-arm64/include")
+endif()
+if(_modbus_openssl_include)
+  include_directories(BEFORE "${_modbus_openssl_include}")
+  message(STATUS "Modbus target OpenSSL headers: ${_modbus_openssl_include}")
+endif()
+
+# Fail at configure time with an actionable message. In plaintext builds no
+# OpenSSL headers are needed by the transport; honor its actual compile macro.
+include(CheckCSourceCompiles)
+set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+if(_modbus_openssl_include)
+  list(PREPEND CMAKE_REQUIRED_INCLUDES "${_modbus_openssl_include}")
+endif()
+unset(MODBUS_OPENSSL_HEADERS_OK CACHE)
+check_c_source_compiles("
+#include <openssl/ssl.h>
+#include <openssl/opensslv.h>
+#if OPENSSL_VERSION_NUMBER < 0x10101000L || OPENSSL_VERSION_NUMBER >= 0x10200000L
+#error Expected target OpenSSL 1.1.1 headers for libssl.so.1.1
+#endif
+int main(void) { return 0; }
+" MODBUS_OPENSSL_HEADERS_OK)
+unset(CMAKE_REQUIRED_INCLUDES)
+if(NOT MODBUS_OPENSSL_HEADERS_OK)
+  message(FATAL_ERROR
+    "Missing/incompatible AArch64 OpenSSL 1.1.1 headers. Run: "
+    "sh ${CMAKE_CURRENT_SOURCE_DIR}/scripts/prepare_openssl_headers.sh ; "
+    "then rerun cmake. Or set MODBUS_OPENSSL_INCLUDE_DIR to a complete target SDK include directory. "
+    "Do not add /usr/include/x86_64-linux-gnu for an AArch64 build.")
 endif()
 
 # === 头文件搜索路径 ===

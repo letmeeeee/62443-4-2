@@ -234,6 +234,7 @@ typedef struct {
     unsigned int  dbHoldDays; //
     unsigned int  dbSaveTime;
     unsigned int  reactiverate;
+    unsigned int  modbus_tls_enabled;
 
 //[BMS_NETWORK]
     INT32U  bms_brand[MAX_BMS_NUM];                   //BMS型号

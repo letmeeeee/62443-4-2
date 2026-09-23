@@ -155,7 +155,7 @@ void DIDO_E1214_Task(INT8U dido_num)
         struct timeval time_out = {0, (400 * 1000)};
 
         //创建本地客户端socket
-        if ((socket_fd = Create_Client_Socket(server_addr, time_out)) == -1) 
+        if ((socket_fd = Create_Modbus_Client_Socket(server_addr, time_out)) == -1)
         {
             connect_cnt=connect_cnt<=LOG_PRINTF_CNT? connect_cnt+1 : connect_cnt;        //小于12自增
             if(connect_cnt<=LOG_PRINTF_CNT)
@@ -196,7 +196,8 @@ void DIDO_E1214_Task(INT8U dido_num)
                 //DIDO通讯异常或超时
                 if ((recv_bytes < 0) || ((recv_bytes == 0) && (Get_DIDO_Comm(dido_num) == IsFault))) {
                     LOG_INFO("DIDO-%d: close the DIDO socket, after receive back data fault:%d", dido_num, recv_bytes);
-                    close(socket_fd);
+                    Modbus_Close(socket_fd);
+                    socket_fd = -1;
                     sleep(1);
                     break;
                 }
@@ -206,6 +207,7 @@ void DIDO_E1214_Task(INT8U dido_num)
         }
     } //loop connect
 
-    close(socket_fd);
+    Modbus_Close(socket_fd);
+    socket_fd = -1;
     return;
 }

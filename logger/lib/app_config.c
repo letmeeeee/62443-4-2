@@ -256,6 +256,15 @@ static int System_parsing(sysPara* pconfig, const char* section, const char* nam
     {
         pconfig->reactiverate = atoi(value);
     }     
+    else if (MATCH("SYSTEM", "modbus_tls_enabled"))
+    {
+        if (strcmp(value, "1") == 0)
+            pconfig->modbus_tls_enabled = 1;
+        else if (strcmp(value, "0") == 0)
+            pconfig->modbus_tls_enabled = 0;
+        else
+            pconfig->modbus_tls_enabled = 0;
+    }
     //所有系统项都没匹配成功
     else
     {

@@ -185,7 +185,7 @@ void* Bank_XIE_Write_Task(const char *arg) {
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->bms_ip[bms_num]);
         struct timeval time_out = {0, (200 * 1000)};
         // 创建本地客户端socket
-        if ((socket_Bank[bms_num] = Create_Client_Socket(server_addr, time_out)) == -1) {
+        if ((socket_Bank[bms_num] = Create_Modbus_Client_Socket(server_addr, time_out)) == -1) {
             LOG_INFO("BMS-%d Create write socket failure! ip:%s[port:%d]", bms_num, sys_cfg->bms_ip[bms_num], sys_cfg->bms_port[bms_num]);
             sleep(5);
             continue;
@@ -234,7 +234,8 @@ void* Bank_XIE_Write_Task(const char *arg) {
             // BMS通讯异常
             if (read_recv_res < 0) {
                 LOG_INFO("BMS-%d: close the BMS read socket, after receive back data fault", bms_num);
-                close(socket_Bank[bms_num]);
+                Modbus_Close(socket_Bank[bms_num]);
+                socket_Bank[bms_num] = -1;
                 Task_Is_Over = 1;
                 break;
             }
@@ -246,12 +247,14 @@ void* Bank_XIE_Write_Task(const char *arg) {
                 // 多次timeout 或者 invalid data，已经判了超时
                 if (status == IsFault) {
                     LOG_INFO("BMS-%d: close the BMS socket, time out happen", bms_num);
-                    close(socket_Bank[bms_num]);
+                    Modbus_Close(socket_Bank[bms_num]);
+                    socket_Bank[bms_num] = -1;
                     Task_Is_Over = 1;
                     break;
                 } else if (status == IsWarn) { // 超时之前就做4次重选
                     LOG_INFO("BMS-%d: close the BMS socket, time warn happen", bms_num);
-                    close(socket_Bank[bms_num]);
+                    Modbus_Close(socket_Bank[bms_num]);
+                    socket_Bank[bms_num] = -1;
                     usleep(200 * 1000); // 此时间需要和Check_Dev_Timeout取余运算的除数对应，不可随便改
                     Task_Is_Over = 1;
                     break;
@@ -264,6 +267,7 @@ void* Bank_XIE_Write_Task(const char *arg) {
             }
         }
     }
-    close(socket_Bank[bms_num]);
+    Modbus_Close(socket_Bank[bms_num]);
+    socket_Bank[bms_num] = -1;
     return;
 }

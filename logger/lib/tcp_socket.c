@@ -67,6 +67,17 @@ int Create_Client_Socket(struct sockaddr_in server_addr, struct timeval time_out
     return socket_fd;
 }
 
+int Create_Modbus_Client_Socket(struct sockaddr_in server_addr, struct timeval time_out)
+{
+    int fd = Create_Client_Socket(server_addr, time_out);
+    if (fd >= 0 && Modbus_Client_Attach(fd) < 0) {
+        LOG_INFO("Modbus client TLS handshake/configuration failed fd:%d", fd);
+        close(fd);
+        return -1;
+    }
+    return fd;
+}
+
 int Create_Server_Socket(in_port_t sin_port, int connections)
 {
     // 初始化socket
@@ -244,7 +255,11 @@ int Recv_Modbus_Back(int socket_fd, int dev_num, int recv_size, DATA_PROCESS han
 
     // 接收返回数据
     memset((char *)recv_buf, 0, sizeof(recv_buf));
-    recv_bytes = recv(socket_fd, recv_buf, recv_size, 0);
+    if (recv_size <= 0 || recv_size > (int)sizeof(recv_buf)) {
+        errno = EINVAL;
+        return -2;
+    }
+    recv_bytes = Modbus_Recv(socket_fd, recv_buf, (size_t)recv_size);
 
     // 接收数据异常
     if (((recv_bytes < 0) && (errno != EAGAIN)) || (recv_bytes == 0))
@@ -288,7 +303,11 @@ int Recv_Modbus_Timer(int socket_fd, int dev_num, int recv_size, DATA_PROCESS ha
 
     // 接收返回数据
     memset((char *)recv_buf, 0, sizeof(recv_buf));
-    recv_bytes = recv(socket_fd, recv_buf, recv_size, 0);
+    if (recv_size <= 0 || recv_size > (int)sizeof(recv_buf)) {
+        errno = EINVAL;
+        return -2;
+    }
+    recv_bytes = Modbus_Recv(socket_fd, recv_buf, (size_t)recv_size);
 
     // 接收数据异常
     if (((recv_bytes < 0) && (errno != EAGAIN)) || (recv_bytes == 0))

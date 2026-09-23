@@ -695,7 +695,7 @@ void* Pcs_Taida_Write_Task(void *arg)
         struct timeval time_out = {0, (2 * 1000)};
 
         // 创建本地客户端socket
-        if ((socket_Taida_Pcs[pcs_num] = Create_Client_Socket(server_addr, time_out)) == -1) {
+        if ((socket_Taida_Pcs[pcs_num] = Create_Modbus_Client_Socket(server_addr, time_out)) == -1) {
             LOG_INFO("PCS-%d Create write socket failure! ip:%s[port:%d]",
                     pcs_num, sys_cfg->pcs_ip[pcs_num], sys_cfg->pcs_port[pcs_num]);
             sleep(5);
@@ -785,7 +785,8 @@ void* Pcs_Taida_Write_Task(void *arg)
         if (socket_Heart_Pcs[pcs_num]==-1)  
                 {
                     LOG_INFO("PCS-%d:其他套接字故障 ", pcs_num);
-                    close(socket_Taida_Pcs[pcs_num]);
+                    Modbus_Close(socket_Taida_Pcs[pcs_num]);
+                    socket_Taida_Pcs[pcs_num] = -1;
                     LOG_INFO("PCS-%d: 连接异常，断开服务端连接 ", pcs_num);
                     break;
                 }
@@ -810,7 +811,8 @@ void* Pcs_Taida_Write_Task(void *arg)
         }
     
     }  
-    close(socket_Taida_Pcs[pcs_num]);
+    Modbus_Close(socket_Taida_Pcs[pcs_num]);
+    socket_Taida_Pcs[pcs_num] = -1;
     return NULL;
 }
 
@@ -6022,7 +6024,7 @@ sysPara *sys_cfg = SysConf_GetInfo();
         struct timeval time_out = {0, (400 * 1000)};
 
         // 创建本地客户端socket
-        if ((socket_Heart_Pcs[pcs_num] = Create_Client_Socket(server_addr, time_out)) == -1) {
+        if ((socket_Heart_Pcs[pcs_num] = Create_Modbus_Client_Socket(server_addr, time_out)) == -1) {
             LOG_INFO("PCS-%d Create hb socket failure! ip:%s[port:%d]",
                     pcs_num, sys_cfg->pcs_ip[pcs_num], sys_cfg->pcs_port[pcs_num]);
             sleep(5);
@@ -6098,13 +6100,15 @@ while (1) {
                                                 PCS_BUFF_LEN,
                                                 PCS_Taida_Write_Heart_DataProcess);
             if (numbytes < 0) {
-                close(socket_Heart_Pcs[pcs_num]);
+                Modbus_Close(socket_Heart_Pcs[pcs_num]);
+                socket_Heart_Pcs[pcs_num] = -1;
                 socket_Heart_Pcs[pcs_num]=-1;
                 break;
             } else if (numbytes == 0) {
                 timeout_cnt++;
                 if (timeout_cnt >= 75) {
-                    close(socket_Heart_Pcs[pcs_num]);
+                    Modbus_Close(socket_Heart_Pcs[pcs_num]);
+                    socket_Heart_Pcs[pcs_num] = -1;
                     socket_Heart_Pcs[pcs_num]=-1;
                     break;
                 }

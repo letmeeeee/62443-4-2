@@ -285,26 +285,35 @@ void ETH_MEASURE_Task(const char *_item)
         if (setsockopt(Sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&rec_TimeOut, sizeof(rec_TimeOut)) == -1)
         {
             printf("MEASURE-ETH:setsockopt SO_SNDTIMEO failed!\n");
-            close(Sockfd);
+            Modbus_Close(Sockfd);
+            Sockfd = -1;
             sleep(1);
             continue;
         }
         if (setsockopt(Sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&rec_TimeOut, sizeof(rec_TimeOut)) == -1)
         {
             printf("MEASURE-ETH:setsockopt SO_RCVTIMEO failed!\n");
-            close(Sockfd);
+            Modbus_Close(Sockfd);
+            Sockfd = -1;
             sleep(1);
             continue;
         }
         if (connect(Sockfd, (struct sockaddr *)(&server_addr), sizeof(struct sockaddr)) == -1)
         {
             // LOG_INFO("MEASURE-ETH: Connect fail!");
-            close(Sockfd); //关闭客户端
+            Modbus_Close(Sockfd);
+            Sockfd = -1; //关闭客户端
             sleep(1);
             continue;
         }
         else
         {
+            if (Modbus_Client_Attach(Sockfd) < 0) {
+                Modbus_Close(Sockfd);
+                Sockfd = -1;
+                sleep(1);
+                continue;
+            }
             LOG_INFO("MEASURE->ETH-%d: Connect SUCCESS ", measure_num);
             Set_MEASU_Comm(measure_num, IsNoFault);
             Loop = 0;
@@ -331,7 +340,7 @@ void ETH_MEASURE_Task(const char *_item)
                 }
 
                 memset((char *)ReceBuf, 0, sizeof(ReceBuf));
-                numbytes = recv(Sockfd, ReceBuf, 64, 0);
+                numbytes = Modbus_Recv(Sockfd, ReceBuf, sizeof(ReceBuf));
                 if (((numbytes < 0) && (errno != EAGAIN)) || (numbytes == 0))
                 {
                     if (numbytes == 0) //连接关闭
@@ -344,7 +353,8 @@ void ETH_MEASURE_Task(const char *_item)
                         LOG_INFO("MEASURE->ETH-%d: Other socket fault! ", measure_num);
                     }
 
-                    close(Sockfd);
+                    Modbus_Close(Sockfd);
+                    Sockfd = -1;
                     LOG_INFO("MEASURE->ETH-%d: CLose the di socket 1", measure_num);
                     break;
                 }
@@ -359,7 +369,8 @@ void ETH_MEASURE_Task(const char *_item)
                 }
                 if (Get_MEASU_Comm(measure_num)) //多次timeout 或者 invalid data，已经判了超时
                 {
-                    close(Sockfd);
+                    Modbus_Close(Sockfd);
+                    Sockfd = -1;
                     LOG_INFO("MEASURE->ETH-%d：close the di socket 2", measure_num);
                     sleep(1);
                     break;
@@ -369,6 +380,7 @@ void ETH_MEASURE_Task(const char *_item)
         }
     } // while(1)
 
-    close(Sockfd);
+    Modbus_Close(Sockfd);
+    Sockfd = -1;
     return;
 }

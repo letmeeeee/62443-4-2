@@ -176,7 +176,7 @@ void PCS_PE_Task(const char *arg)
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->pcs_ip[pcs_num]);
         struct timeval time_out = {0, (400 * 1000)};
         //创建本地客户端socket
-        if ((socket_fd = Create_Client_Socket(server_addr, time_out)) == -1)
+        if ((socket_fd = Create_Modbus_Client_Socket(server_addr, time_out)) == -1)
         {
             connect_cnt=connect_cnt<=LOG_PRINTF_CNT? connect_cnt+1 : connect_cnt;        //小于12自增
             if(connect_cnt<=LOG_PRINTF_CNT)
@@ -319,7 +319,8 @@ void PCS_PE_Task(const char *arg)
                         LOG_INFO("PCS-%d:其他套接字故障 ", pcs_num);
                    
 
-                    close(socket_fd);
+                    Modbus_Close(socket_fd);
+                    socket_fd = -1;
                     LOG_INFO("PCS-%d: 连接异常，断开服务端连接 ", pcs_num);
                     break;
                 }
@@ -330,7 +331,8 @@ void PCS_PE_Task(const char *arg)
                 }
                 if (Get_PCS_Comm(pcs_num) == 1) //多次timeout 或者 invalid data，已经判了超时
                 {
-                    close(socket_fd);
+                    Modbus_Close(socket_fd);
+                    socket_fd = -1;
                     LOG_INFO("PCS-%d: 通讯异常，断开服务端连接 ", pcs_num);
                     break;
                 }
@@ -341,6 +343,7 @@ void PCS_PE_Task(const char *arg)
 
     } //loop connect
 
-    close(socket_fd);
+    Modbus_Close(socket_fd);
+    socket_fd = -1;
     return;
 }

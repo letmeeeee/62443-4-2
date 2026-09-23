@@ -119,7 +119,7 @@ void Modbus_TCP_Read(int socket_fd, INT8U device_id, INT8U cmd_type, INT16U star
     SendBuffer[11] = len.D8[0];
 
     //发送
-    write_flag=write(socket_fd, SendBuffer, 12);
+    write_flag=Modbus_Send(socket_fd, SendBuffer, 12);
 //    LOG_INFO("socket_fd:%d,device_id:%d,cmd_type:%d,start_addr:%d,length:%d",socket_fd,device_id,cmd_type,start_addr,length);
     if(write_flag==-1)
     {
@@ -201,7 +201,7 @@ void Modbus_TCP_Write_Single(int socket_fd, INT8U device_id, INT8U cmd_type, INT
         LOG_INFO("putdown active power to PCS, addr:%d,value:%d", addr.D16, val.D16);
     }
 //    led_on();
-    write(socket_fd, SendBuffer, 12);
+    Modbus_Send(socket_fd, SendBuffer, 12);
   //led_off();
     //LOG_INFO("socket_fd:%d,device_id:%d,cmd_type:%d,start_addr:%d,value:%d",socket_fd,device_id,cmd_type,start_addr,value);
     //  LOG_INFO("LC send is %s",SendBuffer);
@@ -251,7 +251,7 @@ void Modbus_TCP_Write_Heart(int socket_fd, INT8U device_id, INT8U cmd_type, INT1
     SendBuffer[11] = val.D8[0];
 
     //发送
-    write(socket_fd, SendBuffer, 12);
+    Modbus_Send(socket_fd, SendBuffer, 12);
     //LOG_INFO("socket_fd:%d,device_id:%d,cmd_type:%d,start_addr:%d,value:%d",socket_fd,device_id,cmd_type,start_addr,value);
     //  LOG_INFO("LC send is %s",SendBuffer);
     memset(LogStr, 0, sizeof(LogStr));
@@ -315,7 +315,7 @@ void Modbus_TCP_Write_Multiple(int socket_fd, INT8U device_id, INT16U start_addr
     }
 
     //发送
-    write(socket_fd, SendBuffer, (length * 2 + 13));
+    Modbus_Send(socket_fd, SendBuffer, (length * 2 + 13));
     //在服务器断开链接时，防止程序中断
         memset(LogStr, 0, sizeof(LogStr));
     for (j = 0; (j < sizeof(LogStr)) && (j < 40); j++)
@@ -380,7 +380,7 @@ void Modbus_TCP_Write_MultipleCoil(int socket_fd, INT8U device_id, INT16U start_
     }
 
     // 发送
-    write(socket_fd, SendBuffer, (exlen + 13));
+    Modbus_Send(socket_fd, SendBuffer, (exlen + 13));
     // 在服务器断开链接时，防止程序中断
     signal(SIGPIPE, SIG_IGN);
     // 命令下发后延迟读取

@@ -416,7 +416,7 @@ void* Bank_G2pro_Read_Task(const char *arg) {
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->bms_ip[bms_num]);
         struct timeval time_out = {0, (400 * 1000)};
         // 创建本地客户端socket
-        if ((socket_Bank = Create_Client_Socket(server_addr, time_out)) == -1) {
+        if ((socket_Bank = Create_Modbus_Client_Socket(server_addr, time_out)) == -1) {
             LOG_INFO("BMS-%d Create read socket failure! ip:%s[port:%d]", bms_num, sys_cfg->bms_ip[bms_num], sys_cfg->bms_port[bms_num]);
             sleep(5);
             if(GET_INPUT(P2P_mode)==1)
@@ -565,7 +565,8 @@ void* Bank_G2pro_Read_Task(const char *arg) {
             // BMS通讯异常
             if (read_recv_res < 0) {
                 LOG_INFO("BMS-%d: close the BMS read socket, after receive back data fault", bms_num);
-                close(socket_Bank);
+                Modbus_Close(socket_Bank);
+                socket_Bank = -1;
                 break;
             }
             else if (read_recv_res == 0) {
@@ -574,7 +575,8 @@ void* Bank_G2pro_Read_Task(const char *arg) {
                    if (timeout_cnt >= 75) {   
                      LOG_INFO("BMS-%d: 连续超时次数过多(%d)，认为通讯异常，准备重连", 
                      bms_num, timeout_cnt);
-                    close(socket_Bank);
+                    Modbus_Close(socket_Bank);
+                    socket_Bank = -1;
                
                     break;
             }
@@ -589,12 +591,14 @@ void* Bank_G2pro_Read_Task(const char *arg) {
                 // 多次timeout 或者 invalid data，已经判了超时
                 if (status == IsFault) {
                     LOG_INFO("BMS-%d: close the BMS socket, time out happen", bms_num);
-                    close(socket_Bank);
+                    Modbus_Close(socket_Bank);
+                    socket_Bank = -1;
                  
                     break;
                 } else if (status == IsWarn) { // 超时之前就做4次重选
                     LOG_INFO("BMS-%d: close the BMS socket, time warn happen", bms_num);
-                    close(socket_Bank);
+                    Modbus_Close(socket_Bank);
+                    socket_Bank = -1;
                     usleep(200 * 1000); // 此时间需要和Check_Dev_Timeout取余运算的除数对应，不可随便改
                
                     break;
@@ -609,7 +613,8 @@ void* Bank_G2pro_Read_Task(const char *arg) {
             }
         }
     }
-    close(socket_Bank);
+    Modbus_Close(socket_Bank);
+    socket_Bank = -1;
     return;
 }
 void* Rank1_6_G2pro_Read_Task(const char *arg) {
@@ -638,7 +643,7 @@ void* Rank1_6_G2pro_Read_Task(const char *arg) {
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->bms_ip[bms_num]);
         struct timeval time_out = {0, (400 * 1000)};
         // 创建本地客户端socket
-        if ((socket_Rack1_6 = Create_Client_Socket(server_addr, time_out)) == -1) {
+        if ((socket_Rack1_6 = Create_Modbus_Client_Socket(server_addr, time_out)) == -1) {
             LOG_INFO("BMS-%d Create read socket failure! ip:%s[port:%d]", bms_num, sys_cfg->bms_ip[bms_num], sys_cfg->bms_port[bms_num]);
             sleep(5);
             continue;
@@ -801,7 +806,8 @@ void* Rank1_6_G2pro_Read_Task(const char *arg) {
                 // BMS通讯异常
                 if (read_recv_res < 0) {
                     LOG_INFO("BMS-%d: close the BMS read socket, after receive back data fault", bms_num);
-                    close(socket_Rack1_6);
+                    Modbus_Close(socket_Rack1_6);
+                    socket_Rack1_6 = -1;
                     Task_Is_Over = 1;
                     break;
                 }
@@ -818,7 +824,8 @@ void* Rank1_6_G2pro_Read_Task(const char *arg) {
                      bms_num, timeout_cnt);
                     //  Set_PCS_Comm(pcs_num, IsNoFault, FALSE);
 
-                    close(socket_Rack1_6);
+                    Modbus_Close(socket_Rack1_6);
+                    socket_Rack1_6 = -1;
                
                     break;
                     }
@@ -829,12 +836,14 @@ void* Rank1_6_G2pro_Read_Task(const char *arg) {
                     // 多次timeout 或者 invalid data，已经判了超时
                     if (status == IsFault) {
                         LOG_INFO("BMS-%d: close the BMS socket, time out happen", bms_num);
-                        close(socket_Rack1_6);
+                        Modbus_Close(socket_Rack1_6);
+                        socket_Rack1_6 = -1;
                         Task_Is_Over = 1;
                         break;
                     } else if (status == IsWarn) { // 超时之前就做4次重选
                         LOG_INFO("BMS-%d: close the BMS socket, time warn happen", bms_num);
-                        close(socket_Rack1_6);
+                        Modbus_Close(socket_Rack1_6);
+                        socket_Rack1_6 = -1;
                         usleep(200 * 1000); // 此时间需要和Check_Dev_Timeout取余运算的除数对应，不可随便改
                         Task_Is_Over = 1;
                         break;
@@ -862,7 +871,8 @@ void* Rank1_6_G2pro_Read_Task(const char *arg) {
         }
         }
     }
-    close(socket_Rack1_6);
+    Modbus_Close(socket_Rack1_6);
+    socket_Rack1_6 = -1;
     return;
 }
 //读取BMS的6~10簇信息
@@ -894,7 +904,7 @@ void* Rank7_12_G2pro_Read_Task(const char *arg) {
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->bms_ip[bms_num]);
         struct timeval time_out = {0, (400 * 1000)};
         // 创建本地客户端socket
-        if ((socket_Rack7_12 = Create_Client_Socket(server_addr, time_out)) == -1)
+        if ((socket_Rack7_12 = Create_Modbus_Client_Socket(server_addr, time_out)) == -1)
         {
             LOG_INFO("BMS-%d Create read socket failure! ip:%s[port:%d]", bms_num, sys_cfg->bms_ip[bms_num], sys_cfg->bms_port[bms_num]);
             sleep(5);
@@ -1067,7 +1077,8 @@ void* Rank7_12_G2pro_Read_Task(const char *arg) {
                 if (read_recv_res < 0)
                 {
                     LOG_INFO("BMS-%d: close the BMS read socket, after receive back data fault", bms_num);
-                    close(socket_Rack7_12);
+                    Modbus_Close(socket_Rack7_12);
+                    socket_Rack7_12 = -1;
 
                     Task_Is_Over = 1;
                     break;
@@ -1087,7 +1098,8 @@ void* Rank7_12_G2pro_Read_Task(const char *arg) {
                     if (status == IsFault)
                     {
                         LOG_INFO("BMS-%d: close the BMS socket, time out happen", bms_num);
-                        close(socket_Rack7_12);
+                        Modbus_Close(socket_Rack7_12);
+                        socket_Rack7_12 = -1;
 
                         Task_Is_Over = 1;
                         break;
@@ -1095,7 +1107,8 @@ void* Rank7_12_G2pro_Read_Task(const char *arg) {
                     else if (status == IsWarn) // 超时之前就做4次重选
                     {
                         LOG_INFO("BMS-%d: close the BMS socket, time warn happen", bms_num);
-                        close(socket_Rack7_12);
+                        Modbus_Close(socket_Rack7_12);
+                        socket_Rack7_12 = -1;
                         usleep(200 * 1000); // 此时间需要和Check_Dev_Timeout取余运算的除数对应，不可随便改
                         Task_Is_Over = 1;
                         break;
@@ -1125,7 +1138,8 @@ void* Rank7_12_G2pro_Read_Task(const char *arg) {
 
         }
     }
-close(socket_Rack7_12);
+Modbus_Close(socket_Rack7_12);
+socket_Rack7_12 = -1;
 return;
 }
 }
@@ -1157,7 +1171,7 @@ void* Bank_G2pro_HB_Task(const char *arg)
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->bms_ip[bms_num]);
 
         struct timeval time_out = {0, (200 * 1000)};
-        socket_Bank = Create_Client_Socket(server_addr, time_out);
+        socket_Bank = Create_Modbus_Client_Socket(server_addr, time_out);
         if (socket_Bank == -1){
             LOG_INFO("BMS-%d Create HB socket failure! ip:%s[port:%d]",
                      bms_num, sys_cfg->bms_ip[bms_num], sys_cfg->bms_port[bms_num]);
@@ -1182,7 +1196,8 @@ void* Bank_G2pro_HB_Task(const char *arg)
         if (!hb_started) {
             if (hb_start(hb, socket_Bank, Bank_id,hb_thread) != 0){
                 LOG_INFO("BMS-%d: hb_start failed", bms_num);
-                close(socket_Bank);
+                Modbus_Close(socket_Bank);
+                socket_Bank = -1;
                 break; // 或者改为 continue 重试
             }
             hb_started = true;

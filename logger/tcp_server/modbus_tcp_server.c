@@ -58,7 +58,6 @@ static pthread_mutex_t g_ems_client_mutex = PTHREAD_MUTEX_INITIALIZER;//用于�
 
 static INT32U g_ems_client_num = 0;//用于记录客户端的个数
 
-static INT32U g_ems_connect_time = 0;//用于记录客户端连接的时间
 int16_t calcReactivePower(int16_t activePower,
                           int16_t powerFactor);
 /**
@@ -147,13 +146,11 @@ INT16U PCSnum_calculate(INT16U address)
 
 static void EMS_Close_Client(int fd)
 {
-    // 如果文件描述符有效（大于0），则关闭连接
-    if (fd > 0)
+    // fd=0 也是有效描述符；同时释放 TLS 会话
+    if (fd >= 0)
     {
         // 关闭TCP连接，关闭读写双向通道
-        shutdown(fd, SHUT_RDWR);
-        // 关闭文件描述符
-        close(fd);
+        Modbus_Close(fd);
     }
 
     // 加锁，保护共享资源g_ems_client_num
@@ -181,8 +178,8 @@ static void EMS_Close_Client(int fd)
 * 包括读取保持寄存器(0x03)、读取输入寄存器(0x04)、写多个寄存器(0x10)和
 * 写单个寄存器(0x06)等功能。同时处理系统时间同步、PCS/BMS控制等逻辑。
 * @note 该函数会处理以下特殊字符序列：\t(制表符)、\r(回车)、\n(换行)
-* @note 线程内部维护了连接数统计(connect_num)和连接ID最小值(connect_ID_min)
-* @note 超时时间设置为20ms，长时间无数据(约600s)会自动关闭连接
+* @note TLS 握手在本线程进行；连接数在 accept 阶段限制
+* @note 接收轮询超时为5ms；TLS握手和不完整帧具有独立截止时间
 * @note 最大支持MAX_CLIENT_NUM个客户端同时连接
 */
 
@@ -190,17 +187,9 @@ static void* Server_Handle_Data(void *arg)
 {
 
     ClientCtx *ctx = (ClientCtx*)arg;
-    const INT16U new_fd_thread = ctx ? ctx->fd : -1;
+    const int new_fd_thread = ctx ? ctx->fd : -1;
     free(ctx),
     ctx = NULL;
-
-    static INT16U volatile connect_num = 0; // 统计链接的客户端数量
-
-    static INT16U volatile connect_time = 0;          // 统计链接的客户端总次数
-
-    static INT16U volatile connect_ID_min = UINT_MAX; // 链接的最小序号
-
-    static INT16U volatile connect_ID_max = 0; // 链接的最大序号
 
     ssize_t numbytes;//接收数据长度
 
@@ -232,6 +221,7 @@ static void* Server_Handle_Data(void *arg)
     INT16S EMS_Power_Input[4] = {0};
     struct timeval rec_timeout;
     sysPara* sys_cfg = SysConf_GetInfo();
+    INT8U modbus_tls_enabled = sys_cfg->modbus_tls_enabled;
 
     INT16U pcsnum = 0;
     Set_EMS_Comm(0, IsNoFault, TRUE);    // EMS通讯正常,全部通信链接均判断正常
@@ -251,55 +241,28 @@ static void* Server_Handle_Data(void *arg)
     if (setsockopt(new_fd_thread, SOL_SOCKET, SO_RCVTIMEO, (char *)&rec_timeout, sizeof(rec_timeout)) == -1)
     {
         LOG_INFO("EMS Set socket property failed, SO_RCVTIMEO: %s *Reason: EMS server (fd:%d) ", strerror(errno), new_fd_thread);
-        if (new_fd_thread > 0)
+        if (new_fd_thread >= 0)
         {
-            close(new_fd_thread);
+            EMS_Close_Client(new_fd_thread);
         }
-        return;
+        return NULL;
     }
 
-    // 1. 规范强转类型 + 分配内存
-
-    INT16U *pTimeCnt = (INT16U *)malloc(sizeof(INT16U));
-
-    INT32U   *pConnectID = (INT32U *)malloc(sizeof(INT32U));
-    // 2. 单独判断 + 安全释放（核心修复）
-    if (pTimeCnt == NULL || pConnectID == NULL)
-    {
-        if (new_fd_thread > 0)
-        {
-            close(new_fd_thread);
-        }
-        // 只释放 成功分配 的指针，避免崩溃
-        if (pTimeCnt != NULL) {
-            free(pTimeCnt);
-            pTimeCnt = NULL;  // 释放后置空
-        }
-        if (pConnectID != NULL) {
-            free(pConnectID);
-            pConnectID = NULL;
-        }
-        // 生产环境建议加错误日志
-        LOG_INFO("malloc failed");  // 打印系统级错误原因
-        return;
+    if (new_fd_thread < 0 || Modbus_Server_Attach(new_fd_thread) < 0) {
+        LOG_INFO("EMS TLS handshake/client certificate verification failed fd:%d", new_fd_thread);
+        if (new_fd_thread >= 0) EMS_Close_Client(new_fd_thread);
+        return NULL;
     }
-    *pTimeCnt = 0;
-    connect_num++;
-    connect_time++;
-    *pConnectID = connect_time;
-    connect_ID_max  = *pConnectID;  // 记录最新序号
-    LOG_INFO("EMS Client[%d] new connect success! (fd:%d) ", connect_num, new_fd_thread);
+
+    INT16U time_count = 0;
+    INT16U *pTimeCnt = &time_count;
+    LOG_INFO("EMS connection ready fd:%d TLS enable:%d", new_fd_thread, modbus_tls_enabled);
     while (1)
     {
-        if ((*pConnectID) < connect_ID_min)
-        {
-            connect_ID_min = (*pConnectID);
-        }
-
         // 收信
         memset(buffer, 0, sizeof(buffer));
         memset(sendbuffer, 0, sizeof(sendbuffer));
-        numbytes = recv(new_fd_thread, buffer, TCP_SERVER_RECV_LEN, 0);
+        numbytes = Modbus_Recv(new_fd_thread, buffer, sizeof(buffer));
         // 接收错误
         if (((numbytes < 0) && (errno != EAGAIN)) || (numbytes == 0))
         {
@@ -314,12 +277,6 @@ static void* Server_Handle_Data(void *arg)
                 LOG_INFO("EMS socket recv error fd:%d errno:%d %s",new_fd_thread,errno,strerror(errno));
             }
             (*pTimeCnt) = 0;
-            if (new_fd_thread > 0)
-            {
-                close(new_fd_thread);
-            }
-            connect_num--;
-            LOG_INFO("EMS Client[%d] Close the TCP server socket! (fd:%d) ", connect_num, new_fd_thread);            // 对方关闭连接，或者连接出现错误，则关闭退出线程。
 
             break;
         }
@@ -329,20 +286,36 @@ static void* Server_Handle_Data(void *arg)
             (*pTimeCnt) += 1;
             if ((*pTimeCnt) > (50 * ((EMS_TIMEOUT_CNT / 100) + 5))) // 600s 清理僵尸进程
             {
-                if (new_fd_thread > 0)
-                {
-                    close(new_fd_thread);
-                }
-                connect_num--;
-                LOG_INFO("EMS Client[%d] Close the TCP server socket! (fd:%d) ", connect_num, new_fd_thread);
                 break;
             }
 
         }
         else     // 对接收到数据进行处理
         {
+        if (modbus_tls_enabled)
+        {
+            if (numbytes < 12 || buffer[2] != 0 || buffer[3] != 0 ||
+                (((size_t)buffer[4] << 8) | buffer[5]) + 6 != (size_t)numbytes) {
+                LOG_INFO("EMS invalid Modbus request length fd:%d", new_fd_thread);
+                break;
+            }
+            if (buffer[7] == 0x10) {
+                unsigned quantity = ((unsigned)buffer[10] << 8) | buffer[11];
+                if (numbytes < 13 || quantity == 0 || quantity > 123 ||
+                    buffer[12] != quantity * 2 || numbytes != 13 + quantity * 2)
+                    break;
+                unsigned address = ((unsigned)buffer[8] << 8) | buffer[9];
+                if (address == SYS_SYNC_TIEM_ADDR && quantity < 6) break;
+            } else if (buffer[7] == 0x03 || buffer[7] == 0x04) {
+                unsigned quantity = ((unsigned)buffer[10] << 8) | buffer[11];
+                if (numbytes != 12 || quantity == 0 || quantity > 125) break;
+            } else if (buffer[7] == 0x06) {
+                if (numbytes != 12) break;
+            } else {
+                break;
+            }
+        }
             (*pTimeCnt) = 0;
-            // printf("connect_num = %d\n",connect_num);
             // 接收的数据
             sendbuffer[0] = buffer[0];
             sendbuffer[1] = buffer[1];
@@ -514,7 +487,8 @@ static void* Server_Handle_Data(void *arg)
                     sendbuffer[9] = buffer[9];
                     sendbuffer[10] = buffer[10];
                     sendbuffer[11] = buffer[11];
-                    write(new_fd_thread, sendbuffer, sendbuffer[5] + 6);
+                    if (Modbus_Send(new_fd_thread, sendbuffer, sendbuffer[5] + 6) < 0)
+                        goto connection_done;
                     year = (buffer[13] << 8) + buffer[14];
                     month = (buffer[15] << 8) + buffer[16];
                     day = (buffer[17] << 8) + buffer[18];
@@ -677,7 +651,8 @@ static void* Server_Handle_Data(void *arg)
                             break;
 
                         }
-                        write(new_fd_thread, sendbuffer, sendbuffer[5] + 6);
+                        if (Modbus_Send(new_fd_thread, sendbuffer, sendbuffer[5] + 6) < 0)
+                            goto connection_done;
                         memset(time_str, 0, sizeof(time_str));
                         sprintf(time_str, "date -s '%d-%d-%d %d:%d:%d'", year, month, day, hour, min, second);
                         Do_System(time_str, 2);                          // 设置系统时间
@@ -970,34 +945,13 @@ static void* Server_Handle_Data(void *arg)
             Set_EMS_Comm(0, IsNoFault, TRUE);
 
             // 返信
-            write(new_fd_thread, sendbuffer, sendbuffer[5] + 6);
+            if (Modbus_Send(new_fd_thread, sendbuffer, sendbuffer[5] + 6) < 0)
+                goto connection_done;
            
         }
-        if ((connect_num >= (MAX_CLIENT_NUM - 1)) && (connect_ID_min == (*pConnectID)))
-        {
-            if(connect_ID_max<=(connect_ID_min+(MAX_CLIENT_NUM/5)))// 最新序号和最老序号差得很近时，留住socket
-            {
-                connect_num--;
-                LOG_INFO("EMS Client[%d] Leave the TCP server socket! (fd:%d,connect_ID_min:%d,connect_ID_max:%d) ", connect_num, new_fd_thread, connect_ID_min,connect_ID_max);
-            }
-            else
-            {
-                if (new_fd_thread > 0)
-                {
-                    close(new_fd_thread);
-                }
-                connect_num--;
-                LOG_INFO("EMS Client[%d] Close the TCP server socket! (fd:%d,connect_ID_min:%d) ", connect_num, new_fd_thread, connect_ID_min);
-            }
-            break;
-        }
     }
-    connect_ID_min = UINT_MAX;
-    connect_ID_max = 0;
-    free(pTimeCnt);
-    pTimeCnt = NULL;
-    free(pConnectID);
-    pConnectID = NULL;
+connection_done:
+    EMS_Close_Client(new_fd_thread);
     return NULL;
 }
 
@@ -1033,6 +987,14 @@ static void Accept_Client_Connect(int *pserver_fd)
     {
         return;
     }
+    pthread_mutex_lock(&g_ems_client_mutex);
+    if (g_ems_client_num >= MAX_CLIENT_NUM) {
+        pthread_mutex_unlock(&g_ems_client_mutex);
+        close(client_fd);
+        return;
+    }
+    ++g_ems_client_num; /* Count pending handshakes as well as active peers. */
+    pthread_mutex_unlock(&g_ems_client_mutex);
     LOG_INFO("EMS New Client (fd:%d) connect\n", client_fd);
 
     pthread_t client_thread_id = 0;
@@ -1048,7 +1010,8 @@ static void Accept_Client_Connect(int *pserver_fd)
     ClientCtx *ctx = (ClientCtx*)malloc(sizeof(ClientCtx));
     if (!ctx) {
         LOG_INFO("EMS malloc ctx failed, close fd:%d\n", client_fd);
-        close(client_fd);
+        pthread_attr_destroy(&client_thread_attr);
+        EMS_Close_Client(client_fd);
         return;
     }
     ctx->fd = client_fd;
@@ -1058,7 +1021,7 @@ static void Accept_Client_Connect(int *pserver_fd)
         LOG_INFO("EMS Client (fd:%d) pthread create Error:%s\n", client_fd, strerror(errno));
 
         pthread_attr_destroy(&client_thread_attr);
-        close(client_fd);
+        EMS_Close_Client(client_fd);
         free(ctx);
         return;
     }
@@ -1086,6 +1049,11 @@ static void Accept_Client_Connect(int *pserver_fd)
 
 void Task_EMS_Server(void)
 {
+    if (Modbus_Server_Init() < 0) {
+        LOG_INFO("EMS TLS certificate configuration invalid; listener not started");
+        return;
+    }
+
     // 配置socket资料
 
     static int sockfd_service = 0;

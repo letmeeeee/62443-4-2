@@ -26,6 +26,7 @@ extern "C" {
 #include <linux/sockios.h>
 #include <netinet/in.h>
 #include "system.h"
+#include "modbus_transport.h"
 
 
 /***************************************TCP服务定义************************************/
@@ -59,6 +60,7 @@ typedef void (*SET_DEV_COMM)(INT8U dev_num, INT8U status);
  * @return 本地客户端fd
  */
 int Create_Client_Socket(struct sockaddr_in server_addr, struct timeval time_out);
+int Create_Modbus_Client_Socket(struct sockaddr_in server_addr, struct timeval time_out);
 
 /**
  * @brief 创建本地服务端socket

@@ -81,7 +81,7 @@ void DI_E1210_Task(INT8U di_num)
         struct timeval time_out = {0, (400 * 1000)};
 
         //创建本地客户端socket
-        if((socket_fd = Create_Client_Socket(server_addr, time_out)) == -1)
+        if((socket_fd = Create_Modbus_Client_Socket(server_addr, time_out)) == -1)
         {
             connect_cnt=connect_cnt<=LOG_PRINTF_CNT? connect_cnt+1 : connect_cnt;        //小于12自增
             if(connect_cnt<=LOG_PRINTF_CNT)
@@ -108,7 +108,8 @@ void DI_E1210_Task(INT8U di_num)
                 //DIDO通讯异常或超时
                 if ((recv_bytes < 0) || ((recv_bytes == 0) && (Get_DI_Comm(di_num)  == IsFault))) {
                     LOG_INFO("DI-%d: 关闭DI socket,接收数据长度为:%d", di_num, recv_bytes);
-                    close(socket_fd);
+                    Modbus_Close(socket_fd);
+                    socket_fd = -1;
                     sleep(1);
                     break;
                 }           

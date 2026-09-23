@@ -199,7 +199,7 @@ void PCS_Trina_Task(const char *arg)
         server_addr.sin_addr.s_addr = inet_addr((char *)sys_cfg->pcs_ip[pcs_num]);
         struct timeval time_out = {0, (400 * 1000)};
         //创建本地客户端socket
-        if ((Trina_Pcs_Read_Socket[pcs_num] = Create_Client_Socket(server_addr, time_out)) == -1)
+        if ((Trina_Pcs_Read_Socket[pcs_num] = Create_Modbus_Client_Socket(server_addr, time_out)) == -1)
         {
             connect_cnt=connect_cnt<=LOG_PRINTF_CNT? connect_cnt+1 : connect_cnt;        //小于12自增
             if(connect_cnt<=LOG_PRINTF_CNT)
@@ -398,7 +398,7 @@ void PCS_Trina_Task(const char *arg)
                   if (numbytes < 0)  
                 {
                      LOG_INFO("PCS-%d:其他套接字故障 ", pcs_num);
-                    close(Trina_Pcs_Read_Socket[pcs_num]);
+                    Modbus_Close(Trina_Pcs_Read_Socket[pcs_num]);
                     Trina_Pcs_Read_Socket[pcs_num] = -1;
                     LOG_INFO("PCS-%d: 连接异常，断开服务端连接 ", pcs_num);
                     break;
@@ -408,8 +408,8 @@ void PCS_Trina_Task(const char *arg)
                    if (timeout_cnt >= 75) {   //超时时间约为400ms
                      LOG_INFO("PCS-%d: 连续超时次数过多(%d)，认为通讯异常，准备重连", 
                      pcs_num, timeout_cnt);
-                     close(Trina_Pcs_Read_Socket[pcs_num]);   
-                     Trina_Pcs_Read_Socket[pcs_num] = -1;            
+                     Modbus_Close(Trina_Pcs_Read_Socket[pcs_num]);
+                     Trina_Pcs_Read_Socket[pcs_num] = -1;          
                      break;
                 }
 
@@ -431,7 +431,8 @@ void PCS_Trina_Task(const char *arg)
  
     } //loop connect
 }
-    close(Trina_Pcs_Read_Socket[pcs_num]);
+    Modbus_Close(Trina_Pcs_Read_Socket[pcs_num]);
+    Trina_Pcs_Read_Socket[pcs_num] = -1;
     return;
 }
 
