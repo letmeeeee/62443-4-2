@@ -1,4 +1,4 @@
-# Install script for directory: /home/zlg/MV_G2/code/version/spc104/logger
+# Install script for directory: /home/wx/WorkStation/ItemCode/62443-4-2/logger
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,7 @@ endif()
 
 # Is this installation the result of a crosscompile?
 if(NOT DEFINED CMAKE_CROSSCOMPILING)
-  set(CMAKE_CROSSCOMPILING "FALSE")
+  set(CMAKE_CROSSCOMPILING "TRUE")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/zlg/MV_G2/code/version/spc104/logger/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

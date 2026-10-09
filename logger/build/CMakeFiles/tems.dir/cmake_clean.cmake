@@ -27,6 +27,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/tems.dir/lib/ini.c.o"
   "CMakeFiles/tems.dir/lib/modbus_protocol.c.o"
   "CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o"
+  "CMakeFiles/tems.dir/lib/modbus_transport.c.o"
   "CMakeFiles/tems.dir/lib/port.c.o"
   "CMakeFiles/tems.dir/lib/serial.c.o"
   "CMakeFiles/tems.dir/lib/tcp_socket.c.o"

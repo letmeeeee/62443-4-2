@@ -2461,6 +2461,12 @@ def getConfigDatafromParams():
                         actual_value -= 1
                         is_reac_mode = False
                     data_list.append(actual_value)
+        elif data_type in ["systemctl-power"]:
+            for params in params_list:
+                for text in params.get("params").get("text",""):
+                    text_t = text.copy()
+                    actual_value = _read_param_value(text_t, functioncode = READ_HOLD_REGISTER)
+                    data_list.append(actual_value)
         # 读取ini文件
         else:
             for params in params_list:

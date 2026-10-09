@@ -16,6 +16,7 @@ CMakeFiles/tems.dir/base/address_map.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/address_map.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/address_map.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/address_map.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/address_map.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/address_map.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/address_map.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/address_map.c.o: ../lib/tcp_socket.h
@@ -82,6 +83,7 @@ CMakeFiles/tems.dir/base/heart_beat.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/heart_beat.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/heart_beat.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/heart_beat.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/heart_beat.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/heart_beat.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/heart_beat.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/heart_beat.c.o: ../lib/tcp_socket.h
@@ -148,6 +150,7 @@ CMakeFiles/tems.dir/base/ip_config_update.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/ip_config_update.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/ip_config_update.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/ip_config_update.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/ip_config_update.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/ip_config_update.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/ip_config_update.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/ip_config_update.c.o: ../lib/tcp_socket.h
@@ -215,6 +218,7 @@ CMakeFiles/tems.dir/base/ir_log.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/ir_log.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/ir_log.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/ir_log.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/ir_log.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/ir_log.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/ir_log.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/ir_log.c.o: ../lib/tcp_socket.h
@@ -281,6 +285,7 @@ CMakeFiles/tems.dir/base/log_g2_mv.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/log_g2_mv.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/log_g2_mv.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/log_g2_mv.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/log_g2_mv.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/log_g2_mv.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/log_g2_mv.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/log_g2_mv.c.o: ../lib/tcp_socket.h
@@ -354,6 +359,7 @@ CMakeFiles/tems.dir/base/main.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/main.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/main.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/main.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/main.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/main.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/main.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/main.c.o: ../lib/tcp_socket.h
@@ -420,6 +426,7 @@ CMakeFiles/tems.dir/base/serial_device.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/serial_device.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/serial_device.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/serial_device.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/serial_device.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/serial_device.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/serial_device.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/serial_device.c.o: ../lib/tcp_socket.h
@@ -489,6 +496,7 @@ CMakeFiles/tems.dir/base/share_ram.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/share_ram.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/share_ram.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/share_ram.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/share_ram.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/share_ram.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/share_ram.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/share_ram.c.o: ../lib/tcp_socket.h
@@ -555,6 +563,7 @@ CMakeFiles/tems.dir/base/taida_lc_ems.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/taida_lc_ems.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/taida_lc_ems.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/taida_lc_ems.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/taida_lc_ems.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/taida_lc_ems.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/taida_lc_ems.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/taida_lc_ems.c.o: ../lib/tcp_socket.h
@@ -622,6 +631,7 @@ CMakeFiles/tems.dir/base/timed_check.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/timed_check.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/timed_check.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/timed_check.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/timed_check.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/timed_check.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/timed_check.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/timed_check.c.o: ../lib/tcp_socket.h
@@ -688,6 +698,7 @@ CMakeFiles/tems.dir/base/timed_work.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/base/timed_work.c.o: ../lib/log.h
 CMakeFiles/tems.dir/base/timed_work.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/base/timed_work.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/base/timed_work.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/base/timed_work.c.o: ../lib/port.h
 CMakeFiles/tems.dir/base/timed_work.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/base/timed_work.c.o: ../lib/tcp_socket.h
@@ -764,6 +775,7 @@ CMakeFiles/tems.dir/bms/bms_g2pro.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/bms/bms_g2pro.c.o: ../lib/log.h
 CMakeFiles/tems.dir/bms/bms_g2pro.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/bms/bms_g2pro.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/bms/bms_g2pro.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/bms/bms_g2pro.c.o: ../lib/port.h
 CMakeFiles/tems.dir/bms/bms_g2pro.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/bms/bms_g2pro.c.o: ../lib/tcp_socket.h
@@ -833,6 +845,7 @@ CMakeFiles/tems.dir/bms/bms_xieneng.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/bms/bms_xieneng.c.o: ../lib/log.h
 CMakeFiles/tems.dir/bms/bms_xieneng.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/bms/bms_xieneng.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/bms/bms_xieneng.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/bms/bms_xieneng.c.o: ../lib/port.h
 CMakeFiles/tems.dir/bms/bms_xieneng.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/bms/bms_xieneng.c.o: ../lib/tcp_socket.h
@@ -899,6 +912,7 @@ CMakeFiles/tems.dir/bms/bms_xieneng_write.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/bms/bms_xieneng_write.c.o: ../lib/log.h
 CMakeFiles/tems.dir/bms/bms_xieneng_write.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/bms/bms_xieneng_write.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/bms/bms_xieneng_write.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/bms/bms_xieneng_write.c.o: ../lib/port.h
 CMakeFiles/tems.dir/bms/bms_xieneng_write.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/bms/bms_xieneng_write.c.o: ../lib/tcp_socket.h
@@ -967,6 +981,7 @@ CMakeFiles/tems.dir/cJSON/cJSON_app.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/cJSON/cJSON_app.c.o: ../lib/log.h
 CMakeFiles/tems.dir/cJSON/cJSON_app.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/cJSON/cJSON_app.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/cJSON/cJSON_app.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/cJSON/cJSON_app.c.o: ../lib/port.h
 CMakeFiles/tems.dir/cJSON/cJSON_app.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/cJSON/cJSON_app.c.o: ../lib/tcp_socket.h
@@ -1035,6 +1050,7 @@ CMakeFiles/tems.dir/cem9000/cem9000.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/cem9000/cem9000.c.o: ../lib/log.h
 CMakeFiles/tems.dir/cem9000/cem9000.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/cem9000/cem9000.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/cem9000/cem9000.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/cem9000/cem9000.c.o: ../lib/port.h
 CMakeFiles/tems.dir/cem9000/cem9000.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/cem9000/cem9000.c.o: ../lib/tcp_socket.h
@@ -1100,6 +1116,7 @@ CMakeFiles/tems.dir/dido/di_e1210.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/dido/di_e1210.c.o: ../lib/log.h
 CMakeFiles/tems.dir/dido/di_e1210.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/dido/di_e1210.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/dido/di_e1210.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/dido/di_e1210.c.o: ../lib/port.h
 CMakeFiles/tems.dir/dido/di_e1210.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/dido/di_e1210.c.o: ../lib/tcp_socket.h
@@ -1166,6 +1183,7 @@ CMakeFiles/tems.dir/dido/dido_e1214.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/dido/dido_e1214.c.o: ../lib/log.h
 CMakeFiles/tems.dir/dido/dido_e1214.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/dido/dido_e1214.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/dido/dido_e1214.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/dido/dido_e1214.c.o: ../lib/port.h
 CMakeFiles/tems.dir/dido/dido_e1214.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/dido/dido_e1214.c.o: ../lib/tcp_socket.h
@@ -1239,6 +1257,7 @@ CMakeFiles/tems.dir/lib/app_config.c.o: ../lib/assist_func.h
 CMakeFiles/tems.dir/lib/app_config.c.o: ../lib/log.h
 CMakeFiles/tems.dir/lib/app_config.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/lib/app_config.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/lib/app_config.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/app_config.c.o: ../lib/port.h
 CMakeFiles/tems.dir/lib/app_config.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/lib/app_config.c.o: ../lib/tcp_socket.h
@@ -1306,6 +1325,7 @@ CMakeFiles/tems.dir/lib/assist_func.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/lib/assist_func.c.o: ../lib/log.h
 CMakeFiles/tems.dir/lib/assist_func.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/lib/assist_func.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/lib/assist_func.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/assist_func.c.o: ../lib/port.h
 CMakeFiles/tems.dir/lib/assist_func.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/lib/assist_func.c.o: ../lib/tcp_socket.h
@@ -1375,6 +1395,7 @@ CMakeFiles/tems.dir/lib/modbus_protocol.c.o: ../lib/assist_func.h
 CMakeFiles/tems.dir/lib/modbus_protocol.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/lib/modbus_protocol.c.o: ../lib/log.h
 CMakeFiles/tems.dir/lib/modbus_protocol.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/lib/modbus_protocol.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/modbus_protocol.c.o: ../lib/port.h
 CMakeFiles/tems.dir/lib/modbus_protocol.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/lib/modbus_protocol.c.o: ../lib/tcp_socket.h
@@ -1441,6 +1462,7 @@ CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/assist_func.h
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/log.h
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/modbus_protocol.h
+CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/port.h
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/tcp_socket.h
@@ -1483,6 +1505,66 @@ CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../whitelist/whitelist.h
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/modbus_rtu_poll.c
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/modbus_rtu_poll.h
 
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/asn1.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/asn1err.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/async.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/asyncerr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/bio.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/bioerr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/bn.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/bnerr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/buffer.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/buffererr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/comp.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/comperr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/crypto.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/cryptoerr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/ct.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/cterr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/dh.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/dherr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/dsa.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/dsaerr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/dtls1.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/e_os2.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/ebcdic.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/ec.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/ecerr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/err.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/evp.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/evperr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/hmac.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/lhash.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/obj_mac.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/objects.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/objectserr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/opensslconf.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/opensslv.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/ossl_typ.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/pem.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/pemerr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/pkcs7.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/pkcs7err.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/rsa.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/rsaerr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/safestack.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/sha.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/srtp.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/ssl.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/ssl2.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/ssl3.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/sslerr.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/stack.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/symhacks.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/tls1.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/x509.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/x509_vfy.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../.deps/openssl-arm64/include/openssl/x509err.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../base/system.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../lib/app_config.h
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../lib/modbus_transport.c
+CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../lib/modbus_transport.h
+
 CMakeFiles/tems.dir/lib/port.c.o: ../base/address_map.h
 CMakeFiles/tems.dir/lib/port.c.o: ../base/heart_beat.h
 CMakeFiles/tems.dir/lib/port.c.o: ../base/ir_log.h
@@ -1508,6 +1590,7 @@ CMakeFiles/tems.dir/lib/port.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/lib/port.c.o: ../lib/log.h
 CMakeFiles/tems.dir/lib/port.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/lib/port.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/lib/port.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/port.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/lib/port.c.o: ../lib/tcp_socket.h
 CMakeFiles/tems.dir/lib/port.c.o: ../lib/timer.h
@@ -1574,6 +1657,7 @@ CMakeFiles/tems.dir/lib/serial.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/lib/serial.c.o: ../lib/log.h
 CMakeFiles/tems.dir/lib/serial.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/lib/serial.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/lib/serial.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/serial.c.o: ../lib/port.h
 CMakeFiles/tems.dir/lib/serial.c.o: ../lib/tcp_socket.h
 CMakeFiles/tems.dir/lib/serial.c.o: ../lib/timer.h
@@ -1678,6 +1762,7 @@ CMakeFiles/tems.dir/lib/tcp_socket.c.o: ../serival_device/mv_ups.h
 CMakeFiles/tems.dir/lib/tcp_socket.c.o: ../tcp_server/modbus_tcp_server.h
 CMakeFiles/tems.dir/lib/tcp_socket.c.o: ../web_server/web_server.h
 CMakeFiles/tems.dir/lib/tcp_socket.c.o: ../whitelist/whitelist.h
+CMakeFiles/tems.dir/lib/tcp_socket.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/tcp_socket.c.o: ../lib/tcp_socket.c
 CMakeFiles/tems.dir/lib/tcp_socket.c.o: ../lib/tcp_socket.h
 
@@ -1706,6 +1791,7 @@ CMakeFiles/tems.dir/lib/timer.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/lib/timer.c.o: ../lib/log.h
 CMakeFiles/tems.dir/lib/timer.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/lib/timer.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/lib/timer.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/timer.c.o: ../lib/port.h
 CMakeFiles/tems.dir/lib/timer.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/lib/timer.c.o: ../lib/tcp_socket.h
@@ -1772,6 +1858,7 @@ CMakeFiles/tems.dir/lib/trina_log.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/lib/trina_log.c.o: ../lib/log.h
 CMakeFiles/tems.dir/lib/trina_log.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/lib/trina_log.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/lib/trina_log.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/trina_log.c.o: ../lib/port.h
 CMakeFiles/tems.dir/lib/trina_log.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/lib/trina_log.c.o: ../lib/tcp_socket.h
@@ -1838,6 +1925,7 @@ CMakeFiles/tems.dir/lib/user_debug.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/lib/user_debug.c.o: ../lib/log.h
 CMakeFiles/tems.dir/lib/user_debug.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/lib/user_debug.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/lib/user_debug.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/lib/user_debug.c.o: ../lib/port.h
 CMakeFiles/tems.dir/lib/user_debug.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/lib/user_debug.c.o: ../lib/tcp_socket.h
@@ -1934,6 +2022,7 @@ CMakeFiles/tems.dir/logic/blackstart_sys.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/logic/blackstart_sys.c.o: ../lib/log.h
 CMakeFiles/tems.dir/logic/blackstart_sys.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/logic/blackstart_sys.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/logic/blackstart_sys.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/logic/blackstart_sys.c.o: ../lib/port.h
 CMakeFiles/tems.dir/logic/blackstart_sys.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/logic/blackstart_sys.c.o: ../lib/tcp_socket.h
@@ -2014,6 +2103,7 @@ CMakeFiles/tems.dir/logic/state_sub.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/logic/state_sub.c.o: ../lib/log.h
 CMakeFiles/tems.dir/logic/state_sub.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/logic/state_sub.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/logic/state_sub.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/logic/state_sub.c.o: ../lib/port.h
 CMakeFiles/tems.dir/logic/state_sub.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/logic/state_sub.c.o: ../lib/tcp_socket.h
@@ -2080,6 +2170,7 @@ CMakeFiles/tems.dir/logic/state_sys.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/logic/state_sys.c.o: ../lib/log.h
 CMakeFiles/tems.dir/logic/state_sys.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/logic/state_sys.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/logic/state_sys.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/logic/state_sys.c.o: ../lib/port.h
 CMakeFiles/tems.dir/logic/state_sys.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/logic/state_sys.c.o: ../lib/tcp_socket.h
@@ -2146,6 +2237,7 @@ CMakeFiles/tems.dir/logic/state_sys_trina.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/logic/state_sys_trina.c.o: ../lib/log.h
 CMakeFiles/tems.dir/logic/state_sys_trina.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/logic/state_sys_trina.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/logic/state_sys_trina.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/logic/state_sys_trina.c.o: ../lib/port.h
 CMakeFiles/tems.dir/logic/state_sys_trina.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/logic/state_sys_trina.c.o: ../lib/tcp_socket.h
@@ -2213,6 +2305,7 @@ CMakeFiles/tems.dir/logic/state_task.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/logic/state_task.c.o: ../lib/log.h
 CMakeFiles/tems.dir/logic/state_task.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/logic/state_task.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/logic/state_task.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/logic/state_task.c.o: ../lib/port.h
 CMakeFiles/tems.dir/logic/state_task.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/logic/state_task.c.o: ../lib/tcp_socket.h
@@ -2281,6 +2374,7 @@ CMakeFiles/tems.dir/logic/xxtea.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/logic/xxtea.c.o: ../lib/log.h
 CMakeFiles/tems.dir/logic/xxtea.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/logic/xxtea.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/logic/xxtea.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/logic/xxtea.c.o: ../lib/port.h
 CMakeFiles/tems.dir/logic/xxtea.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/logic/xxtea.c.o: ../lib/tcp_socket.h
@@ -2347,6 +2441,7 @@ CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: ../lib/log.h
 CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: ../lib/port.h
 CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: ../lib/tcp_socket.h
@@ -2413,6 +2508,7 @@ CMakeFiles/tems.dir/pcs/pcs_globals.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/pcs/pcs_globals.c.o: ../lib/log.h
 CMakeFiles/tems.dir/pcs/pcs_globals.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/pcs/pcs_globals.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/pcs/pcs_globals.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/pcs/pcs_globals.c.o: ../lib/port.h
 CMakeFiles/tems.dir/pcs/pcs_globals.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/pcs/pcs_globals.c.o: ../lib/tcp_socket.h
@@ -2479,6 +2575,7 @@ CMakeFiles/tems.dir/pcs/pcs_pe.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/pcs/pcs_pe.c.o: ../lib/log.h
 CMakeFiles/tems.dir/pcs/pcs_pe.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/pcs/pcs_pe.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/pcs/pcs_pe.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/pcs/pcs_pe.c.o: ../lib/port.h
 CMakeFiles/tems.dir/pcs/pcs_pe.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/pcs/pcs_pe.c.o: ../lib/tcp_socket.h
@@ -2545,6 +2642,7 @@ CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: ../lib/log.h
 CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: ../lib/port.h
 CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: ../lib/tcp_socket.h
@@ -2611,6 +2709,7 @@ CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: ../lib/log.h
 CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: ../lib/port.h
 CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: ../lib/tcp_socket.h
@@ -2678,6 +2777,7 @@ CMakeFiles/tems.dir/pcs/pcs_taida.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/pcs/pcs_taida.c.o: ../lib/log.h
 CMakeFiles/tems.dir/pcs/pcs_taida.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/pcs/pcs_taida.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/pcs/pcs_taida.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/pcs/pcs_taida.c.o: ../lib/port.h
 CMakeFiles/tems.dir/pcs/pcs_taida.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/pcs/pcs_taida.c.o: ../lib/tcp_socket.h
@@ -2745,6 +2845,7 @@ CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: ../lib/log.h
 CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: ../lib/port.h
 CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: ../lib/tcp_socket.h
@@ -2816,6 +2917,7 @@ CMakeFiles/tems.dir/pcs/pcs_trina.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/pcs/pcs_trina.c.o: ../lib/log.h
 CMakeFiles/tems.dir/pcs/pcs_trina.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/pcs/pcs_trina.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/pcs/pcs_trina.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/pcs/pcs_trina.c.o: ../lib/port.h
 CMakeFiles/tems.dir/pcs/pcs_trina.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/pcs/pcs_trina.c.o: ../lib/tcp_socket.h
@@ -2882,6 +2984,7 @@ CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: ../lib/log.h
 CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: ../lib/port.h
 CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: ../lib/tcp_socket.h
@@ -2957,6 +3060,7 @@ CMakeFiles/tems.dir/serival_device/eth_measure.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/serival_device/eth_measure.c.o: ../lib/log.h
 CMakeFiles/tems.dir/serival_device/eth_measure.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/serival_device/eth_measure.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/serival_device/eth_measure.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/serival_device/eth_measure.c.o: ../lib/port.h
 CMakeFiles/tems.dir/serival_device/eth_measure.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/serival_device/eth_measure.c.o: ../lib/tcp_socket.h
@@ -3024,6 +3128,7 @@ CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: ../lib/log.h
 CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: ../lib/port.h
 CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: ../lib/tcp_socket.h
@@ -3091,6 +3196,7 @@ CMakeFiles/tems.dir/serival_device/mv_ups.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/serival_device/mv_ups.c.o: ../lib/log.h
 CMakeFiles/tems.dir/serival_device/mv_ups.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/serival_device/mv_ups.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/serival_device/mv_ups.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/serival_device/mv_ups.c.o: ../lib/port.h
 CMakeFiles/tems.dir/serival_device/mv_ups.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/serival_device/mv_ups.c.o: ../lib/tcp_socket.h
@@ -3157,6 +3263,7 @@ CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: ../lib/log.h
 CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: ../lib/port.h
 CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: ../lib/tcp_socket.h
@@ -3224,6 +3331,7 @@ CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: ../lib/log.h
 CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: ../lib/port.h
 CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: ../lib/tcp_socket.h
@@ -3572,6 +3680,7 @@ CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: ../lib/log.h
 CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: ../lib/port.h
 CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: ../lib/tcp_socket.h
@@ -3638,6 +3747,7 @@ CMakeFiles/tems.dir/web_server/web_server.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/web_server/web_server.c.o: ../lib/log.h
 CMakeFiles/tems.dir/web_server/web_server.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/web_server/web_server.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/web_server/web_server.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/web_server/web_server.c.o: ../lib/port.h
 CMakeFiles/tems.dir/web_server/web_server.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/web_server/web_server.c.o: ../lib/tcp_socket.h
@@ -3704,6 +3814,7 @@ CMakeFiles/tems.dir/whitelist/whitelist.c.o: ../lib/ini.h
 CMakeFiles/tems.dir/whitelist/whitelist.c.o: ../lib/log.h
 CMakeFiles/tems.dir/whitelist/whitelist.c.o: ../lib/modbus_protocol.h
 CMakeFiles/tems.dir/whitelist/whitelist.c.o: ../lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/whitelist/whitelist.c.o: ../lib/modbus_transport.h
 CMakeFiles/tems.dir/whitelist/whitelist.c.o: ../lib/port.h
 CMakeFiles/tems.dir/whitelist/whitelist.c.o: ../lib/serial.h
 CMakeFiles/tems.dir/whitelist/whitelist.c.o: ../lib/tcp_socket.h

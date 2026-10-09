@@ -31,6 +31,7 @@ def create_app():
         return app.send_static_file("index.html")
     from routes.route_g2 import g2_bp
     from routes.route_g3 import g3_bp
+    from routes import route_cert, route_tee  # noqa: F401 - register routes
     from routes.route_permission import permission_bp
     app.register_blueprint(g2_bp)
     app.register_blueprint(g3_bp)
