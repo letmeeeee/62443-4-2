@@ -6,7 +6,9 @@
 #include <unistd.h>
 
 #include <openssl/ssl.h>
+#include "modbus_tee.h"
 #include <openssl/err.h>
+#include "zlog.h"
 #include <fcntl.h>
 #include <limits.h>
 #include <poll.h>
@@ -36,6 +38,22 @@ static pthread_once_t server_once = PTHREAD_ONCE_INIT;
 static pthread_once_t client_once = PTHREAD_ONCE_INIT;
 static pthread_once_t library_once = PTHREAD_ONCE_INIT;
 static SSL_CTX *server_ctx, *client_ctx;
+
+/* Drain this thread's OpenSSL queue into the existing default zlog category. */
+static void log_tls_errors(const char *stage, int server, int fd)
+{
+    unsigned long code;
+    char description[256];
+    int saved_errno = errno;
+    dzlog_error("Modbus TLS %s failed role=%s fd=%d errno=%d",
+                stage, server ? "slave" : "master", fd, saved_errno);
+    while ((code = ERR_get_error()) != 0) {
+        ERR_error_string_n(code, description, sizeof(description));
+        dzlog_error("Modbus TLS %s role=%s fd=%d openssl=0x%lx error=%s",
+                    stage, server ? "slave" : "master", fd, code, description);
+    }
+    errno = saved_errno;
+}
 
 /* The application loads this setting before starting communication threads. */
 static int tls_enabled(void)
@@ -73,11 +91,19 @@ static SSL_CTX *make_context(int server)
 {
     pthread_once(&library_once, library_init);
     SSL_CTX *ctx = SSL_CTX_new(server ? TLS_server_method() : TLS_client_method());
-    if (!ctx) return NULL;
-    if (SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION) != 1 ||
-        SSL_CTX_use_certificate_chain_file(ctx, server ? MODBUS_TLS_SERVER_CERT : MODBUS_TLS_CLIENT_CERT) != 1 ||
-        SSL_CTX_use_PrivateKey_file(ctx, server ? MODBUS_TLS_SERVER_KEY : MODBUS_TLS_CLIENT_KEY, SSL_FILETYPE_PEM) != 1 ||
-        SSL_CTX_check_private_key(ctx) != 1)
+    if (!ctx) {
+        log_tls_errors("context allocation", server, -1);
+        return NULL;
+    }
+    EVP_PKEY *key = Modbus_TEE_Key(server ? 1 : 0);
+    int identity_ok = key &&
+        SSL_CTX_use_certificate_chain_file(ctx, server ? MODBUS_TLS_SERVER_CERT : MODBUS_TLS_CLIENT_CERT) == 1 &&
+        SSL_CTX_use_PrivateKey(ctx, key) == 1 && SSL_CTX_check_private_key(ctx) == 1 &&
+        Modbus_TEE_Check(SSL_CTX_get0_certificate(ctx), server ? 1 : 0);
+    EVP_PKEY_free(key);
+    if (!identity_ok || SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION) != 1 ||
+        SSL_CTX_set_cipher_list(ctx, "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384") != 1 ||
+        SSL_CTX_set1_sigalgs_list(ctx, "rsa_pss_rsae_sha256:rsa_pss_rsae_sha384:rsa_pss_rsae_sha512:rsa_pkcs1_sha256:rsa_pkcs1_sha384:rsa_pkcs1_sha512") != 1)
         goto fail;
     if (server) {
         if (SSL_CTX_load_verify_locations(ctx, MODBUS_TLS_CLIENT_CA, NULL) != 1)
@@ -95,8 +121,7 @@ static SSL_CTX *make_context(int server)
     }
     return ctx;
 fail:
-    fprintf(stderr, "Modbus TLS: failed to load %s certificate/key/CA\n", server ? "server" : "client");
-    ERR_print_errors_fp(stderr);
+    log_tls_errors("certificate/key/trust configuration", server, -1);
     SSL_CTX_free(ctx);
     return NULL;
 }
@@ -166,8 +191,7 @@ static int attach(int fd, int server)
     pthread_mutex_unlock(&registry);
     return 0;
 fail:
-    fprintf(stderr, "Modbus TLS: %s handshake failed fd=%d\n", server ? "server" : "client", fd);
-    ERR_print_errors_fp(stderr);
+    log_tls_errors("handshake", server, fd);
     SSL_free(c->ssl);
     free(c);
     errno = EPROTO;

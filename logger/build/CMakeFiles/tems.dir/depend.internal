@@ -1505,6 +1505,58 @@ CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o
  ../whitelist/whitelist.h
  /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_rtu_poll.c
  /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_rtu_poll.h
+CMakeFiles/tems.dir/lib/modbus_tee.c.o
+ ../../optee_ta_examples/ta/crypto_ta/include/crypto_ta.h
+ ../.deps/openssl-arm64/include/openssl/asn1.h
+ ../.deps/openssl-arm64/include/openssl/asn1err.h
+ ../.deps/openssl-arm64/include/openssl/bio.h
+ ../.deps/openssl-arm64/include/openssl/bioerr.h
+ ../.deps/openssl-arm64/include/openssl/bn.h
+ ../.deps/openssl-arm64/include/openssl/bnerr.h
+ ../.deps/openssl-arm64/include/openssl/buffer.h
+ ../.deps/openssl-arm64/include/openssl/buffererr.h
+ ../.deps/openssl-arm64/include/openssl/crypto.h
+ ../.deps/openssl-arm64/include/openssl/cryptoerr.h
+ ../.deps/openssl-arm64/include/openssl/dh.h
+ ../.deps/openssl-arm64/include/openssl/dherr.h
+ ../.deps/openssl-arm64/include/openssl/dsa.h
+ ../.deps/openssl-arm64/include/openssl/dsaerr.h
+ ../.deps/openssl-arm64/include/openssl/e_os2.h
+ ../.deps/openssl-arm64/include/openssl/ebcdic.h
+ ../.deps/openssl-arm64/include/openssl/ec.h
+ ../.deps/openssl-arm64/include/openssl/ecerr.h
+ ../.deps/openssl-arm64/include/openssl/engine.h
+ ../.deps/openssl-arm64/include/openssl/engineerr.h
+ ../.deps/openssl-arm64/include/openssl/err.h
+ ../.deps/openssl-arm64/include/openssl/evp.h
+ ../.deps/openssl-arm64/include/openssl/evperr.h
+ ../.deps/openssl-arm64/include/openssl/lhash.h
+ ../.deps/openssl-arm64/include/openssl/obj_mac.h
+ ../.deps/openssl-arm64/include/openssl/objects.h
+ ../.deps/openssl-arm64/include/openssl/objectserr.h
+ ../.deps/openssl-arm64/include/openssl/opensslconf.h
+ ../.deps/openssl-arm64/include/openssl/opensslv.h
+ ../.deps/openssl-arm64/include/openssl/ossl_typ.h
+ ../.deps/openssl-arm64/include/openssl/pem.h
+ ../.deps/openssl-arm64/include/openssl/pemerr.h
+ ../.deps/openssl-arm64/include/openssl/pkcs7.h
+ ../.deps/openssl-arm64/include/openssl/pkcs7err.h
+ ../.deps/openssl-arm64/include/openssl/rand.h
+ ../.deps/openssl-arm64/include/openssl/randerr.h
+ ../.deps/openssl-arm64/include/openssl/rsa.h
+ ../.deps/openssl-arm64/include/openssl/rsaerr.h
+ ../.deps/openssl-arm64/include/openssl/safestack.h
+ ../.deps/openssl-arm64/include/openssl/sha.h
+ ../.deps/openssl-arm64/include/openssl/stack.h
+ ../.deps/openssl-arm64/include/openssl/symhacks.h
+ ../.deps/openssl-arm64/include/openssl/ui.h
+ ../.deps/openssl-arm64/include/openssl/uierr.h
+ ../.deps/openssl-arm64/include/openssl/x509.h
+ ../.deps/openssl-arm64/include/openssl/x509_vfy.h
+ ../.deps/openssl-arm64/include/openssl/x509err.h
+ ../.deps/optee-arm64/include/tee_client_api.h
+ /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_tee.c
+ /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_tee.h
 CMakeFiles/tems.dir/lib/modbus_transport.c.o
  ../.deps/openssl-arm64/include/openssl/asn1.h
  ../.deps/openssl-arm64/include/openssl/asn1err.h
@@ -1563,8 +1615,10 @@ CMakeFiles/tems.dir/lib/modbus_transport.c.o
  ../.deps/openssl-arm64/include/openssl/x509err.h
  ../base/system.h
  /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/app_config.h
+ /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_tee.h
  /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_transport.c
  /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_transport.h
+ /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/zlog.h
 CMakeFiles/tems.dir/lib/port.c.o
  ../base/address_map.h
  ../base/heart_beat.h

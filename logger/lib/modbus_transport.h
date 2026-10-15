@@ -13,17 +13,11 @@
 #ifndef MODBUS_TLS_SERVER_CERT
 #define MODBUS_TLS_SERVER_CERT "/etc/ems/modbus/slave.crt"
 #endif
-#ifndef MODBUS_TLS_SERVER_KEY
-#define MODBUS_TLS_SERVER_KEY "/etc/ems/modbus/slave.key"
-#endif
 #ifndef MODBUS_TLS_CLIENT_CA
 #define MODBUS_TLS_CLIENT_CA "/etc/ems/modbus/master-ca.crt"
 #endif
 #ifndef MODBUS_TLS_CLIENT_CERT
 #define MODBUS_TLS_CLIENT_CERT "/etc/ems/modbus/master.crt"
-#endif
-#ifndef MODBUS_TLS_CLIENT_KEY
-#define MODBUS_TLS_CLIENT_KEY "/etc/ems/modbus/master.key"
 #endif
 #ifndef MODBUS_TLS_HANDSHAKE_MS
 #define MODBUS_TLS_HANDSHAKE_MS 5000

@@ -56,6 +56,52 @@ CMAKE_BINARY_DIR = /home/wx/WorkStation/ItemCode/62443-4-2/logger/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -109,6 +155,19 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
+
+#=============================================================================
+# Target rules for targets named modbus_tee_identity
+
+# Build rule for target.
+modbus_tee_identity: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 modbus_tee_identity
+.PHONY : modbus_tee_identity
+
+# fast build rule for target.
+modbus_tee_identity/fast:
+	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/build
+.PHONY : modbus_tee_identity/fast
 
 #=============================================================================
 # Target rules for targets named tems
@@ -878,6 +937,36 @@ lib/modbus_rtu_poll.s: lib/modbus_rtu_poll.c.s
 lib/modbus_rtu_poll.c.s:
 	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.s
 .PHONY : lib/modbus_rtu_poll.c.s
+
+lib/modbus_tee.o: lib/modbus_tee.c.o
+
+.PHONY : lib/modbus_tee.o
+
+# target to build an object file
+lib/modbus_tee.c.o:
+	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/lib/modbus_tee.c.o
+	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_tee.c.o
+.PHONY : lib/modbus_tee.c.o
+
+lib/modbus_tee.i: lib/modbus_tee.c.i
+
+.PHONY : lib/modbus_tee.i
+
+# target to preprocess a source file
+lib/modbus_tee.c.i:
+	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/lib/modbus_tee.c.i
+	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_tee.c.i
+.PHONY : lib/modbus_tee.c.i
+
+lib/modbus_tee.s: lib/modbus_tee.c.s
+
+.PHONY : lib/modbus_tee.s
+
+# target to generate assembly for a file
+lib/modbus_tee.c.s:
+	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/lib/modbus_tee.c.s
+	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_tee.c.s
+.PHONY : lib/modbus_tee.c.s
 
 lib/modbus_transport.o: lib/modbus_transport.c.o
 
@@ -1661,6 +1750,33 @@ pcs/pcs_write_queue.s: pcs/pcs_write_queue.c.s
 pcs/pcs_write_queue.c.s:
 	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/pcs/pcs_write_queue.c.s
 .PHONY : pcs/pcs_write_queue.c.s
+
+scripts/modbus_tee_identity.o: scripts/modbus_tee_identity.c.o
+
+.PHONY : scripts/modbus_tee_identity.o
+
+# target to build an object file
+scripts/modbus_tee_identity.c.o:
+	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/scripts/modbus_tee_identity.c.o
+.PHONY : scripts/modbus_tee_identity.c.o
+
+scripts/modbus_tee_identity.i: scripts/modbus_tee_identity.c.i
+
+.PHONY : scripts/modbus_tee_identity.i
+
+# target to preprocess a source file
+scripts/modbus_tee_identity.c.i:
+	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/scripts/modbus_tee_identity.c.i
+.PHONY : scripts/modbus_tee_identity.c.i
+
+scripts/modbus_tee_identity.s: scripts/modbus_tee_identity.c.s
+
+.PHONY : scripts/modbus_tee_identity.s
+
+# target to generate assembly for a file
+scripts/modbus_tee_identity.c.s:
+	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/scripts/modbus_tee_identity.c.s
+.PHONY : scripts/modbus_tee_identity.c.s
 
 serival_device/eth_measure.o: serival_device/eth_measure.c.o
 
@@ -2964,8 +3080,13 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... install/strip"
+	@echo "... install/local"
+	@echo "... install"
+	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... modbus_tee_identity"
 	@echo "... tems"
 	@echo "... base/address_map.o"
 	@echo "... base/address_map.i"
@@ -3051,6 +3172,9 @@ help:
 	@echo "... lib/modbus_rtu_poll.o"
 	@echo "... lib/modbus_rtu_poll.i"
 	@echo "... lib/modbus_rtu_poll.s"
+	@echo "... lib/modbus_tee.o"
+	@echo "... lib/modbus_tee.i"
+	@echo "... lib/modbus_tee.s"
 	@echo "... lib/modbus_transport.o"
 	@echo "... lib/modbus_transport.i"
 	@echo "... lib/modbus_transport.s"
@@ -3138,6 +3262,9 @@ help:
 	@echo "... pcs/pcs_write_queue.o"
 	@echo "... pcs/pcs_write_queue.i"
 	@echo "... pcs/pcs_write_queue.s"
+	@echo "... scripts/modbus_tee_identity.o"
+	@echo "... scripts/modbus_tee_identity.i"
+	@echo "... scripts/modbus_tee_identity.s"
 	@echo "... serival_device/eth_measure.o"
 	@echo "... serival_device/eth_measure.i"
 	@echo "... serival_device/eth_measure.s"

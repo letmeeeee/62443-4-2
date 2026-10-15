@@ -32,6 +32,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/ini.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/ini.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_protocol.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/modbus_protocol.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_rtu_poll.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o"
+  "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_tee.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/modbus_tee.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_transport.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/modbus_transport.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/port.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/port.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/serial.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/serial.c.o"
@@ -131,6 +132,8 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
   "../whitelist"
   "../p2p_server"
   "../mysqlib/include"
+  "../.deps/optee-arm64/include"
+  "../../optee_ta_examples/ta/crypto_ta/include"
   )
 
 # Targets to which this target links.

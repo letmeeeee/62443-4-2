@@ -6,34 +6,7 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-set(OPTEE_CLIENT_INCLUDE_DIR "" CACHE PATH
-    "Directory containing the target tee_client_api.h")
-set(OPTEE_CLIENT_LIBRARY "" CACHE FILEPATH
-    "Target-architecture libteec.so or libteec.a")
-
-if(NOT OPTEE_CLIENT_INCLUDE_DIR OR
-   NOT EXISTS "${OPTEE_CLIENT_INCLUDE_DIR}/tee_client_api.h")
-    find_path(OPTEE_CLIENT_INCLUDE_DIR
-        NAMES tee_client_api.h
-        PATH_SUFFIXES include include/optee-client)
-endif()
-
-if(NOT OPTEE_CLIENT_LIBRARY OR NOT EXISTS "${OPTEE_CLIENT_LIBRARY}")
-    find_library(OPTEE_CLIENT_LIBRARY NAMES teec)
-endif()
-
-if(NOT OPTEE_CLIENT_INCLUDE_DIR OR
-   NOT EXISTS "${OPTEE_CLIENT_INCLUDE_DIR}/tee_client_api.h")
-    message(FATAL_ERROR
-        "Target tee_client_api.h was not found. Set "
-        "-DOPTEE_CLIENT_INCLUDE_DIR=/path/to/optee_client/include")
-endif()
-
-if(NOT OPTEE_CLIENT_LIBRARY OR NOT EXISTS "${OPTEE_CLIENT_LIBRARY}")
-    message(FATAL_ERROR
-        "Target libteec was not found. Set "
-        "-DOPTEE_CLIENT_LIBRARY=/path/to/libteec.so (or libteec.a)")
-endif()
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../../logger/cmake/OpteeClient.cmake")
 
 add_executable(crypto_ta_client crypto_ta_client.c)
 target_include_directories(crypto_ta_client PRIVATE

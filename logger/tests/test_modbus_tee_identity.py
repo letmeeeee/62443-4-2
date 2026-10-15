@@ -1,0 +1,58 @@
+"""End-to-end certificate CLI/script tests using a software TEEC substitute."""
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def run(*args, env=None, success=True):
+    result = subprocess.run(list(map(str, args)), env=env, capture_output=True)
+    if success and result.returncode:
+        raise AssertionError(result.stderr.decode())
+    if not success and not result.returncode:
+        raise AssertionError('operation unexpectedly succeeded')
+    return result.stdout
+
+
+def main():
+    header = os.environ.get('OPTEE_CLIENT_INCLUDE_DIR', str(ROOT / 'logger/.deps/optee-arm64/include'))
+    with tempfile.TemporaryDirectory(prefix='modbus-tee-test-') as temp:
+        directory = Path(temp)
+        executable = directory / 'modbus_tee_identity'
+        store = directory / 'mock-ta-store'
+        store.mkdir(mode=0o700)
+        run('cc', '-std=c99', '-Wall', '-Wextra', '-Werror',
+            '-Wno-deprecated-declarations', '-DMODBUS_TEE_STUB_ONLY',
+            '-I' + str(ROOT / 'logger/lib'), '-I' + header,
+            '-I' + str(ROOT / 'optee_ta_examples/ta/crypto_ta/include'),
+            ROOT / 'logger/scripts/modbus_tee_identity.c',
+            ROOT / 'logger/lib/modbus_tee.c', ROOT / 'logger/tests/test_modbus_tee.c',
+            '-lssl', '-lcrypto', '-lpthread', '-o', executable)
+        env = dict(os.environ, MODBUS_TEE_IDENTITY=str(executable),
+                   MODBUS_TEE_TEST_STORE=str(store))
+        script = ROOT / 'logger/scripts/modbus_certs.py'
+        certdir = directory / 'certs'
+        base = ['python3', script, '--dir', certdir]
+        run(*base, 'generate', '--role', 'master', '--name', 'device-master', env=env)
+        run(*base, 'generate', '--role', 'slave', '--name', 'device-slave',
+            '--ip', '192.168.1.10', env=env)
+        assert not list(certdir.glob('*.key'))
+        master = certdir / 'master.crt'
+        original = master.read_bytes()
+        public = run('openssl', 'x509', '-in', master, '-pubkey', '-noout')
+        run(*base, 'check', '--role', 'master', env=env)
+        run(*base, 'check', '--role', 'slave', env=env)
+        run(*base, 'renew', '--role', 'master', '--name', 'device-master', env=env)
+        assert master.read_bytes() != original
+        assert run('openssl', 'x509', '-in', master, '-pubkey', '-noout') == public
+        run(*base, 'trust-add', '--cert', master, env=env)
+        run(executable, 'check', 'slave', master, env=env, success=False)
+        assert list((certdir / 'backups').glob('*/master.crt'))
+        assert not list(certdir.glob('*.key'))
+        print('PASS: TA certificate generation/check/renew, stable public key, SAN, trust import, wrong-role rejection, no private-key files')
+
+
+if __name__ == '__main__':
+    main()

@@ -1,3 +1,8 @@
+/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/install/strip.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/install/local.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/install.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/list_install_components.dir
 /home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/rebuild_cache.dir
 /home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/edit_cache.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/modbus_tee_identity.dir
 /home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir

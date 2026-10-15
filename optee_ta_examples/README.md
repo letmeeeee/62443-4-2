@@ -23,6 +23,10 @@ dev kit 用 `keys/default.pem` 自动签名，与当前 prebuilt bl32 配套，�
 
 ## 前置条件
 
+Modbus TLS 新增命令 8～11 和独立主从密钥槽，完整参数布局见共享头文件。
+摘要签名接口用于 OpenSSL 握手，传入摘要后不再哈希；原命令 0～7 的行为
+保持兼容。部署与迁移详见 `../logger/MODBUS_TEE.md`。
+
 1. OP-TEE TA dev kit：已随工程内置在 `dev_kit/`（含 `mk/`、`lib/`、
    `keys/default.pem` 等，平台 `em1000`），为默认值；可用
    `TA_DEV_KIT_DIR=/path/to/export-ta_arm64 make ...` 覆盖。

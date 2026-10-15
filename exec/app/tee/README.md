@@ -12,6 +12,22 @@ SHA-256 is performed inside the TA.
 
 ## Build and install
 
+Target dependencies are shared with tems under `logger/.deps/optee-arm64`.
+Import them once from the matching device, then build without external SDK
+paths (run from the repository root):
+
+```sh
+sh logger/scripts/prepare_optee_client.sh --device root@DEVICE_IP
+cmake -S exec/app/tee -B exec/app/tee/build \
+  -DCMAKE_TOOLCHAIN_FILE="$PWD/exec/app/tee/cmake/aarch64-linux-gnu.cmake"
+cmake --build exec/app/tee/build
+```
+
+Transfer `logger/.deps` with the project when migrating to another build
+machine. Check imported files with
+`sh logger/scripts/prepare_optee_client.sh --check`. The compiler and standard
+C runtime sysroot are provided by the build machine's AArch64 toolchain.
+
 Do not assume the production image contains a compiler. Prefer building in its
 cross-compilation SDK, with the target OP-TEE Client headers and `libteec`:
 

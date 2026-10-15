@@ -19,9 +19,9 @@
 #   make install DESTDIR=/mnt/rootfs
 
 TA_DEV_KIT_DIR ?= $(CURDIR)/dev_kit
-CROSS_COMPILE  ?= aarch64-oe-linux-
-OPTEE_CLIENT_INC ?= /usr/include
-LIBTEEC_LIB    ?= /usr/lib
+CROSS_COMPILE  ?= aarch64-linux-gnu-
+OPTEE_CLIENT_INC ?= $(abspath $(CURDIR)/../logger/.deps/optee-arm64/include)
+LIBTEEC_LIB    ?= $(abspath $(CURDIR)/../logger/.deps/optee-arm64/lib)
 DESTDIR        ?= /
 
 TA_DIRS = ta/crypto_ta

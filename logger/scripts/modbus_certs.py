@@ -15,6 +15,15 @@ import tempfile
 import uuid
 
 PEM = re.compile(rb'-----BEGIN CERTIFICATE-----\s+.*?-----END CERTIFICATE-----', re.S)
+TEE_IDENTITY = os.environ.get('MODBUS_TEE_IDENTITY', '/home/zlg/app/bin/modbus_tee_identity')
+
+
+def tee_identity(*args):
+    result = subprocess.run([TEE_IDENTITY, *map(str, args)],
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
+    if result.returncode:
+        raise ValueError(result.stderr.decode(errors='replace').strip() or 'Modbus TA operation failed')
+    return result.stdout
 
 
 def openssl(*args, data=None):
@@ -107,14 +116,14 @@ def backup(directory, paths):
 
 def generate(args, directory):
     cert_path, key_path = identity_paths(directory, args.role)
-    paths = (cert_path, key_path)
+    paths = (cert_path,)
     if any(p.is_symlink() for p in paths):
-        raise ValueError('证书/私钥路径不能是符号链接')
+        raise ValueError('证书路径不能是符号链接')
     exists = any(p.exists() for p in paths)
     if args.command == 'generate' and exists:
-        raise ValueError('已有证书或私钥；需要换证时使用 renew（自动备份）')
-    if args.command == 'renew' and not all(p.exists() for p in paths):
-        raise ValueError('renew 要求已有完整证书和私钥；首次创建请使用 generate')
+        raise ValueError('已有证书；需要换证时使用 renew（自动备份）')
+    if args.command == 'renew' and not cert_path.exists():
+        raise ValueError('renew 要求已有证书；首次创建请使用 generate')
     if not re.fullmatch(r'[A-Za-z0-9_.:@-]{1,64}', args.name):
         raise ValueError('设备名称限 1～64 个字母、数字或 _ . : @ -')
     if not 1 <= args.days <= 3650:
@@ -124,40 +133,15 @@ def generate(args, directory):
         if len(dns) > 253 or not all(re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?', label) for label in dns.split('.')):
             raise ValueError('无效 DNS 名称: ' + dns)
         sans.append('DNS:' + dns)
-    with tempfile.TemporaryDirectory(prefix='.generate-', dir=directory) as temp:
-        cert, key = Path(temp) / 'cert.pem', Path(temp) / 'key.pem'
-        config = Path(temp) / 'openssl.cnf'
-        config.write_text('[req]\ndistinguished_name = dn\n[dn]\n')
-        # OpenSSL 1.1.1 recognizes directly trusted self-signed leaves without
-        # a keyUsage extension. CA:FALSE prevents issuing other certificates;
-        # EKU constrains the TLS role. Do not grant keyCertSign to a leaf.
-        command = ['req', '-config', config, '-new', '-x509', '-newkey', 'rsa:2048', '-nodes', '-sha256',
-                   '-days', str(args.days), '-subj', '/CN=' + args.name,
-                   '-keyout', key, '-out', cert,
-                   '-addext', 'basicConstraints=critical,CA:FALSE',
-                   '-addext', 'extendedKeyUsage=' + ('clientAuth' if args.role == 'master' else 'serverAuth'),
-                   '-addext', 'subjectKeyIdentifier=hash']
-        if sans:
-            command += ['-addext', 'subjectAltName=' + ','.join(sans)]
-        openssl(*command)
-        cert_data, key_data = cert.read_bytes(), key.read_bytes()
-        validate(cert_data, args.role, directory)
-        saved = backup(directory, paths) if exists else None
-        try:
-            atomic_write(key_path, key_data)
-            atomic_write(cert_path, cert_data)
-        except BaseException:
-            for path in paths:
-                if saved:
-                    atomic_write(path, (saved / path.name).read_bytes())
-                else:
-                    path.unlink(missing_ok=True)
-            raise
+    cert_data = tee_identity('cert', args.role, args.name, args.days, ','.join(sans))
+    validate(cert_data, args.role, directory)
+    saved = backup(directory, paths) if exists else None
+    atomic_write(cert_path, cert_data, 0o644)
     print('已生成:', cert_path)
     print('SHA256:', fingerprint(cert_data))
     if saved:
-        print('旧证书和私钥备份:', saved)
-    print('私钥仅保存在本机。生效需重启 tems；脚本不会自动重启。')
+        print('旧证书备份:', saved)
+    print('RSA-3072 私钥保存在 TA 的对应角色密钥槽中；续期复用密钥。生效需重启 tems。')
     if args.role == 'master':
         print('请将新的 master.crt 导入需要连接的从机信任文件。')
 
@@ -202,13 +186,7 @@ def main():
             cert = certs[0]
             if args.command == 'check':
                 validate(cert, args.role, directory)
-                openssl('pkey', '-in', key_path, '-passin', 'pass:', '-check', '-noout')
-                key_pub = openssl('pkey', '-in', key_path, '-passin', 'pass:', '-pubout', '-outform', 'DER')
-                cert_pub = openssl('pkey', '-pubin', '-outform', 'DER', data=openssl('x509', '-pubkey', '-noout', data=cert))
-                if key_pub != cert_pub:
-                    raise ValueError('证书与私钥不匹配')
-                if key_path.stat().st_mode & 0o077:
-                    raise ValueError('私钥权限过宽，应为 600（或更严格）')
+                tee_identity('check', args.role, cert_path)
                 print('校验通过：自签名、有效期、用途和私钥匹配')
             elif args.command == 'export':
                 with args.out.open('xb') as stream:

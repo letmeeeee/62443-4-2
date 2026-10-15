@@ -206,6 +206,15 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 //Target OpenSSL 1.1 include directory
 MODBUS_OPENSSL_INCLUDE_DIR:PATH=
 
+//Target tee_client_api.h directory
+OPTEE_CLIENT_INCLUDE_DIR:PATH=
+
+//Target AArch64 libteec
+OPTEE_CLIENT_LIBRARY:FILEPATH=
+
+//Project-local target OP-TEE Client SDK
+OPTEE_CLIENT_ROOT:PATH=/home/wx/WorkStation/ItemCode/62443-4-2/logger/.deps/optee-arm64
+
 //Value Computed by CMake
 tems_BINARY_DIR:STATIC=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build
 

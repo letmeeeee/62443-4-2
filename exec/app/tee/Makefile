@@ -5,10 +5,12 @@ CC := $(if $(CROSS_COMPILE),$(CROSS_COMPILE)gcc,gcc)
 endif
 
 SYSROOT ?=
+OPTEE_CLIENT_ROOT ?= ../../../logger/.deps/optee-arm64
 CPPFLAGS ?=
-CPPFLAGS += -I../../../optee_ta_examples/ta/crypto_ta/include
+override CPPFLAGS += -I../../../optee_ta_examples/ta/crypto_ta/include -I$(OPTEE_CLIENT_ROOT)/include
 CFLAGS ?= -O2 -Wall -Wextra -Werror
 LDFLAGS ?=
+override LDFLAGS += -L$(OPTEE_CLIENT_ROOT)/lib
 LDLIBS ?= -lteec
 
 ifneq ($(strip $(SYSROOT)),)

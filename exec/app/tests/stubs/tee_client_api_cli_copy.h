@@ -1,3 +1,4 @@
+/* Archived CLI test stub; never use this for a deployed client. */
 #ifndef TEST_TEE_CLIENT_API_H
 #define TEST_TEE_CLIENT_API_H
 

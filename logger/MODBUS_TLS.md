@@ -1,5 +1,9 @@
 # Modbus TCP 编译开关
 
+当前私钥后端已改为 OP-TEE，构建和迁移须先阅读
+[Modbus TA 接入说明](MODBUS_TEE.md)。`generate`/`renew` 通过 TA 生成身份，
+`renew` 复用密钥；不读写 `.key` 文件。
+
 想手动观察“主机证明身份 → 从机允许/拒绝通信”，请先看 [主机/从机手动验证教程](scripts/MODBUS_TLS_PEER.md)。工具支持与实际 `tems` 对接，并提供可信证书、无证书、陌生证书三个对照操作。
 
 开关在 `lib/modbus_transport.h`：
@@ -23,10 +27,10 @@
 | 角色 | 默认文件 | 用途 |
 |---|---|---|
 | 从机 | `/etc/ems/modbus/slave.crt` | 本机直接自签服务端证书，允许 serverAuth |
-| 从机 | `/etc/ems/modbus/slave.key` | 服务端私钥 |
+| 从机 | TA 逻辑槽 1 | 服务端 RSA-3072 私钥 |
 | 从机 | `/etc/ems/modbus/master-ca.crt` | 信任的对端主机自签证书集合（PEM） |
 | 主机 | `/etc/ems/modbus/master.crt` | 本机直接自签客户端证书，允许 clientAuth |
-| 主机 | `/etc/ems/modbus/master.key` | 客户端私钥 |
+| 主机 | TA 逻辑槽 0 | 客户端 RSA-3072 私钥 |
 
 文件路径可通过同一头文件中的 `MODBUS_TLS_*` 宏调整。私钥只保存在所属设备，不能发送给对端；TLS 握手发送证书并证明私钥持有权。服务端仍须配置自己的证书/私钥，但主机不验证它。该模式不能声称主机已确认从机身份，也不是要求双向认证的完整 Modbus Security 配置。
 
@@ -137,14 +141,14 @@ python3 logger/scripts/modbus_certs.py show --role master
 # 检查自签名、有效期、角色用途、证书/私钥匹配和私钥权限
 python3 logger/scripts/modbus_certs.py check --role master
 
-# 备份旧身份并生成新私钥和证书，IP/DNS 需重新显式传入
+# 备份旧证书并复用 TA 密钥续期，IP/DNS 需重新显式传入
 python3 logger/scripts/modbus_certs.py renew --role master --name master-001 --days 365
 
 # 从机删除指定可信主机证书
 python3 logger/scripts/modbus_certs.py trust-remove --fingerprint 完整SHA256指纹
 ```
 
-`generate` 拒绝覆盖已有身份；`renew` 自动将旧证书和私钥保存到 `backups/时间-随机编号/`。信任文件修改前也自动备份。证书和私钥以 600 权限保存，默认新目录为 700，运行 `tems` 的账号必须能读取。备份含私钥，应按私钥保护。
+`generate` 拒绝覆盖已有证书；`renew` 将旧公开证书保存到 `backups/时间-随机编号/`，复用 TA 密钥。信任文件修改前也自动备份。公开证书以 644 权限保存，默认新目录为 700，运行 `tems` 的账号须能读取证书并访问 TEE。旧文件私钥不参与新流程，也不会自动删除。
 
 换证前停止相关 `tems` 进程，避免进程在两份身份文件替换期间启动读取；脚本对单文件原子替换、命令间加锁，但不提供证书与私钥两文件的跨崩溃原子事务。主机换证后，先将新公开证书导入从机（可暂时保留旧证书），重启从机使新信任生效，再启动使用新证书的主机；确认通信后删除旧信任并再次重启从机。删除最后一个信任证书会生成空信任文件，当前 TLS 实现重启后不会启动从机监听，必须先导入新的可信证书。
 

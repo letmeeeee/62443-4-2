@@ -21,4 +21,27 @@
 #define CRYPTO_GET_RSA_3072_PUB_KEY	6	/* 输出: n(memref)+e(memref) <- RSA 公钥 */
 #define CRYPTO_ROTATE_RSA_3072_KEY	7	/* 显式生成新 RSA-3072 密钥对并覆盖旧对象 */
 
+/* Modbus TLS extension; existing commands 0..7 retain their ABI.
+ * Slot values are logical roles, never persistent storage object IDs.
+ * 8: (VALUE_INPUT,NONE,NONE,NONE), p0.a=slot
+ * 9: (MEMREF_OUTPUT,MEMREF_OUTPUT,VALUE_INPUT,NONE), p2.a=slot
+ * 10: (MEMREF_INPUT,MEMREF_OUTPUT,VALUE_INPUT,NONE), digest -> signature
+ * 11: (MEMREF_INPUT,MEMREF_INPUT,VALUE_INOUT,NONE), digest + signature
+ * For 10/11: p2.a=slot, p2.b=scheme; 11 returns p2.a=0 valid, 1 invalid.
+ * Digest inputs are already hashed; PSS uses MGF1 with the same hash and
+ * salt length equal to digest length. All signatures are 384 bytes.
+ */
+#define CRYPTO_MODBUS_ENSURE_RSA 8
+#define CRYPTO_MODBUS_GET_PUBLIC 9
+#define CRYPTO_MODBUS_SIGN_DIGEST 10
+#define CRYPTO_MODBUS_VERIFY_DIGEST 11
+#define CRYPTO_MODBUS_MASTER 0
+#define CRYPTO_MODBUS_SLAVE 1
+#define CRYPTO_RSA_PKCS1_SHA256 1
+#define CRYPTO_RSA_PKCS1_SHA384 2
+#define CRYPTO_RSA_PKCS1_SHA512 3
+#define CRYPTO_RSA_PSS_SHA256 4
+#define CRYPTO_RSA_PSS_SHA384 5
+#define CRYPTO_RSA_PSS_SHA512 6
+
 #endif /* CRYPTO_TA_H */

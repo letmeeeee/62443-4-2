@@ -56,7 +56,8 @@ static TEE_Result ensure_key(const void *obj_id, size_t obj_id_len,
 		goto out;
 	/* 把瞬态对象里的密钥材料写进持久对象；成功后关闭持久句柄。 */
 	res = TEE_CreatePersistentObject(TESTTA_STORAGE_ID, obj_id, obj_id_len,
-					 PERSIST_FLAGS, trans, NULL, 0, &pers);
+					 PERSIST_FLAGS & ~TEE_DATA_FLAG_OVERWRITE,
+					 trans, NULL, 0, &pers);
 	if (res == TEE_SUCCESS)
 		TEE_CloseObject(pers);
 out:
@@ -385,6 +386,90 @@ out:
 }
 
 /* TA 生命周期入口：本例无需初始化/清理，直接返回成功。 */
+static const char *modbus_id(uint32_t slot, size_t *len)
+{
+	static const char master[] = "modbus_master_rsa3072";
+	static const char slave[] = "modbus_slave_rsa3072";
+	if (slot == CRYPTO_MODBUS_MASTER) { *len = sizeof(master); return master; }
+	if (slot == CRYPTO_MODBUS_SLAVE) { *len = sizeof(slave); return slave; }
+	return NULL;
+}
+
+static TEE_Result cmd_modbus(uint32_t cmd, uint32_t pt, TEE_Param p[4])
+{
+	TEE_ObjectHandle pers = TEE_HANDLE_NULL, trans = TEE_HANDLE_NULL;
+	TEE_OperationHandle op = TEE_HANDLE_NULL;
+	TEE_Result res;
+	uint32_t slot = cmd == CRYPTO_MODBUS_ENSURE_RSA ? p[0].value.a : p[2].value.a;
+	uint32_t scheme = p[2].value.b, alg = 0;
+	size_t id_len = 0, digest_len = 0, sig_len;
+	const char *id;
+	TEE_Attribute salt;
+	uint32_t expected = TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_INPUT,
+		cmd == CRYPTO_MODBUS_SIGN_DIGEST ? TEE_PARAM_TYPE_MEMREF_OUTPUT : TEE_PARAM_TYPE_MEMREF_INPUT,
+		cmd == CRYPTO_MODBUS_SIGN_DIGEST ? TEE_PARAM_TYPE_VALUE_INPUT : TEE_PARAM_TYPE_VALUE_INOUT,
+		TEE_PARAM_TYPE_NONE);
+	if (cmd == CRYPTO_MODBUS_ENSURE_RSA)
+		expected = TEE_PARAM_TYPES(TEE_PARAM_TYPE_VALUE_INPUT, 0, 0, 0);
+	else if (cmd == CRYPTO_MODBUS_GET_PUBLIC)
+		expected = TEE_PARAM_TYPES(TEE_PARAM_TYPE_MEMREF_OUTPUT, TEE_PARAM_TYPE_MEMREF_OUTPUT,
+			TEE_PARAM_TYPE_VALUE_INPUT, TEE_PARAM_TYPE_NONE);
+	if (pt != expected) return TEE_ERROR_BAD_PARAMETERS;
+	id = modbus_id(slot, &id_len);
+	if (!id) return TEE_ERROR_BAD_PARAMETERS;
+	if (cmd == CRYPTO_MODBUS_ENSURE_RSA)
+		return ensure_key(id, id_len, TEE_TYPE_RSA_KEYPAIR, RSA_KEY_BITS);
+	res = load_key(id, id_len, TEE_TYPE_RSA_KEYPAIR, RSA_KEY_BITS, &pers, &trans);
+	if (res) return res;
+	if (cmd == CRYPTO_MODBUS_GET_PUBLIC) {
+		res = TEE_GetObjectBufferAttribute(pers, TEE_ATTR_RSA_MODULUS,
+			p[0].memref.buffer, &p[0].memref.size);
+		if (!res) res = TEE_GetObjectBufferAttribute(pers, TEE_ATTR_RSA_PUBLIC_EXPONENT,
+			p[1].memref.buffer, &p[1].memref.size);
+		goto out;
+	}
+	switch (scheme) {
+	case CRYPTO_RSA_PKCS1_SHA256: alg = TEE_ALG_RSASSA_PKCS1_V1_5_SHA256; digest_len = 32; break;
+	case CRYPTO_RSA_PKCS1_SHA384: alg = TEE_ALG_RSASSA_PKCS1_V1_5_SHA384; digest_len = 48; break;
+	case CRYPTO_RSA_PKCS1_SHA512: alg = TEE_ALG_RSASSA_PKCS1_V1_5_SHA512; digest_len = 64; break;
+	case CRYPTO_RSA_PSS_SHA256: alg = TEE_ALG_RSASSA_PKCS1_PSS_MGF1_SHA256; digest_len = 32; break;
+	case CRYPTO_RSA_PSS_SHA384: alg = TEE_ALG_RSASSA_PKCS1_PSS_MGF1_SHA384; digest_len = 48; break;
+	case CRYPTO_RSA_PSS_SHA512: alg = TEE_ALG_RSASSA_PKCS1_PSS_MGF1_SHA512; digest_len = 64; break;
+	default: res = TEE_ERROR_BAD_PARAMETERS; goto out;
+	}
+	if (p[0].memref.size != digest_len) { res = TEE_ERROR_BAD_PARAMETERS; goto out; }
+	if (cmd == CRYPTO_MODBUS_SIGN_DIGEST && p[1].memref.size < RSA_SIG_SIZE) {
+		p[1].memref.size = RSA_SIG_SIZE; res = TEE_ERROR_SHORT_BUFFER; goto out;
+	}
+	if (cmd == CRYPTO_MODBUS_VERIFY_DIGEST && p[1].memref.size != RSA_SIG_SIZE) {
+		res = TEE_ERROR_BAD_PARAMETERS; goto out;
+	}
+	res = TEE_AllocateOperation(&op, alg,
+		cmd == CRYPTO_MODBUS_SIGN_DIGEST ? TEE_MODE_SIGN : TEE_MODE_VERIFY, RSA_KEY_BITS);
+	if (res) goto out;
+	res = TEE_SetOperationKey(op, trans);
+	if (res) goto out;
+	TEE_InitValueAttribute(&salt, TEE_ATTR_RSA_PSS_SALT_LENGTH, digest_len, 0);
+	if (cmd == CRYPTO_MODBUS_SIGN_DIGEST) {
+		sig_len = p[1].memref.size;
+		res = TEE_AsymmetricSignDigest(op, scheme >= CRYPTO_RSA_PSS_SHA256 ? &salt : NULL,
+			scheme >= CRYPTO_RSA_PSS_SHA256 ? 1 : 0, p[0].memref.buffer, digest_len,
+			p[1].memref.buffer, &sig_len);
+		p[1].memref.size = sig_len;
+	} else {
+		res = TEE_AsymmetricVerifyDigest(op, scheme >= CRYPTO_RSA_PSS_SHA256 ? &salt : NULL,
+			scheme >= CRYPTO_RSA_PSS_SHA256 ? 1 : 0, p[0].memref.buffer, digest_len,
+			p[1].memref.buffer, p[1].memref.size);
+		if (res == TEE_SUCCESS || res == TEE_ERROR_SIGNATURE_INVALID) {
+			p[2].value.a = res == TEE_SUCCESS ? 0 : 1; res = TEE_SUCCESS;
+		}
+	}
+out:
+	if (op != TEE_HANDLE_NULL) TEE_FreeOperation(op);
+	release_key(pers, trans);
+	return res;
+}
+
 TEE_Result TA_CreateEntryPoint(void)
 {
 	return TEE_SUCCESS;
@@ -410,6 +495,11 @@ TEE_Result TA_InvokeCommandEntryPoint(void *sess __unused, uint32_t cmd,
 				      uint32_t pt, TEE_Param params[4])
 {
 	switch (cmd) {
+	case CRYPTO_MODBUS_ENSURE_RSA:
+	case CRYPTO_MODBUS_GET_PUBLIC:
+	case CRYPTO_MODBUS_SIGN_DIGEST:
+	case CRYPTO_MODBUS_VERIFY_DIGEST:
+		return cmd_modbus(cmd, pt, params);
 	case CRYPTO_GEN_AES_128_KEY:
 		return ensure_key(CRYPTO_AES_KEY_OBJ_ID,
 				  sizeof(CRYPTO_AES_KEY_OBJ_ID),

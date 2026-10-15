@@ -113,6 +113,18 @@ file(GLOB_RECURSE ALL_SRCS
 
 add_executable(tems ${ALL_SRCS})
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/OpteeClient.cmake")
+set(MODBUS_TA_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/../optee_ta_examples/ta/crypto_ta/include")
+target_include_directories(tems PRIVATE "${OPTEE_CLIENT_INCLUDE_DIR}" "${MODBUS_TA_INCLUDE}")
+target_link_libraries(tems PRIVATE "${OPTEE_CLIENT_LIBRARY}")
+
+add_executable(modbus_tee_identity scripts/modbus_tee_identity.c lib/modbus_tee.c)
+target_include_directories(modbus_tee_identity PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib"
+  "${OPTEE_CLIENT_INCLUDE_DIR}" "${MODBUS_TA_INCLUDE}")
+target_link_libraries(modbus_tee_identity PRIVATE "${OPTEE_CLIENT_LIBRARY}" -l:libcrypto.so.1.1 Threads::Threads dl)
+set_target_properties(modbus_tee_identity PROPERTIES INSTALL_RPATH "\$ORIGIN/../lib;\$ORIGIN/../mysqlib/lib")
+install(TARGETS modbus_tee_identity RUNTIME DESTINATION bin)
+
 # === 关键：用 C++ 链接器，并指定库顺序 ===
 # - libmysqlclient.a 静态（避免链接到 .so）
 # - OpenSSL/zlib 精确到 1.1 / 1.2.11，避免误连系统的 3.x

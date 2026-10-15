@@ -684,7 +684,7 @@ void* Pcs_Trina_Write_Task(void *arg)
             time_keepalive = now_ms;
         }
         if ((time_keepalive + 1000ULL) < now_ms) {
-            LOG_INFO("PCS-%d: 发送keepalive报文 ", pcs_num);
+            // LOG_INFO("PCS-%d: 发送keepalive报文 ", pcs_num);
             Modbus_TCP_Read(socket_Trina_Pcs[pcs_num], PCS_Trina_SLAVE_ADDR, MODBUS_READ_TYPE_04, PCS_Trina_04addr2, PCS_Trina_04size2, CMD_DELAY_0);
             time_keepalive = now_ms;
         }
