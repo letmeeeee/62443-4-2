@@ -37,8 +37,13 @@ if [ -n "$device" ]; then
     header=${header:-/usr/include/tee_client_api.h}
     library=${library:-/usr/lib/aarch64-linux-gnu/libteec.so.2.0.0}
     case "$header:$library" in /*:/*) ;; *) echo "Remote paths must be absolute" >&2; exit 2;; esac
-    scp -- "$device:$header" "$staging/include/tee_client_api.h"
-    scp -- "$device:$library" "$staging/lib/imported-library"
+    if [ "${DEPLOY_SSH_BATCH:-0}" = 1 ]; then
+        scp -o BatchMode=yes -o ConnectTimeout=10 -- "$device:$header" "$staging/include/tee_client_api.h"
+        scp -o BatchMode=yes -o ConnectTimeout=10 -- "$device:$library" "$staging/lib/imported-library"
+    else
+        scp -- "$device:$header" "$staging/include/tee_client_api.h"
+        scp -- "$device:$library" "$staging/lib/imported-library"
+    fi
 else
     [ -f "$header" ] && [ -f "$library" ] || { echo "Specify real --header and --library files" >&2; exit 2; }
     cp -- "$header" "$staging/include/tee_client_api.h"

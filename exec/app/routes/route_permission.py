@@ -1,14 +1,57 @@
 #!/usr/bin/env python3
-from flask import request, jsonify, Blueprint, g
+from flask import request, jsonify, Blueprint, g, session, current_app
 from sqlalchemy import text
 from config import PERM_TABLE, engine
 from utils.method import _ensure_perm_table_in_request, _perm_table_exists, md5_password, generate_salt
 import config
-from utils.auth import establish_session, revoke_session, is_developer_account_disabled
+from utils.auth import (establish_session, revoke_session, is_developer_account_disabled,
+                        login_capacity, LoginCapacityExceeded)
 import utils.operationLog as operationLog
 from datetime import datetime, timedelta
 
 permission_bp = Blueprint("permission", __name__)
+
+
+@permission_bp.after_request
+def log_auth_result(response):
+    """Log actual HTTP auth outcomes, independently of Socket.IO activity."""
+    actions = {
+        'permission.permission_login': '用户登录',
+        'permission.permission_logout': '用户退出登录',
+    }
+    action = actions.get(request.endpoint)
+    is_session_query = request.endpoint == 'permission.permission_session' and request.method == 'GET'
+    if not is_session_query and (action is None or request.method != 'POST'):
+        return response
+    from utils.utils import DPrint
+
+    data = response.get_json(silent=True) or {}
+    succeeded = response.status_code == 200 and data.get('ok') is True
+    capacity_provider = current_app.extensions.get('web_connection_capacity')
+    capacity = capacity_provider() if capacity_provider else None
+    try:
+        logins = login_capacity()
+    except Exception:
+        current_app.logger.exception('Failed to read login capacity')
+        logins = None
+    if logins is not None and (succeeded or response.status_code == 429):
+        data['loginSessions'] = logins
+        response.set_data(current_app.json.dumps(data))
+    if succeeded and capacity is not None:
+        data['webConnections'] = capacity
+        response.set_data(current_app.json.dumps(data))
+    if is_session_query:
+        return response
+    user = getattr(g, 'current_user', None) or {}
+    username = data.get('username') or user.get('username') or '-'
+    result = '成功' if succeeded else '失败'
+    capacity_log = (f", logins={logins['active']}/{logins['limit']}, "
+                    f"remaining={logins['remaining']}" if logins is not None else ', remaining=unknown')
+    DPrint(f"[Auth] {action}{result}: username={username!r}, "
+           f"ip={request.remote_addr}, path={request.path}, status={response.status_code}{capacity_log}")
+    return response
+
+
 # ================== 权限管理 API ==================
 @permission_bp.route("/permission/login", methods=["POST"])
 def permission_login():
@@ -196,6 +239,9 @@ def permission_login():
             "message": message,
         })
 
+    except LoginCapacityExceeded:
+        return jsonify(ok=False, error="Maximum concurrent login sessions reached",
+                       code="LOGIN_LIMIT_REACHED"), 429
     except Exception as e:
         _result = operationLog.OperationResult.FAIL
         return jsonify({
@@ -222,7 +268,11 @@ def permission_session():
 
 @permission_bp.route("/permission/logout", methods=["POST"])
 def permission_logout():
+    session_id = session.get('sid')
     revoke_session()
+    disconnect_connections = current_app.extensions.get('disconnect_session_connections')
+    if session_id and disconnect_connections:
+        disconnect_connections(session_id)
     return jsonify(ok=True)
 
 

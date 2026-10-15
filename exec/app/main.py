@@ -2,9 +2,10 @@ from utils.utils import DPrint, now_str
 from config import remote_client_lock, HOST_IP, HTTPS_ENABLE
 from utils.method import ensure_remote_connected
 from utils.ini import ini_param
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_socketio import SocketIO
 import os
+from threading import Lock
 from utils.auth import init_auth, authenticate_session
 from script.session_config import configure_session
 
@@ -33,15 +34,49 @@ def create_app():
     from routes.route_g3 import g3_bp
     from routes import route_cert, route_tee  # noqa: F401 - register routes
     from routes.route_permission import permission_bp
+    from routes.route_system import system_bp
     app.register_blueprint(g2_bp)
     app.register_blueprint(g3_bp)
     app.register_blueprint(permission_bp)
+    app.register_blueprint(system_bp)
     return app
 
 app = create_app()
 socketio = SocketIO(app)
+MAX_WEB_CONNECTIONS = 20
+web_connections = set()
+web_connection_sessions = {}
+web_connections_lock = Lock()
+
+
+def get_web_connection_capacity():
+    with web_connections_lock:
+        active = len(web_connections)
+        return {'limit': MAX_WEB_CONNECTIONS, 'active': active,
+                'remaining': max(0, MAX_WEB_CONNECTIONS - active)}
+
+
+app.extensions['web_connection_capacity'] = get_web_connection_capacity
+
+
+def disconnect_session_connections(session_id):
+    with web_connections_lock:
+        connections = [sid for sid, login_sid in web_connection_sessions.items()
+                       if login_sid == session_id]
+    # disconnect invokes on_disconnect, which takes the same lock.
+    for sid in connections:
+        socketio.server.disconnect(sid, namespace='/')
+
+
+app.extensions['disconnect_session_connections'] = disconnect_session_connections
 
 def main():
+    from utils.disk_cleanup import start_disk_cleanup_monitor
+    start_disk_cleanup_monitor(DPrint)
+    from utils.port_monitor import start_port_monitor
+    start_port_monitor(DPrint)
+    from utils.ini_integrity import start_ini_integrity_monitor
+    start_ini_integrity_monitor(DPrint)
     DPrint(f"[{now_str()}] [MAIN] 尝试首次连接远程 Modbus 服务器 {HOST_IP}:1502")
     with remote_client_lock:
         ok = ensure_remote_connected("startup")
@@ -67,7 +102,30 @@ def on_connect(auth=None):
         app.logger.exception("SocketIO authentication failed")
         DPrint(f"[{now_str()}] [SocketIO] 客户端连接验证失败: {request.remote_addr}")
         return False
-    DPrint(f"[{now_str()}] [SocketIO] 新客户端连接: {request.remote_addr}")
+    with web_connections_lock:
+        if request.sid not in web_connections and len(web_connections) >= MAX_WEB_CONNECTIONS:
+            DPrint(f"[{now_str()}] [SocketIO] 连接被拒绝（达到上限）: "
+                   f"sid={request.sid}, ip={request.remote_addr}, "
+                   f"connections={len(web_connections)}/{MAX_WEB_CONNECTIONS}, remaining=0")
+            return False
+        web_connections.add(request.sid)
+        web_connection_sessions[request.sid] = session.get('sid')
+        DPrint(f"[{now_str()}] [SocketIO] 前端连接: sid={request.sid}, "
+               f"ip={request.remote_addr}, connections={len(web_connections)}/{MAX_WEB_CONNECTIONS}, "
+               f"remaining={MAX_WEB_CONNECTIONS - len(web_connections)}")
+
+
+@socketio.on('disconnect')
+def on_disconnect(reason=None):
+    with web_connections_lock:
+        if request.sid not in web_connections:
+            return
+        web_connections.remove(request.sid)
+        web_connection_sessions.pop(request.sid, None)
+        DPrint(f"[{now_str()}] [SocketIO] 前端断连: sid={request.sid}, "
+               f"ip={request.remote_addr}, reason={reason}, "
+               f"connections={len(web_connections)}/{MAX_WEB_CONNECTIONS}, "
+               f"remaining={MAX_WEB_CONNECTIONS - len(web_connections)}")
 
 if __name__ == '__main__':
     main()

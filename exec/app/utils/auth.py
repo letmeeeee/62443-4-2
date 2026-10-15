@@ -9,7 +9,8 @@ from datetime import timedelta
 from urllib.parse import urlsplit
 
 from flask import current_app, g, jsonify, request, session
-from sqlalchemy import Column, Float, MetaData, String, Table
+from sqlalchemy import Column, Float, MetaData, String, Table, Integer, select, func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.schema import CreateTable
 
 
@@ -22,6 +23,24 @@ LOGIN_SESSIONS = Table(
     Column("csrf_token", String(64), nullable=False),
     mysql_engine="InnoDB", mysql_charset="utf8mb4",
 )
+
+MAX_LOGIN_SESSIONS = 20
+LOGIN_CAPACITY_LOCK = Table(
+    'login_capacity_lock', MetaData(), Column('id', Integer, primary_key=True),
+    mysql_engine='InnoDB',
+)
+
+
+class LoginCapacityExceeded(Exception):
+    pass
+
+
+def login_capacity():
+    with _store() as connection:
+        active = connection.execute(select(func.count()).select_from(LOGIN_SESSIONS).where(
+            LOGIN_SESSIONS.c.expires_at > time.time())).scalar_one()
+    return {'limit': MAX_LOGIN_SESSIONS, 'active': active,
+            'remaining': max(0, MAX_LOGIN_SESSIONS - active)}
 
 
 @contextmanager
@@ -91,17 +110,28 @@ def revoke_session():
 
 def establish_session(username, password_hash, salt):
     """Call only after successful password verification. Rotate existing session."""
-    revoke_session()
+    previous_sid = session.get('sid')
     sid = secrets.token_urlsafe(32)
     csrf_token = secrets.token_urlsafe(32)
     expires_at = time.time() + current_app.permanent_session_lifetime.total_seconds()
     with _store() as connection:
+        # Serialize admission across workers using an InnoDB row lock (also works on SQLite).
+        connection.execute(LOGIN_CAPACITY_LOCK.update().where(
+            LOGIN_CAPACITY_LOCK.c.id == 1).values(id=1))
         connection.execute(LOGIN_SESSIONS.delete().where(LOGIN_SESSIONS.c.expires_at <= time.time()))
+        if isinstance(previous_sid, str):
+            connection.execute(LOGIN_SESSIONS.delete().where(
+                LOGIN_SESSIONS.c.sid == _digest(previous_sid)))
+        active = connection.execute(select(func.count()).select_from(LOGIN_SESSIONS)).scalar_one()
+        if active >= MAX_LOGIN_SESSIONS:
+            # Transaction rollback preserves any previous session on rejection.
+            raise LoginCapacityExceeded()
         connection.execute(LOGIN_SESSIONS.insert().values(
             sid=_digest(sid), username=username,
             credential=_digest(password_hash + ":" + salt),
             expires_at=expires_at, csrf_token=csrf_token,
         ))
+    session.clear()
     session["sid"] = sid
     session.permanent = True
     return csrf_token
@@ -161,6 +191,13 @@ def init_auth(app):
     # IF NOT EXISTS also permits simultaneous worker startup. DDL errors abort startup.
     with app.app_context(), _store() as connection:
         connection.execute(CreateTable(LOGIN_SESSIONS, if_not_exists=True))
+        connection.execute(CreateTable(LOGIN_CAPACITY_LOCK, if_not_exists=True))
+    try:
+        with app.app_context(), _store() as connection:
+            connection.execute(LOGIN_CAPACITY_LOCK.insert().values(id=1))
+    except IntegrityError:
+        # Another startup (or previous run) already initialized the singleton row.
+        pass
     init_developer_accounts(app)
 
     @app.before_request
