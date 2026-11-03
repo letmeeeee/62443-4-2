@@ -1,4 +1,4 @@
-"""Flask signed cookie + persistent, revocable server-side login sessions."""
+"""Explicit per-tab bearer credentials + persistent, revocable login sessions."""
 import hashlib
 import hmac
 import os
@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from datetime import timedelta
 from urllib.parse import urlsplit
 
-from flask import current_app, g, jsonify, request, session
+from flask import current_app, g, jsonify, request
 from sqlalchemy import Column, Float, MetaData, String, Table, Integer, select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.schema import CreateTable
@@ -25,6 +25,7 @@ LOGIN_SESSIONS = Table(
 )
 
 MAX_LOGIN_SESSIONS = 20
+_HTTP_TOKEN = object()
 LOGIN_CAPACITY_LOCK = Table(
     'login_capacity_lock', MetaData(), Column('id', Integer, primary_key=True),
     mysql_engine='InnoDB',
@@ -100,17 +101,66 @@ def load_user(username):
     }
 
 
-def revoke_session():
-    sid = session.get("sid")
-    if isinstance(sid, str):
+def request_session_token():
+    """Never fall back to shared cookies or accept credentials in URLs."""
+    parts = request.headers.get("Authorization", "").split()
+    if len(parts) == 2 and parts[0].lower() == "bearer":
+        return parts[1]
+    return None
+
+
+def _disconnect_session(sid, *, hashed=False):
+    extension = "disconnect_session_connections_by_id" if hashed else "disconnect_session_connections"
+    disconnect = current_app.extensions.get(extension)
+    if sid and disconnect:
+        try:
+            disconnect(sid)
+        except Exception:
+            # The DB transaction has committed; a socket failure must not hide
+            # a successful login/logout or leave a new credential undelivered.
+            current_app.logger.exception("Failed to disconnect revoked session connections")
+
+
+def revoke_session(sid=None):
+    if sid is None:
+        sid = request_session_token()
+    if isinstance(sid, str) and sid:
         with _store() as connection:
             connection.execute(LOGIN_SESSIONS.delete().where(LOGIN_SESSIONS.c.sid == _digest(sid)))
-    session.clear()
+        _disconnect_session(sid)
+
+
+def list_login_sessions(current_token):
+    """Expose management identifiers, never bearer/CSRF tokens or credentials."""
+    now = time.time()
+    with _store() as connection:
+        rows = connection.execute(select(
+            LOGIN_SESSIONS.c.sid, LOGIN_SESSIONS.c.username, LOGIN_SESSIONS.c.expires_at
+        ).order_by(LOGIN_SESSIONS.c.username, LOGIN_SESSIONS.c.expires_at,
+                   LOGIN_SESSIONS.c.sid)).mappings().all()
+    current_id = _digest(current_token)
+    return [{"session_id": row["sid"], "username": row["username"],
+             "expires_at": row["expires_at"], "expired": row["expires_at"] <= now,
+             "current": row["sid"] == current_id} for row in rows]
+
+
+def revoke_session_by_id(session_id):
+    """Delete exactly one stored digest; disconnect only after commit."""
+    with _store() as connection:
+        row = connection.execute(select(
+            LOGIN_SESSIONS.c.username
+        ).where(LOGIN_SESSIONS.c.sid == session_id).with_for_update()).mappings().first()
+        if row is None:
+            return None
+        connection.execute(LOGIN_SESSIONS.delete().where(LOGIN_SESSIONS.c.sid == session_id))
+        username = row["username"]
+    _disconnect_session(session_id, hashed=True)
+    return {"session_id": session_id, "username": username}
 
 
 def establish_session(username, password_hash, salt):
-    """Call only after successful password verification. Rotate existing session."""
-    previous_sid = session.get('sid')
+    """Rotate only the credential explicitly supplied by the logging-in tab."""
+    previous_sid = request_session_token()
     sid = secrets.token_urlsafe(32)
     csrf_token = secrets.token_urlsafe(32)
     expires_at = time.time() + current_app.permanent_session_lifetime.total_seconds()
@@ -131,30 +181,30 @@ def establish_session(username, password_hash, salt):
             credential=_digest(password_hash + ":" + salt),
             expires_at=expires_at, csrf_token=csrf_token,
         ))
-    session.clear()
-    session["sid"] = sid
-    session.permanent = True
-    return csrf_token
+    _disconnect_session(previous_sid)
+    return {"session_token": sid, "csrf_token": csrf_token, "expires_at": expires_at}
 
 
-def authenticate_session():
-    sid = session.get("sid")
-    if not isinstance(sid, str):
+def authenticate_session(token=_HTTP_TOKEN):
+    # Socket.IO supplies its auth payload explicitly; HTTP uses Authorization.
+    sid = request_session_token() if token is _HTTP_TOKEN else token
+    if not isinstance(sid, str) or not sid:
         return False
     with _store() as connection:
         row = connection.execute(
             LOGIN_SESSIONS.select().where(LOGIN_SESSIONS.c.sid == _digest(sid))
         ).mappings().first()
     if row is None or row["expires_at"] <= time.time():
-        revoke_session()
+        revoke_session(sid)
         return False
     user = current_app.config["AUTH_USER_LOADER"](row["username"])
     if (user is None or user.get("disabled", False)
             or not hmac.compare_digest(user["credential"], row["credential"])):
-        revoke_session()
+        revoke_session(sid)
         return False
     g.current_user = user
     g.csrf_token = row["csrf_token"]
+    g.session_id = sid
     return True
 
 

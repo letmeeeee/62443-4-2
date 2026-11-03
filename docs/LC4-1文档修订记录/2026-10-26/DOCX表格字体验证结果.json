@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-26",
+  "files_checked": 13,
+  "tables_checked": 251,
+  "files_changed": 12,
+  "runs_changed": 69,
+  "files": [
+    {
+      "file": "01 安全管理/TES-62443-GI-0001 00 储能安全产品开发管理规范.docx",
+      "tables_checked": 17,
+      "changed": true
+    },
+    {
+      "file": "02 安全需求分析/TES-62443-GI-0002 00 储能产品安全需求管理规范.docx",
+      "tables_checked": 30,
+      "changed": true
+    },
+    {
+      "file": "03 安全设计/TES-62443-GI-0002-06 A 产品安全纵深防御设计模板.docx",
+      "tables_checked": 29,
+      "changed": true
+    },
+    {
+      "file": "03 安全设计/TES-62443-GI-0003 00  产品安全设计规范.docx",
+      "tables_checked": 32,
+      "changed": true
+    },
+    {
+      "file": "03 安全设计/TES-62443-GI-0003-03 A 软件设计方案模板.docx",
+      "tables_checked": 21,
+      "changed": true
+    },
+    {
+      "file": "04 安全测试/TES-62443-GI-0004 00 产品安全测试规范.docx",
+      "tables_checked": 19,
+      "changed": true
+    },
+    {
+      "file": "04 安全测试/TES-62443-GI-0004-04 A 产品渗透测试报告模板.docx",
+      "tables_checked": 13,
+      "changed": true
+    },
+    {
+      "file": "05 安全实现/TES-62443-GI-0005 00 储能产品安全实现规范.docx",
+      "tables_checked": 9,
+      "changed": true
+    },
+    {
+      "file": "06 安全缺陷/TES-62443-GI-0006 00 产品安全缺陷管理规范.docx",
+      "tables_checked": 11,
+      "changed": false
+    },
+    {
+      "file": "07 安全更新/TES-62443-GI-0007 00 产品安全更新规范.docx",
+      "tables_checked": 16,
+      "changed": true
+    },
+    {
+      "file": "07 安全更新/TES-62443-GI-0007-01 A 安全更新发布说明模板.docx",
+      "tables_checked": 17,
+      "changed": true
+    },
+    {
+      "file": "08 安全使用/TES-62443-GI-0008 00 产品安全使用指南规范.docx",
+      "tables_checked": 23,
+      "changed": true
+    },
+    {
+      "file": "08 安全使用/TES-62443-GI-0008-01 A 产品安全使用指南模板.docx",
+      "tables_checked": 14,
+      "changed": true
+    }
+  ],
+  "checks": [
+    "全部表格参照原文件逐段文字格式核对",
+    "新增履历参照原履历对应列",
+    "二次应用无变化",
+    "仅rPr文字格式变化，正文及修订标记保留",
+    "其他ZIP部件逐字节一致"
+  ],
+  "limits": "未使用Office进行屏幕渲染与分页验证。"
+}

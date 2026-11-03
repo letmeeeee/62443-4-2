@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #include <openssl/ssl.h>
-#include "modbus_tee.h"
+#include "modbus_identity.h"
 #include <openssl/err.h>
 #include "zlog.h"
 #include <fcntl.h>
@@ -95,11 +95,12 @@ static SSL_CTX *make_context(int server)
         log_tls_errors("context allocation", server, -1);
         return NULL;
     }
-    EVP_PKEY *key = Modbus_TEE_Key(server ? 1 : 0);
+    const char *certificate_path = server ? MODBUS_TLS_SERVER_CERT : MODBUS_TLS_CLIENT_CERT;
+    EVP_PKEY *key = Modbus_Identity_Key(server ? 1 : 0, certificate_path);
     int identity_ok = key &&
         SSL_CTX_use_certificate_chain_file(ctx, server ? MODBUS_TLS_SERVER_CERT : MODBUS_TLS_CLIENT_CERT) == 1 &&
         SSL_CTX_use_PrivateKey(ctx, key) == 1 && SSL_CTX_check_private_key(ctx) == 1 &&
-        Modbus_TEE_Check(SSL_CTX_get0_certificate(ctx), server ? 1 : 0);
+        Modbus_Identity_Check(SSL_CTX_get0_certificate(ctx), server ? 1 : 0, certificate_path);
     EVP_PKEY_free(key);
     if (!identity_ok || SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION) != 1 ||
         SSL_CTX_set_cipher_list(ctx, "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384") != 1 ||

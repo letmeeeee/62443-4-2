@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-from flask import request, jsonify, Blueprint, g, session, current_app
+from flask import request, jsonify, Blueprint, g, current_app
 from sqlalchemy import text
 from config import PERM_TABLE, engine
 from utils.method import _ensure_perm_table_in_request, _perm_table_exists, md5_password, generate_salt
 import config
 from utils.auth import (establish_session, revoke_session, is_developer_account_disabled,
-                        login_capacity, LoginCapacityExceeded)
+                        login_capacity, LoginCapacityExceeded, list_login_sessions, revoke_session_by_id)
 import utils.operationLog as operationLog
 from datetime import datetime, timedelta
 
@@ -216,7 +216,7 @@ def permission_login():
                     "error":"Invalid username or password"
                 }),401
 
-        csrf_token = establish_session(username, db_hash, salt)
+        credentials = establish_session(username, db_hash, salt)
         _result = operationLog.OperationResult.SUCCESS
 
         # return jsonify({
@@ -228,7 +228,7 @@ def permission_login():
         return jsonify({
             "ok": True,
             "db_status": 1,
-            "csrf_token": csrf_token,
+            **credentials,
             "username": username,
             "permission": int(permission),
             "first_login": int(first_login),
@@ -268,12 +268,53 @@ def permission_session():
 
 @permission_bp.route("/permission/logout", methods=["POST"])
 def permission_logout():
-    session_id = session.get('sid')
-    revoke_session()
-    disconnect_connections = current_app.extensions.get('disconnect_session_connections')
-    if session_id and disconnect_connections:
-        disconnect_connections(session_id)
+    revoke_session(g.session_id)
     return jsonify(ok=True)
+
+
+def _session_admin_allowed():
+    return g.current_user["permission"] in config.PERMISSION_TABLE.get("usermanage", [])
+
+
+@permission_bp.route("/permission/sessions", methods=["GET"])
+def permission_sessions():
+    if not _session_admin_allowed():
+        return jsonify(ok=False, error="Administrator permission required"), 403
+    try:
+        return jsonify(ok=True, sessions=list_login_sessions(g.session_id))
+    except Exception:
+        current_app.logger.exception("Failed to list login sessions")
+        return jsonify(ok=False, error="Session store unavailable"), 503
+
+
+@permission_bp.route("/permission/sessions/revoke", methods=["POST"])
+def permission_revoke_session():
+    operator = g.current_user["username"]
+    result = operationLog.OperationResult.FAIL
+    remark = "Permission denied"
+    try:
+        if not _session_admin_allowed():
+            return jsonify(ok=False, error="Administrator permission required"), 403
+        data = request.get_json(silent=True)
+        session_id = data.get("session_id") if isinstance(data, dict) else None
+        if (not isinstance(session_id, str) or len(session_id) != 64
+                or any(char not in "0123456789abcdef" for char in session_id)):
+            remark = "Invalid session_id"
+            return jsonify(ok=False, error="session_id must be a 64-character lowercase SHA-256 hex digest"), 400
+        remark = f"session_id={session_id}"
+        revoked = revoke_session_by_id(session_id)
+        if revoked is None:
+            return jsonify(ok=False, error="Session not found"), 404
+        result = operationLog.OperationResult.SUCCESS
+        remark += f"; username={revoked['username']}"
+        return jsonify(ok=True, **revoked)
+    except Exception:
+        current_app.logger.exception("Failed to revoke login session")
+        return jsonify(ok=False, error="Session store unavailable"), 503
+    finally:
+        operationLog.enqueue_operation_log(
+            operator, operationLog.OperationType.USER, "force logout session",
+            1, result, remark)
 
 
 @permission_bp.route("/permission/delete", methods=["POST"])

@@ -111,17 +111,26 @@ file(GLOB_RECURSE ALL_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/p2p_server/*.c
 )
 
+option(MODBUS_WITH_TEE "Include optional TEE identity backend (runtime default remains file)" ON)
+set(MODBUS_TEE_SOURCES)
+if(MODBUS_WITH_TEE)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/OpteeClient.cmake")
+  set(MODBUS_TA_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/../optee_ta_examples/ta/crypto_ta/include")
+  list(APPEND MODBUS_TEE_SOURCES lib/modbus_tee.c)
+else()
+  list(REMOVE_ITEM ALL_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/lib/modbus_tee.c")
+endif()
 add_executable(tems ${ALL_SRCS})
-
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/OpteeClient.cmake")
-set(MODBUS_TA_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/../optee_ta_examples/ta/crypto_ta/include")
-target_include_directories(tems PRIVATE "${OPTEE_CLIENT_INCLUDE_DIR}" "${MODBUS_TA_INCLUDE}")
-target_link_libraries(tems PRIVATE "${OPTEE_CLIENT_LIBRARY}")
-
-add_executable(modbus_tee_identity scripts/modbus_tee_identity.c lib/modbus_tee.c)
-target_include_directories(modbus_tee_identity PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib"
-  "${OPTEE_CLIENT_INCLUDE_DIR}" "${MODBUS_TA_INCLUDE}")
-target_link_libraries(modbus_tee_identity PRIVATE "${OPTEE_CLIENT_LIBRARY}" -l:libcrypto.so.1.1 Threads::Threads dl)
+add_executable(modbus_tee_identity scripts/modbus_tee_identity.c lib/modbus_identity.c ${MODBUS_TEE_SOURCES})
+foreach(_identity_target tems modbus_tee_identity)
+  target_compile_definitions(${_identity_target} PRIVATE MODBUS_WITH_TEE=$<BOOL:${MODBUS_WITH_TEE}>)
+  if(MODBUS_WITH_TEE)
+    target_include_directories(${_identity_target} PRIVATE "${OPTEE_CLIENT_INCLUDE_DIR}" "${MODBUS_TA_INCLUDE}")
+    target_link_libraries(${_identity_target} PRIVATE "${OPTEE_CLIENT_LIBRARY}")
+  endif()
+endforeach()
+target_include_directories(modbus_tee_identity PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+target_link_libraries(modbus_tee_identity PRIVATE -l:libcrypto.so.1.1 Threads::Threads dl)
 set_target_properties(modbus_tee_identity PROPERTIES INSTALL_RPATH "\$ORIGIN/../lib;\$ORIGIN/../mysqlib/lib")
 install(TARGETS modbus_tee_identity RUNTIME DESTINATION bin)
 

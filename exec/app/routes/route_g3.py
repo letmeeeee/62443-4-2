@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, threading, shutil
+import json, threading, shutil, subprocess
 from flask import request, jsonify, g
 from werkzeug.utils import secure_filename
 import traceback
@@ -36,6 +36,109 @@ import utils.operationLog as operationLog
 g3_bp = Blueprint("g3", __name__)
 PUBLIC_KEY_PATH = Path("/home/zlg/app/keys/ota_public_key.pem")
 UPGRADE_PACKAGE_DIR = UPLOAD_DIR / "packages"
+# SSH 通道仅控制本机当前运行状态，不修改开机自启设置。
+SSH_SERVICE_UNITS = ("ssh.service", "sshd.service", "dropbear.service")
+SSH_CONTROL_LOCK = threading.Lock()
+
+
+def _ssh_systemctl(*args, allow_missing=False):
+    result = subprocess.run(
+        ["systemctl", "--no-ask-password", *args],
+        capture_output=True, text=True, timeout=15,
+    )
+    missing = allow_missing and "LoadState=not-found" in result.stdout.splitlines()
+    if result.returncode != 0 and not missing:
+        raise RuntimeError(result.stderr.strip() or "systemctl command failed")
+    return result.stdout.strip()
+
+
+def _ssh_unit_state(unit):
+    output = _ssh_systemctl("show", unit, "--property=LoadState,ActiveState", allow_missing=True)
+    properties = dict(line.split("=", 1) for line in output.splitlines() if "=" in line)
+    if properties.get("LoadState") == "not-found":
+        return None
+    if properties.get("LoadState") not in ("loaded", "masked"):
+        raise RuntimeError("Cannot load SSH unit: " + unit)
+    state = properties.get("ActiveState")
+    if not state:
+        raise RuntimeError("Cannot query SSH unit state: " + unit)
+    return state
+
+
+def _ssh_status():
+    for service in SSH_SERVICE_UNITS:
+        state = _ssh_unit_state(service)
+        if state is not None:
+            # 停止服务时同时停止 socket，避免新连接重新激活服务。
+            socket_unit = service.replace(".service", ".socket")
+            socket_state = _ssh_unit_state(socket_unit)
+            return {
+                "service": service,
+                "state": state,
+                "socket": socket_unit if socket_state is not None else None,
+                "socketState": socket_state,
+                "enabled": state == "active" or socket_state == "active",
+            }
+    raise RuntimeError("No supported SSH service found")
+
+
+@g3_bp.route('/api/system/ssh/status', methods=['GET'])
+def get_ssh_status():
+    """查询本机 SSH 服务及 socket 当前状态；需要登录。"""
+    if not getattr(g, "current_user", None):
+        return jsonify(success=False, error="Authentication required"), 401
+    try:
+        with SSH_CONTROL_LOCK:
+            status = _ssh_status()
+        return jsonify(success=True, **status), 200
+    except (OSError, subprocess.TimeoutExpired, RuntimeError) as exc:
+        DPrint(f"[SSH] status query failed: {exc}")
+        return jsonify(success=False, error="Unable to query SSH status"), 503
+
+
+@g3_bp.route('/api/system/ssh', methods=['POST'])
+def set_ssh_enabled():
+    """管理员设置本机 SSH 开关，请求 JSON: {"enabled": true/false}。"""
+    user = getattr(g, "current_user", None)
+    if not user:
+        return jsonify(success=False, error="Authentication required"), 401
+    body = request.get_json(silent=True)
+    success = False
+    remark = "SSH control rejected"
+    try:
+        if user.get("permission") not in config.PERMISSION_TABLE.get("usermanage", []):
+            remark = "Administrator permission required"
+            return jsonify(success=False, error=remark), 403
+        if not isinstance(body, dict) or type(body.get("enabled")) is not bool:
+            remark = "enabled must be boolean"
+            return jsonify(success=False, error=remark), 400
+        enabled = body["enabled"]
+        remark = "Enable SSH" if enabled else "Disable SSH"
+        with SSH_CONTROL_LOCK:
+            status = _ssh_status()
+            if not enabled and status["socket"]:
+                _ssh_systemctl("stop", status["socket"])
+            _ssh_systemctl("start" if enabled else "stop", status["service"])
+            status = _ssh_status()
+            settled_states = ("inactive", "failed")
+            success = (status["state"] == "active" if enabled else
+                       status["state"] in settled_states and
+                       status["socketState"] in (*settled_states, None))
+            if not success:
+                raise RuntimeError("SSH did not reach requested state")
+        return jsonify(success=True, **status), 200
+    except (OSError, subprocess.TimeoutExpired, RuntimeError) as exc:
+        DPrint(f"[SSH] control failed: {exc}")
+        remark += ": failed"
+        return jsonify(success=False, error="Unable to change SSH status"), 503
+    finally:
+        operationLog.enqueue_operation_log(
+            user["username"], operationLog.OperationType.CONTROL, "SSH", 1,
+            operationLog.OperationResult.SUCCESS if success else operationLog.OperationResult.FAIL,
+            remark=remark,
+        )
+
+
 # ================================= api/接口定义 ===========================================
 # 设备列表查询
 @g3_bp.route('/api/device/list', methods=['GET'])

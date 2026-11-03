@@ -1,4 +1,4 @@
-#include "modbus_tee.h"
+#include "modbus_identity.h"
 #include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/x509v3.h>
@@ -26,24 +26,33 @@ int main(int argc, char **argv)
     X509 *cert = NULL;
     BIO *bio = NULL;
     int ok = 0;
+    const char *directory = "/etc/ems/modbus";
+    char certificate_path[4096];
+    if (argc >= 3 && !strcmp(argv[1], "--dir")) {
+        directory = argv[2];
+        argc -= 2; argv += 2;
+    }
+    if (!Modbus_Identity_Backend()) goto out;
     if (argc < 3 || (strcmp(argv[2], "master") && strcmp(argv[2], "slave"))) goto out;
     role = !strcmp(argv[2], "slave");
+    int count = snprintf(certificate_path, sizeof(certificate_path), "%s/%s.crt", directory, argv[2]);
+    if (count < 0 || count >= (int)sizeof(certificate_path)) goto out;
     if (!strcmp(argv[1], "ensure") && argc == 3) {
-        ok = Modbus_TEE_Ensure(role);
+        ok = Modbus_Identity_Ensure(role, certificate_path);
         goto out;
     }
     if (!strcmp(argv[1], "check") && argc == 4) {
         bio = BIO_new_file(argv[3], "r");
         if (bio) cert = PEM_read_bio_X509(bio, NULL, NULL, NULL);
-        ok = cert && Modbus_TEE_Check(cert, role);
+        ok = cert && Modbus_Identity_Check(cert, role, certificate_path);
         goto out;
     }
-    if (strcmp(argv[1], "cert") || argc != 6) goto out;
+    if ((strcmp(argv[1], "cert") && strcmp(argv[1], "cert-existing")) || argc != 6) goto out;
     char *end = NULL;
     long days = strtol(argv[4], &end, 10);
     if (!end || *end || days < 1 || days > 3650 || !*argv[3] || strlen(argv[3]) > 64) goto out;
-    if (!Modbus_TEE_Ensure(role)) goto out;
-    key = Modbus_TEE_Key(role); cert = X509_new();
+    if (!strcmp(argv[1], "cert") && !Modbus_Identity_Ensure(role, certificate_path)) goto out;
+    key = Modbus_Identity_Key(role, certificate_path); cert = X509_new();
     unsigned char random[16];
     BIGNUM *serial = NULL;
     if (!key || !cert || RAND_bytes(random, sizeof(random)) != 1) goto out;
@@ -63,11 +72,11 @@ int main(int argc, char **argv)
         !extension(cert, NID_ext_key_usage, role ? "serverAuth" : "clientAuth") ||
         !extension(cert, NID_subject_key_identifier, "hash") ||
         (*argv[5] && !extension(cert, NID_subject_alt_name, argv[5])) ||
-        !X509_sign(cert, key, EVP_sha256()) || !Modbus_TEE_Check(cert, role)) goto out;
+        !X509_sign(cert, key, EVP_sha256()) || !Modbus_Identity_Check(cert, role, certificate_path)) goto out;
     ok = PEM_write_X509(stdout, cert);
 out:
     if (!ok) {
-        fprintf(stderr, "Modbus TA identity failed. usage: %s ensure ROLE | check ROLE CERT | cert ROLE CN DAYS SAN\n", argv[0]);
+        fprintf(stderr, "Modbus identity failed. usage: modbus_tee_identity [--dir DIR] ensure ROLE | check ROLE CERT | cert[-existing] ROLE CN DAYS SAN\n");
         ERR_print_errors_fp(stderr);
     }
     BIO_free(bio); X509_free(cert); EVP_PKEY_free(key);

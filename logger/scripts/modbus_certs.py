@@ -18,11 +18,21 @@ PEM = re.compile(rb'-----BEGIN CERTIFICATE-----\s+.*?-----END CERTIFICATE-----',
 TEE_IDENTITY = os.environ.get('MODBUS_TEE_IDENTITY', '/home/zlg/app/bin/modbus_tee_identity')
 
 
-def tee_identity(*args):
-    result = subprocess.run([TEE_IDENTITY, *map(str, args)],
+def key_backend():
+    value = os.environ.get('MODBUS_KEY_BACKEND', 'file')
+    if value not in ('file', 'tee'):
+        raise ValueError('MODBUS_KEY_BACKEND 只允许 file 或 tee')
+    return value
+
+
+def tee_identity(*args, directory=None):
+    prefix = [TEE_IDENTITY]
+    if directory is not None:
+        prefix += ['--dir', str(directory)]
+    result = subprocess.run([*prefix, *map(str, args)],
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
     if result.returncode:
-        raise ValueError(result.stderr.decode(errors='replace').strip() or 'Modbus TA operation failed')
+        raise ValueError(result.stderr.decode(errors='replace').strip() or 'Modbus identity operation failed')
     return result.stdout
 
 
@@ -82,6 +92,11 @@ def atomic_write(path, data, mode=0o600):
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temp, path)
+        directory_fd = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
     finally:
         if os.path.exists(temp):
             os.unlink(temp)
@@ -133,7 +148,9 @@ def generate(args, directory):
         if len(dns) > 253 or not all(re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?', label) for label in dns.split('.')):
             raise ValueError('无效 DNS 名称: ' + dns)
         sans.append('DNS:' + dns)
-    cert_data = tee_identity('cert', args.role, args.name, args.days, ','.join(sans))
+    operation = 'cert-existing' if args.command == 'renew' else 'cert'
+    cert_data = tee_identity(operation, args.role, args.name, args.days, ','.join(sans),
+                             directory=directory)
     validate(cert_data, args.role, directory)
     saved = backup(directory, paths) if exists else None
     atomic_write(cert_path, cert_data, 0o644)
@@ -141,7 +158,12 @@ def generate(args, directory):
     print('SHA256:', fingerprint(cert_data))
     if saved:
         print('旧证书备份:', saved)
-    print('RSA-3072 私钥保存在 TA 的对应角色密钥槽中；续期复用密钥。生效需重启 tems。')
+    print('密钥后端:', key_backend())
+    if key_backend() == 'file':
+        print('RSA-3072 私钥文件:', key_path)
+    else:
+        print('RSA-3072 私钥保存在 TA 的对应角色密钥槽中。')
+    print('续期复用密钥；生效需重启 tems。')
     if args.role == 'master':
         print('请将新的 master.crt 导入需要连接的从机信任文件。')
 
@@ -156,7 +178,7 @@ def main():
     parser.add_argument('--dir', type=Path, default=Path('/etc/ems/modbus'), help='证书目录，默认 /etc/ems/modbus')
     sub = parser.add_subparsers(dest='command', required=True)
     for command in ('generate', 'renew'):
-        p = sub.add_parser(command, help='创建本机身份' if command == 'generate' else '备份并更换证书与私钥')
+        p = sub.add_parser(command, help='创建本机身份' if command == 'generate' else '复用私钥，备份并续期证书')
         p.add_argument('--role', required=True, choices=['master', 'slave'])
         p.add_argument('--name', required=True, help='本机设备唯一名称（CN）')
         p.add_argument('--days', type=int, default=365)
@@ -174,6 +196,7 @@ def main():
     p = sub.add_parser('trust-remove', help='按完整 SHA256 指纹移除主机证书，自动备份')
     p.add_argument('--fingerprint', required=True)
     args = parser.parse_args()
+    key_backend()  # Validate before any file mutation or subprocess.
     directory = args.dir.absolute()
     with locked(directory):
         if args.command in ('generate', 'renew'):
@@ -186,7 +209,7 @@ def main():
             cert = certs[0]
             if args.command == 'check':
                 validate(cert, args.role, directory)
-                tee_identity('check', args.role, cert_path)
+                tee_identity('check', args.role, cert_path, directory=directory)
                 print('校验通过：自签名、有效期、用途和私钥匹配')
             elif args.command == 'export':
                 with args.out.open('xb') as stream:

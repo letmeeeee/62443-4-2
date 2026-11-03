@@ -1,0 +1,178 @@
+[
+  {
+    "id": "LC41-EXCEL-VERSION-001",
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-002",
+    "file": "01 安全管理/TES-62443-GI-0001-04 A 安全产品判定表.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-003",
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-004",
+    "file": "01 安全管理/TES-62443-GI-0001-07 A 产品第三方定制组件安全评估记录表.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-005",
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-006",
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-007",
+    "file": "02 安全需求分析/TES-62443-GI-0002-03 A 产品初始需求清单(产品IR).xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-008",
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-009",
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-010",
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-011",
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-012",
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-013",
+    "file": "06 安全缺陷/TES-62443-GI-0006-02 A 网络安全票证处理流程字段说明.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-014",
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "location": "修订记录!A5",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-015",
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  },
+  {
+    "id": "LC41-EXCEL-VERSION-016",
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "location": "修订记录 Revision History!A7",
+    "before": "B",
+    "after": "A",
+    "reason": "按用户要求，所有Excel版本保持原值；恢复本轮履历中递进的版本号。",
+    "evidence": "2026-10-26用户确认",
+    "date": "2026-10-26",
+    "kind": "版本恢复"
+  }
+]

@@ -2,10 +2,11 @@ from utils.utils import DPrint, now_str
 from config import remote_client_lock, HOST_IP, HTTPS_ENABLE
 from utils.method import ensure_remote_connected
 from utils.ini import ini_param
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, g
 from flask_socketio import SocketIO
 import os
 from threading import Lock
+from hashlib import sha256
 from utils.auth import init_auth, authenticate_session
 from script.session_config import configure_session
 
@@ -59,16 +60,19 @@ def get_web_connection_capacity():
 app.extensions['web_connection_capacity'] = get_web_connection_capacity
 
 
-def disconnect_session_connections(session_id):
+def disconnect_session_connections(session_id, *, hashed=False):
     with web_connections_lock:
         connections = [sid for sid, login_sid in web_connection_sessions.items()
-                       if login_sid == session_id]
+                       if (sha256(login_sid.encode("utf-8")).hexdigest()
+                           if hashed else login_sid) == session_id]
     # disconnect invokes on_disconnect, which takes the same lock.
     for sid in connections:
         socketio.server.disconnect(sid, namespace='/')
 
 
 app.extensions['disconnect_session_connections'] = disconnect_session_connections
+app.extensions['disconnect_session_connections_by_id'] = (
+    lambda session_id: disconnect_session_connections(session_id, hashed=True))
 
 def main():
     from utils.disk_cleanup import start_disk_cleanup_monitor
@@ -95,7 +99,8 @@ def main():
 @socketio.on('connect')
 def on_connect(auth=None):
     try:
-        if not authenticate_session():
+        token = auth.get("session_token", "") if isinstance(auth, dict) else ""
+        if not authenticate_session(token):
             DPrint(f"[{now_str()}] [SocketIO] 客户端连接被拒绝: {request.remote_addr}")
             return False
     except Exception:
@@ -109,7 +114,7 @@ def on_connect(auth=None):
                    f"connections={len(web_connections)}/{MAX_WEB_CONNECTIONS}, remaining=0")
             return False
         web_connections.add(request.sid)
-        web_connection_sessions[request.sid] = session.get('sid')
+        web_connection_sessions[request.sid] = g.session_id
         DPrint(f"[{now_str()}] [SocketIO] 前端连接: sid={request.sid}, "
                f"ip={request.remote_addr}, connections={len(web_connections)}/{MAX_WEB_CONNECTIONS}, "
                f"remaining={MAX_WEB_CONNECTIONS - len(web_connections)}")

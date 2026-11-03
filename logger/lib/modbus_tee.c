@@ -21,18 +21,21 @@ static int invoke(unsigned command, TEEC_Operation *op)
     static const TEEC_UUID uuid = TA_CRYPTO_UUID;
     TEEC_Result result;
     uint32_t origin = 0;
+    const char *stage = "InitializeContext";
     result = TEEC_InitializeContext(NULL, &context);
     if (result != TEEC_SUCCESS) goto error;
+    stage = "OpenSession";
     result = TEEC_OpenSession(&context, &session, &uuid, TEEC_LOGIN_PUBLIC,
                               NULL, NULL, &origin);
     if (result != TEEC_SUCCESS) { TEEC_FinalizeContext(&context); goto error; }
+    stage = "InvokeCommand";
     result = TEEC_InvokeCommand(&session, command, op, &origin);
     TEEC_CloseSession(&session);
     TEEC_FinalizeContext(&context);
     if (result == TEEC_SUCCESS) return 1;
 error:
-    fprintf(stderr, "Modbus TA command=%u result=0x%08x origin=0x%08x\n",
-            command, result, origin);
+    fprintf(stderr, "Modbus TA stage=%s command=%u result=0x%08x origin=0x%08x\n",
+            stage, command, result, origin);
     return 0;
 }
 

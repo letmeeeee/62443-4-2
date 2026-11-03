@@ -340,6 +340,12 @@ zlog.h
 pthread.h
 -
 
+../lib/modbus_protocol.h
+stdint.h
+-
+system.h
+../lib/system.h
+
 ../lib/modbus_rtu_poll.h
 main.h
 ../lib/main.h
@@ -556,29 +562,11 @@ modbus_rtu_poll.h
 system.h
 ../whitelist/system.h
 
-/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_protocol.c
+/home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_trina.c
 main.h
-/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/main.h
-modbus_protocol.h
-/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_protocol.h
-stdint.h
--
-pthread.h
--
+/home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/main.h
 time.h
-/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/time.h
-stdio.h
--
-fcntl.h
--
-unistd.h
--
-string.h
--
-
-/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_protocol.h
-stdint.h
--
-system.h
-/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/system.h
+/home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/time.h
+modbus_protocol.h
+/home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/modbus_protocol.h
 

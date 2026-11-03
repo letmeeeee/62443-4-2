@@ -1,0 +1,3487 @@
+[
+  {
+    "file": "01 安全管理/TES-62443-GI-0001 00 储能安全产品开发管理规范.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "流程活动裁剪表 clipping table",
+    "row": "18",
+    "before": {
+      "ht": "45.6",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "216",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "流程活动裁剪表 clipping table",
+    "row": "20",
+    "before": {
+      "ht": "45.6",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "96",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "流程活动裁剪表 clipping table",
+    "row": "31",
+    "before": {
+      "ht": "45.6",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "126",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "流程活动裁剪表 clipping table",
+    "row": "33",
+    "before": {
+      "ht": "45.6",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "141",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "流程活动裁剪表 clipping table",
+    "cell": "D18",
+    "before_style": "13",
+    "after_style": "25"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "流程活动裁剪表 clipping table",
+    "cell": "D20",
+    "before_style": "13",
+    "after_style": "25"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "流程活动裁剪表 clipping table",
+    "cell": "D31",
+    "before_style": "13",
+    "after_style": "25"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "流程活动裁剪表 clipping table",
+    "cell": "D33",
+    "before_style": "13",
+    "after_style": "25"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-02 A 安全产品开发流程裁剪表.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-04 A 安全产品判定表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-04 A 安全产品判定表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "判定检查表Decision Checklist",
+    "row": "12",
+    "before": {
+      "ht": "",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "186",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-04 A 安全产品判定表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "判定检查表Decision Checklist",
+    "cell": "A12",
+    "before_style": "19",
+    "after_style": "34"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-04 A 安全产品判定表.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "检查表 Checklist",
+    "row": "8",
+    "before": {
+      "ht": "68.4",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "111",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "检查表 Checklist",
+    "row": "9",
+    "before": {
+      "ht": "57",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "141",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "检查表 Checklist",
+    "row": "11",
+    "before": {
+      "ht": "57",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "216",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "检查表 Checklist",
+    "row": "12",
+    "before": {
+      "ht": "57",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "261",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "检查表 Checklist",
+    "row": "13",
+    "before": {
+      "ht": "57",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "231",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "检查表 Checklist",
+    "cell": "F8",
+    "before_style": "13",
+    "after_style": "30"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "检查表 Checklist",
+    "cell": "F9",
+    "before_style": "13",
+    "after_style": "30"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "检查表 Checklist",
+    "cell": "F11",
+    "before_style": "13",
+    "after_style": "30"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "检查表 Checklist",
+    "cell": "F12",
+    "before_style": "13",
+    "after_style": "30"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "检查表 Checklist",
+    "cell": "F13",
+    "before_style": "13",
+    "after_style": "30"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-06 A 产品发布安全缺陷检查表.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-07 A 产品第三方定制组件安全评估记录表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-07 A 产品第三方定制组件安全评估记录表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "产品第三方组件安全风险评估表 Assessment Form",
+    "row": "10",
+    "before": {
+      "ht": "",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "126",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-07 A 产品第三方定制组件安全评估记录表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "产品第三方组件安全风险评估表 Assessment Form",
+    "cell": "A10",
+    "before_style": "25",
+    "after_style": "38"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-07 A 产品第三方定制组件安全评估记录表.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "外部组件列表 List",
+    "row": "13",
+    "before": {
+      "ht": "",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "96",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "外部组件列表 List",
+    "cell": "A13",
+    "before_style": "26",
+    "after_style": "35"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "外部组件供应商安全能力评估表checklist",
+    "row": "11",
+    "before": {
+      "ht": "30.45",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "外部组件供应商安全能力评估表checklist",
+    "row": "14",
+    "before": {
+      "ht": "43.05",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "外部组件供应商安全能力评估表checklist",
+    "row": "25",
+    "before": {
+      "ht": "28.05",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "81",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "外部组件供应商安全能力评估表checklist",
+    "cell": "E11",
+    "before_style": "11",
+    "after_style": "36"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "外部组件供应商安全能力评估表checklist",
+    "cell": "E14",
+    "before_style": "11",
+    "after_style": "36"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "外部组件供应商安全能力评估表checklist",
+    "cell": "E25",
+    "before_style": "11",
+    "after_style": "36"
+  },
+  {
+    "file": "01 安全管理/TES-62443-GI-0001-09 A 外部组件安全评估检查表.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml",
+      "xl/worksheets/sheet4.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002 00 储能产品安全需求管理规范.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Threat Model Analysis Report",
+    "row": "4",
+    "before": {
+      "ht": "",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "171",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Threat Model Analysis Report",
+    "row": "5",
+    "before": {
+      "ht": "",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "186",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Threat Model Analysis Report",
+    "row": "6",
+    "before": {
+      "ht": "",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "186",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Threat Model Analysis Report",
+    "row": "7",
+    "before": {
+      "ht": "",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "171",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Threat Model Analysis Report",
+    "row": "8",
+    "before": {
+      "ht": "",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "171",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "A4",
+    "before_style": "8",
+    "after_style": "34"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "B4",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "C4",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "D4",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "F4",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "I4",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "J4",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "A5",
+    "before_style": "12",
+    "after_style": "36"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "B5",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "C5",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "D5",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "F5",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "I5",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "J5",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "A6",
+    "before_style": "12",
+    "after_style": "36"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "B6",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "C6",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "D6",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "F6",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "I6",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "J6",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "A7",
+    "before_style": "12",
+    "after_style": "36"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "B7",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "C7",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "D7",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "F7",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "I7",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "J7",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "A8",
+    "before_style": "12",
+    "after_style": "36"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "B8",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "C8",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "D8",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "F8",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "I8",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Threat Model Analysis Report",
+    "cell": "J8",
+    "before_style": "9",
+    "after_style": "35"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-02 A 威胁建模风险报告.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet3.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-03 A 产品初始需求清单(产品IR).xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-03 A 产品初始需求清单(产品IR).xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "产品初始需求单 Initial Requireme",
+    "row": "21",
+    "before": {
+      "ht": "52.8",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "126",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-03 A 产品初始需求清单(产品IR).xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "产品初始需求单 Initial Requireme",
+    "row": "29",
+    "before": {
+      "ht": "98",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "156",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-03 A 产品初始需求清单(产品IR).xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "产品初始需求单 Initial Requireme",
+    "cell": "D21",
+    "before_style": "49",
+    "after_style": "69"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-03 A 产品初始需求清单(产品IR).xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "产品初始需求单 Initial Requireme",
+    "cell": "D29",
+    "before_style": "49",
+    "after_style": "69"
+  },
+  {
+    "file": "02 安全需求分析/TES-62443-GI-0002-03 A 产品初始需求清单(产品IR).xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": " Product Interfaces Description",
+    "row": "8",
+    "before": {
+      "ht": "16.35",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "51.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": " Product Interfaces Description",
+    "row": "9",
+    "before": {
+      "ht": "16.35",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "51.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": " Product Interfaces Description",
+    "row": "10",
+    "before": {
+      "ht": "16.35",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "51.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": " Product Interfaces Description",
+    "row": "11",
+    "before": {
+      "ht": "16.35",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "51.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": " Product Interfaces Description",
+    "row": "12",
+    "before": {
+      "ht": "16.35",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "51.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": " Product Interfaces Description",
+    "row": "17",
+    "before": {
+      "ht": "16.35",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "51.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "H8",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "I8",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "J8",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "M8",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "H9",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "I9",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "J9",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "M9",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "H10",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "I10",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "J10",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "H11",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "J11",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "H12",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "J12",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "H17",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "J17",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": " Product Interfaces Description",
+    "cell": "M17",
+    "before_style": "15",
+    "after_style": "29"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-05 A 产品接口说明.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0002-06 A 产品安全纵深防御设计模板.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003 00  产品安全设计规范.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "5",
+    "before": {
+      "ht": "108.75",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "186",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "6",
+    "before": {
+      "ht": "64.8",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "381",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "9",
+    "before": {
+      "ht": "79.2",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "321",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "10",
+    "before": {
+      "ht": "73.2",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "381",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "13",
+    "before": {
+      "ht": "112.5",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "186",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "15",
+    "before": {
+      "ht": "120",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "216",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "17",
+    "before": {
+      "ht": "63.6",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "216",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "19",
+    "before": {
+      "ht": "87.6",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "141",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "20",
+    "before": {
+      "ht": "75.6",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "306",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Baseline library",
+    "row": "21",
+    "before": {
+      "ht": "68.25",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "141",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L5",
+    "before_style": "19",
+    "after_style": "32"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L6",
+    "before_style": "19",
+    "after_style": "32"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L10",
+    "before_style": "19",
+    "after_style": "32"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L9",
+    "before_style": "19",
+    "after_style": "32"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L13",
+    "before_style": "19",
+    "after_style": "32"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L15",
+    "before_style": "18",
+    "after_style": "33"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L17",
+    "before_style": "20",
+    "after_style": "34"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L19",
+    "before_style": "20",
+    "after_style": "34"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L20",
+    "before_style": "20",
+    "after_style": "34"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Baseline library",
+    "cell": "L21",
+    "before_style": "20",
+    "after_style": "34"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-01 A 网络安全设计基线.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "03 安全设计/TES-62443-GI-0003-03 A 软件设计方案模板.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004 00 产品安全测试规范.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "15",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "17",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "18",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "21",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "22",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "81.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "23",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "25",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "34",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "39",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "41",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "43",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "81.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试checklist",
+    "row": "47",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F15",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M15",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F17",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M17",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F18",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M18",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F21",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M21",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F22",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M22",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F23",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M23",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F25",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M25",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F34",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M34",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F39",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M39",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F41",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M41",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F43",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M43",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "F47",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试checklist",
+    "cell": "M47",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "15",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "156.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "17",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "156.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "18",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "141.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "21",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "141.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "22",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "126.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "23",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "111.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "25",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "141.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "34",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "156.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "39",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "126.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "41",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "141.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "43",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "141.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "47",
+    "before": {
+      "ht": "60",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "141.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F15",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M15",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F17",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M17",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F18",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M18",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F21",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M21",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F22",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M22",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F23",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M23",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F25",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M25",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F34",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M34",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F39",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M39",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F41",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M41",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F43",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M43",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "F47",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "M47",
+    "before_style": "4",
+    "after_style": "13"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-01 A 产品安全测试检查单.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml",
+      "xl/worksheets/sheet3.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试设计评审checklist",
+    "row": "21",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试设计评审checklist",
+    "row": "24",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试设计评审checklist",
+    "row": "26",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试设计评审checklist",
+    "row": "32",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试设计评审checklist",
+    "row": "40",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全测试设计评审checklist",
+    "row": "41",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试设计评审checklist",
+    "cell": "C21",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试设计评审checklist",
+    "cell": "C24",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试设计评审checklist",
+    "cell": "C26",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试设计评审checklist",
+    "cell": "C32",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试设计评审checklist",
+    "cell": "C40",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全测试设计评审checklist",
+    "cell": "C41",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "21",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "111",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "24",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "26",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "32",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "40",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Checklist",
+    "row": "41",
+    "before": {
+      "ht": "54",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "C21",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "C24",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "C26",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "C32",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "C40",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Checklist",
+    "cell": "C41",
+    "before_style": "5",
+    "after_style": "15"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-02 A 安全测试设计评审检查单.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml",
+      "xl/worksheets/sheet3.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "04 安全测试/TES-62443-GI-0004-04 A 产品渗透测试报告模板.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005 00 储能产品安全实现规范.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "12",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "111",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "13",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "126",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "14",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "81",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "15",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "81",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "16",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "81",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "21",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "111",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "25",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "111",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "26",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "126",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "27",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "111",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "29",
+    "before": {
+      "ht": "52",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "96",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "Review form",
+    "row": "43",
+    "before": {
+      "ht": "56",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "66.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I12",
+    "before_style": "8",
+    "after_style": "20"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I13",
+    "before_style": "8",
+    "after_style": "20"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "G14",
+    "before_style": "2",
+    "after_style": "21"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "G15",
+    "before_style": "2",
+    "after_style": "21"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "G16",
+    "before_style": "2",
+    "after_style": "21"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I21",
+    "before_style": "8",
+    "after_style": "20"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I25",
+    "before_style": "8",
+    "after_style": "20"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I26",
+    "before_style": "8",
+    "after_style": "20"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I27",
+    "before_style": "8",
+    "after_style": "20"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I29",
+    "before_style": "8",
+    "after_style": "20"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "E43",
+    "before_style": "2",
+    "after_style": "21"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "G43",
+    "before_style": "2",
+    "after_style": "21"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I14",
+    "before_style": "9",
+    "after_style": "22"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I15",
+    "before_style": "9",
+    "after_style": "22"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "Review form",
+    "cell": "I16",
+    "before_style": "9",
+    "after_style": "22"
+  },
+  {
+    "file": "05 安全实现/TES-62443-GI-0005-02 A 项目安全实现技术评审意见表.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006 00 产品安全缺陷管理规范.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02 A 网络安全票证处理流程字段说明.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02 A 网络安全票证处理流程字段说明.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "客户&研发问题流程字段  Field ",
+    "cell": "A1",
+    "before_style": "32",
+    "after_style": "96"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02 A 网络安全票证处理流程字段说明.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet2.xml",
+      "xl/worksheets/sheet3.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录",
+    "row": "5",
+    "before": null,
+    "after": {
+      "ht": "21.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "网络安全票证字段说明",
+    "row": "30",
+    "before": {
+      "ht": "26.399999618530273",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "网络安全票证字段说明",
+    "row": "37",
+    "before": {
+      "ht": "26.399999618530273",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "网络安全票证字段说明",
+    "cell": "E30",
+    "before_style": "60",
+    "after_style": "205"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "网络安全票证字段说明",
+    "cell": "E37",
+    "before_style": "60",
+    "after_style": "205"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "附录A 缺陷分类",
+    "row": "7",
+    "before": {
+      "ht": "15",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "36",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "附录A 缺陷分类",
+    "cell": "C7",
+    "before_style": "61",
+    "after_style": "206"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "附录B 修改模块",
+    "row": "7",
+    "before": {
+      "ht": "15",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "36",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "附录B 修改模块",
+    "row": "11",
+    "before": {
+      "ht": "15",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "36",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "附录B 修改模块",
+    "cell": "B7",
+    "before_style": "61",
+    "after_style": "206"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "附录B 修改模块",
+    "cell": "B11",
+    "before_style": "61",
+    "after_style": "206"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "附录C 特性分类",
+    "row": "3",
+    "before": {
+      "ht": "15",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "36",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "附录C 特性分类",
+    "row": "6",
+    "before": {
+      "ht": "15",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "36",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "附录C 特性分类",
+    "row": "11",
+    "before": {
+      "ht": "15",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "36",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "附录C 特性分类",
+    "row": "15",
+    "before": {
+      "ht": "15",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "36",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "附录C 特性分类",
+    "row": "24",
+    "before": {
+      "ht": "15",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "36",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "附录C 特性分类",
+    "cell": "D3",
+    "before_style": "58",
+    "after_style": "207"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "附录C 特性分类",
+    "cell": "D6",
+    "before_style": "61",
+    "after_style": "206"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "附录C 特性分类",
+    "cell": "D11",
+    "before_style": "61",
+    "after_style": "206"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "附录C 特性分类",
+    "cell": "D15",
+    "before_style": "61",
+    "after_style": "206"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "附录C 特性分类",
+    "cell": "D24",
+    "before_style": "61",
+    "after_style": "206"
+  },
+  {
+    "file": "06 安全缺陷/TES-62443-GI-0006-02_A_网络安全票证处理流程字段说明_MV_LOGGER_EM1000_更新版.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet2.xml",
+      "xl/worksheets/sheet3.xml",
+      "xl/worksheets/sheet4.xml",
+      "xl/worksheets/sheet5.xml",
+      "xl/worksheets/sheet6.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007 00 产品安全更新规范.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-01 A 安全更新发布说明模板.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新检查表",
+    "row": "22",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新检查表",
+    "row": "24",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新检查表",
+    "row": "34",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新检查表",
+    "row": "49",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新检查表",
+    "row": "50",
+    "before": {
+      "ht": "58",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "58.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新检查表",
+    "row": "57",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新检查表",
+    "cell": "B22",
+    "before_style": "22",
+    "after_style": "40"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新检查表",
+    "cell": "B24",
+    "before_style": "22",
+    "after_style": "40"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新检查表",
+    "cell": "B34",
+    "before_style": "22",
+    "after_style": "40"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新检查表",
+    "cell": "B49",
+    "before_style": "22",
+    "after_style": "40"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新检查表",
+    "cell": "B50",
+    "before_style": "22",
+    "after_style": "40"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新检查表",
+    "cell": "B57",
+    "before_style": "22",
+    "after_style": "40"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-02 A 安全更新检查表.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "修订记录 Revision History",
+    "row": "7",
+    "before": {
+      "ht": "15.15",
+      "customHeight": ""
+    },
+    "after": {
+      "ht": "36.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新交付检查表",
+    "row": "31",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新交付检查表",
+    "row": "33",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "42.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新交付检查表",
+    "row": "42",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新交付检查表",
+    "row": "68",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新交付检查表",
+    "row": "69",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新交付检查表",
+    "row": "71",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新交付检查表",
+    "row": "72",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "42.0",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel行高/换行",
+    "sheet": "安全更新交付检查表",
+    "row": "75",
+    "before": {
+      "ht": "42",
+      "customHeight": "1"
+    },
+    "after": {
+      "ht": "51",
+      "customHeight": "1"
+    }
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新交付检查表",
+    "cell": "C31",
+    "before_style": "4",
+    "after_style": "19"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新交付检查表",
+    "cell": "C33",
+    "before_style": "4",
+    "after_style": "19"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新交付检查表",
+    "cell": "C42",
+    "before_style": "4",
+    "after_style": "19"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新交付检查表",
+    "cell": "C68",
+    "before_style": "4",
+    "after_style": "19"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新交付检查表",
+    "cell": "C69",
+    "before_style": "4",
+    "after_style": "19"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新交付检查表",
+    "cell": "C71",
+    "before_style": "4",
+    "after_style": "19"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新交付检查表",
+    "cell": "C72",
+    "before_style": "4",
+    "after_style": "19"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel自动换行样式",
+    "sheet": "安全更新交付检查表",
+    "cell": "C75",
+    "before_style": "4",
+    "after_style": "19"
+  },
+  {
+    "file": "07 安全更新/TES-62443-GI-0007-03 A 安全更新交付检查表.xlsx",
+    "type": "Excel包级修改",
+    "changed_parts": [
+      "xl/styles.xml",
+      "xl/worksheets/sheet1.xml",
+      "xl/worksheets/sheet2.xml"
+    ],
+    "added_parts": [],
+    "details": "保留原工作表、公式、合并区域和打印范围；新增正式格式的版本履历及自动换行样式，详细修改记录独立保存。"
+  },
+  {
+    "file": "08 安全使用/TES-62443-GI-0008 00 产品安全使用指南规范.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  },
+  {
+    "file": "08 安全使用/TES-62443-GI-0008-01 A 产品安全使用指南模板.docx",
+    "type": "Word包级修改",
+    "changed_parts": [
+      "word/document.xml",
+      "word/settings.xml"
+    ],
+    "details": "正文替换含删除/插入标记；原段落属性保留；原变更履历按用户示例增加正式版本行；启用修订记录。"
+  }
+]

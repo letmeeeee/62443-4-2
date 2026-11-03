@@ -1,0 +1,6 @@
+__pycache__/
+.venv-windows/
+build-windows/
+dist/
+*.zip
+build-windows-pip.log

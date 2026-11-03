@@ -19,6 +19,15 @@ fetch('/api/system/cpu-usage', { credentials: 'same-origin' })
   .catch(console.error);
 ```
 
+## 管理员会话管理
+
+- `GET /permission/sessions`：列出现存会话，返回管理标识 `session_id`、用户名、到期时间、是否过期和是否为当前会话。
+- `POST /permission/sessions/revoke`：请求体 `{"session_id":"<64位小写十六进制摘要>"}`，强制撤销指定会话。该标识来自会话列表或数据库 `login_sessions.sid`，不是登录 Token。
+
+两者必须携带管理员本人的 `Authorization: Bearer <session_token>`，按用户管理权限配置授权（当前等级 4）。POST 建议同时发送管理员本人的 `X-CSRF-Token`。成功删除后返回 `{"ok":true,"session_id":"...","username":"alice"}`；只影响指定会话，同账号其他会话保留，目标下次请求返回 401。接口记录实际管理员的操作日志。
+
+未登录 401、无权限 403、参数错误 400、目标不存在 404、存储异常 503。完整字段和 Socket.IO 断开范围见 [SESSION.md](SESSION.md#管理员强制下线指定会话)。
+
 ## 登录会话名额（当前登录数量统计口径）
 
 所有使用同一会话数据库的服务最多允许 20 个未过期登录会话，与是否使用 Socket.IO 无关。

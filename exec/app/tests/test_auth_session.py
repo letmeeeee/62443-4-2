@@ -30,7 +30,12 @@ def auth_app(tmp_path, monkeypatch):
     config.engine = engine
     config.PERM_TABLE = "users"
     config.HTTPS_ENABLE = True
+    config.PERMISSION_TABLE = {"usermanage": [4]}
     monkeypatch.setitem(sys.modules, "config", config)
+    utility = types.ModuleType("utils.utils")
+    utility.DPrint = Mock()
+    utility.now_str = lambda: "now"
+    monkeypatch.setitem(sys.modules, "utils.utils", utility)
     method = types.ModuleType("utils.method")
     method._ensure_perm_table_in_request = lambda: None
     method._perm_table_exists = lambda connection: True
@@ -75,6 +80,7 @@ def auth_app(tmp_path, monkeypatch):
 def login(client, username="alice"):
     response = client.post("/permission/login", json={"username": username, "password": "correct"})
     assert response.status_code == 200
+    client.environ_base["HTTP_AUTHORIZATION"] = "Bearer " + response.json["session_token"]
     return response
 
 
@@ -83,6 +89,7 @@ def login(client, username="alice"):
     ("/permission/add", "POST"), ("/permission/delete", "POST"),
     ("/permission/update", "POST"), ("/permission/all", "POST"),
     ("/permission/session", "GET"), ("/permission/logout", "POST"),
+    ("/permission/sessions", "GET"), ("/permission/sessions/revoke", "POST"),
 ])
 def test_anonymous_requests_rejected(auth_app, path, method):
     response = auth_app[0].test_client().open(path, method=method)
@@ -93,8 +100,9 @@ def test_anonymous_requests_rejected(auth_app, path, method):
 def test_login_and_current_identity(auth_app):
     client = auth_app[0].test_client()
     response = login(client)
-    assert "HttpOnly" in response.headers["Set-Cookie"]
-    assert "SameSite=Lax" in response.headers["Set-Cookie"]
+    assert "Set-Cookie" not in response.headers
+    assert response.json["expires_at"] > 0
+    assert response.json["session_token"] != response.json["csrf_token"]
     assert response.headers["Cache-Control"] == "no-store"
     assert client.get("/permission/session").json["username"] == "alice"
     assert client.get("/g2").json["permission"] == 1
@@ -120,40 +128,248 @@ def test_csrf_and_same_origin_browser(auth_app):
     assert client.post("/permission/login", json={}, headers={"Origin": "https://evil.example"}).status_code == 403
 
 
-def test_logout_revokes_copied_cookie(auth_app):
+def test_logout_revokes_copied_token(auth_app):
     app = auth_app[0]
     client = app.test_client()
-    token = login(client).json["csrf_token"]
-    old_cookie = client.get_cookie("lc_session").value
+    credentials = login(client).json
+    token = credentials["csrf_token"]
+    old_token = credentials["session_token"]
     assert client.post("/permission/logout", headers={"X-CSRF-Token": token}).status_code == 200
     attacker = app.test_client()
-    attacker.set_cookie("lc_session", old_cookie)
+    attacker.environ_base["HTTP_AUTHORIZATION"] = "Bearer " + old_token
     assert attacker.get("/g2").status_code == 401
 
 
-def test_relogin_rotates_and_revokes_old_cookie(auth_app):
+def test_relogin_rotates_and_revokes_old_token(auth_app):
     app = auth_app[0]
     client = app.test_client()
-    login(client)
-    old_cookie = client.get_cookie("lc_session").value
+    old_token = login(client).json["session_token"]
     login(client, "admin")
     assert client.get("/g2").json["username"] == "admin"
     attacker = app.test_client()
-    attacker.set_cookie("lc_session", old_cookie)
+    attacker.environ_base["HTTP_AUTHORIZATION"] = "Bearer " + old_token
     assert attacker.get("/g2").status_code == 401
 
 
 def test_tampered_and_expired_session(auth_app):
     app = auth_app[0]
     client = app.test_client()
-    login(client)
-    cookie = client.get_cookie("lc_session").value
-    client.set_cookie("lc_session", "tampered" + cookie)
+    token = login(client).json["session_token"]
+    client.environ_base["HTTP_AUTHORIZATION"] = "Bearer tampered" + token
     assert client.get("/g2").status_code == 401
-    client.set_cookie("lc_session", cookie)
+    client.environ_base["HTTP_AUTHORIZATION"] = "Bearer " + token
     with auth_app[1].begin() as connection:
         connection.execute(text("UPDATE login_sessions SET expires_at=0"))
     assert client.get("/g2").status_code == 401
+
+
+def test_tabs_share_browser_cookies_but_keep_identity_and_audit_separate(auth_app):
+    app, engine, log = auth_app
+    browser = app.test_client()
+    # One shared cookie jar, with credentials selected separately by each tab.
+    alice = browser.post("/permission/login", json={"username": "alice", "password": "correct"}).json
+    admin = browser.post("/permission/login", json={"username": "admin", "password": "correct"}).json
+    assert alice["session_token"] != admin["session_token"]
+    with browser.session_transaction() as legacy:
+        legacy["sid"] = admin["session_token"]
+    for username, credentials, level in (("alice", alice, 1), ("admin", admin, 4)):
+        headers = {"Authorization": "Bearer " + credentials["session_token"],
+                   "X-CSRF-Token": credentials["csrf_token"]}
+        identity = browser.get("/permission/session", headers=headers).json
+        assert (identity["username"], identity["permission"]) == (username, level)
+        assert browser.get("/g2", headers=headers).json["username"] == username
+        assert browser.post("/g3", headers=headers).json["username"] == username
+        browser.post("/permission/delete", headers=headers,
+                     json={"username": "missing", "operatorName": "someone-else"})
+        assert log.enqueue_operation_log.call_args.args[0] == username
+    assert browser.post("/permission/logout", headers={
+        "Authorization": "Bearer " + admin["session_token"],
+        "X-CSRF-Token": admin["csrf_token"]}).status_code == 200
+    assert browser.get("/g2", headers={
+        "Authorization": "Bearer " + admin["session_token"]}).status_code == 401
+    assert browser.get("/g2", headers={
+        "Authorization": "Bearer " + alice["session_token"]}).json["username"] == "alice"
+    with engine.connect() as connection:
+        assert len(connection.execute(LOGIN_SESSIONS.select()).all()) == 1
+
+
+@pytest.mark.parametrize("authorization", [None, "", "Basic abc", "Bearer", "Bearer a b", "Bearer invalid"])
+def test_cookie_and_url_cannot_replace_explicit_bearer(auth_app, authorization):
+    browser = auth_app[0].test_client()
+    credentials = browser.post("/permission/login", json={"username": "alice", "password": "correct"}).json
+    token = credentials["session_token"]
+    with browser.session_transaction() as legacy:
+        legacy["sid"] = token
+    headers = {} if authorization is None else {"Authorization": authorization}
+    assert browser.get("/g2?session_token=" + token, headers=headers).status_code == 401
+    headers["X-CSRF-Token"] = credentials["csrf_token"]
+    headers["Origin"] = "http://localhost"
+    assert browser.post("/g3", headers=headers).status_code == 401
+    assert browser.get("/g2", headers={"Authorization": "bearer " + token}).status_code == 200
+
+
+def test_tab_relogin_failure_and_capacity_preserve_other_sessions(auth_app, monkeypatch):
+    import utils.auth as auth
+
+    monkeypatch.setattr(auth, "MAX_LOGIN_SESSIONS", 2)
+    app, engine, _ = auth_app
+    first, second, third = (app.test_client() for _ in range(3))
+    original = login(first).json
+    login(second, "admin")
+    rejected = third.post("/permission/login", json={"username": "alice", "password": "correct"})
+    assert rejected.status_code == 429
+    assert rejected.json["code"] == "LOGIN_LIMIT_REACHED"
+    assert first.post("/permission/login", json={"username": "admin", "password": "wrong"}).status_code == 401
+    assert first.get("/g2").json["username"] == "alice"
+    # At capacity, replacing the first tab's own session still succeeds.
+    login(first, "admin")
+    assert first.get("/g2").json["username"] == "admin"
+    assert second.get("/g2").json["username"] == "admin"
+    assert third.get("/g2", headers={"Authorization": "Bearer " + original["session_token"]}).status_code == 401
+    with engine.connect() as connection:
+        assert len(connection.execute(LOGIN_SESSIONS.select()).all()) == 2
+
+
+def test_socket_disconnect_failure_does_not_hide_new_credentials(auth_app):
+    app, _, _ = auth_app
+    client = app.test_client()
+    old_token = login(client).json["session_token"]
+    disconnect = Mock(side_effect=RuntimeError("socket unavailable"))
+    app.extensions["disconnect_session_connections"] = disconnect
+    login(client, "admin")
+    disconnect.assert_called_once_with(old_token)
+    assert client.get("/g2").json["username"] == "admin"
+    assert app.test_client().get("/g2", headers={
+        "Authorization": "Bearer " + old_token}).status_code == 401
+
+
+def test_admin_lists_and_revokes_one_session_without_affecting_same_user(auth_app):
+    import hashlib
+
+    app, engine, log = auth_app
+    admin, target, other = (app.test_client() for _ in range(3))
+    administrator = login(admin, "admin").json
+    victim = login(target).json
+    another = login(other).json
+    rows = admin.get("/permission/sessions").json["sessions"]
+    assert len(rows) == 3
+    assert sum(row["current"] for row in rows) == 1
+    assert next(row for row in rows if row["current"])["username"] == "admin"
+    assert all(set(row) == {"session_id", "username", "expires_at", "expired", "current"} for row in rows)
+    for credentials in (administrator, victim, another):
+        assert credentials["session_token"] not in str(rows)
+        assert credentials["csrf_token"] not in str(rows)
+    target_id = hashlib.sha256(victim["session_token"].encode()).hexdigest()
+    assert any(row["session_id"] == target_id for row in rows)
+    disconnect = Mock()
+    app.extensions["disconnect_session_connections_by_id"] = disconnect
+    headers = {"X-CSRF-Token": administrator["csrf_token"]}
+    response = admin.post("/permission/sessions/revoke", headers=headers,
+                          json={"session_id": target_id, "operatorName": "alice"})
+    assert response.status_code == 200
+    assert response.json == {"ok": True, "session_id": target_id, "username": "alice"}
+    disconnect.assert_called_once_with(target_id)
+    with engine.connect() as connection:
+        assert connection.execute(LOGIN_SESSIONS.select().where(LOGIN_SESSIONS.c.sid == target_id)).first() is None
+    assert log.enqueue_operation_log.call_args.args[0] == "admin"
+    assert log.enqueue_operation_log.call_args.args[4] == 1
+    assert target.get("/g2").status_code == 401
+    assert other.get("/g2").status_code == 200
+    assert admin.get("/permission/session").json["loginSessions"]["active"] == 2
+    assert admin.post("/permission/sessions/revoke", headers=headers,
+                      json={"session_id": target_id}).status_code == 404
+
+
+@pytest.mark.parametrize("level", [1, 2, 3])
+def test_nonadmins_cannot_list_or_revoke_sessions(auth_app, level):
+    app, engine, log = auth_app
+    client = app.test_client()
+    credentials = login(client).json
+    with engine.begin() as connection:
+        connection.execute(text("UPDATE users SET permission=:level WHERE username='alice'"), {"level": level})
+    assert client.get("/permission/sessions").status_code == 403
+    assert client.post("/permission/sessions/revoke", json={"session_id": "a" * 64},
+                       headers={"X-CSRF-Token": credentials["csrf_token"]}).status_code == 403
+    assert client.get("/g2").status_code == 200
+    assert log.enqueue_operation_log.call_args.args[0] == "alice"
+    assert log.enqueue_operation_log.call_args.args[4] == 0
+
+
+@pytest.mark.parametrize("body", [None, [], {}, {"session_id": 1}, {"session_id": "ok"},
+                                   {"session_id": "G" * 64}, {"username": "alice"}])
+def test_force_logout_rejects_invalid_ids(auth_app, body):
+    client = auth_app[0].test_client()
+    credentials = login(client, "admin").json
+    response = client.post("/permission/sessions/revoke", json=body,
+                           headers={"X-CSRF-Token": credentials["csrf_token"]})
+    assert response.status_code == 400
+    assert client.get("/g2").status_code == 200
+
+
+def test_force_logout_requires_csrf_and_can_remove_expired_or_current_session(auth_app):
+    app, engine, _ = auth_app
+    admin, target = (app.test_client() for _ in range(2))
+    credentials = login(admin, "admin").json
+    login(target)
+    with engine.begin() as connection:
+        connection.execute(text("UPDATE login_sessions SET expires_at=0 WHERE username='alice'"))
+    rows = admin.get("/permission/sessions").json["sessions"]
+    expired = next(row for row in rows if row["expired"])
+    current = next(row for row in rows if row["current"])
+    body = {"session_id": expired["session_id"]}
+    assert admin.post("/permission/sessions/revoke", json=body).status_code == 403
+    headers = {"X-CSRF-Token": credentials["csrf_token"]}
+    assert admin.post("/permission/sessions/revoke", json=body, headers=headers).status_code == 200
+    assert admin.post("/permission/sessions/revoke", json={"session_id": current["session_id"]},
+                      headers=headers).status_code == 200
+    assert admin.get("/g2").status_code == 401
+    with engine.connect() as connection:
+        assert connection.execute(LOGIN_SESSIONS.select()).first() is None
+
+
+@pytest.mark.parametrize("endpoint,helper,method", [
+    ("/permission/sessions", "list_login_sessions", "GET"),
+    ("/permission/sessions/revoke", "revoke_session_by_id", "POST"),
+])
+def test_session_management_store_errors_fail_closed(auth_app, monkeypatch, endpoint, helper, method):
+    app, _, log = auth_app
+    client = app.test_client()
+    credentials = login(client, "admin").json
+    function = app.view_functions["permission.permission_sessions"]
+    monkeypatch.setitem(function.__globals__, helper, Mock(side_effect=RuntimeError("store down")))
+    response = client.open(endpoint, method=method, json={"session_id": "a" * 64},
+                           headers={"X-CSRF-Token": credentials["csrf_token"]})
+    assert response.status_code == 503
+    assert client.get("/g2").status_code == 200
+    if method == "POST":
+        assert log.enqueue_operation_log.call_args.args[4] == 0
+
+
+def test_failed_delete_preserves_target_session_and_does_not_disconnect(auth_app):
+    from sqlalchemy import event
+
+    app, engine, _ = auth_app
+    admin, target = (app.test_client() for _ in range(2))
+    credentials = login(admin, "admin").json
+    login(target)
+    rows = admin.get("/permission/sessions").json["sessions"]
+    target_id = next(row["session_id"] for row in rows if row["username"] == "alice")
+    disconnect = Mock()
+    app.extensions["disconnect_session_connections_by_id"] = disconnect
+
+    def fail_delete(connection, cursor, statement, parameters, context, executemany):
+        if statement.startswith("DELETE FROM login_sessions"):
+            raise RuntimeError("delete failed")
+
+    event.listen(engine, "before_cursor_execute", fail_delete)
+    try:
+        response = admin.post("/permission/sessions/revoke", json={"session_id": target_id},
+                              headers={"X-CSRF-Token": credentials["csrf_token"]})
+    finally:
+        event.remove(engine, "before_cursor_execute", fail_delete)
+    assert response.status_code == 503
+    disconnect.assert_not_called()
+    assert target.get("/g2").status_code == 200
 
 
 @pytest.mark.parametrize("sql", [
@@ -204,9 +420,9 @@ def test_session_is_stored_in_account_database_and_removed_on_logout(auth_app):
 
     app, engine, _ = auth_app
     client = app.test_client()
-    token = login(client).json["csrf_token"]
-    with client.session_transaction() as cookie_session:
-        sid = cookie_session["sid"]
+    credentials = login(client).json
+    token = credentials["csrf_token"]
+    sid = credentials["session_token"]
     with engine.connect() as connection:
         row = connection.execute(LOGIN_SESSIONS.select()).mappings().one()
         assert row["sid"] == hashlib.sha256(sid.encode()).hexdigest()
@@ -241,7 +457,7 @@ def test_sessions_survive_app_restart(auth_app):
     init_auth(another_app)
     another_app.add_url_rule("/protected", "protected", lambda: jsonify(g.current_user))
     another_client = another_app.test_client()
-    another_client.set_cookie("lc_session", client.get_cookie("lc_session").value)
+    another_client.environ_base["HTTP_AUTHORIZATION"] = client.environ_base["HTTP_AUTHORIZATION"]
     assert another_client.get("/protected").json["username"] == "alice"
 
 
@@ -251,7 +467,7 @@ def test_missing_secret_fails_startup(monkeypatch):
         init_auth(Flask("missing-key"))
 
 
-def test_https_cookie_defaults_and_origin(auth_app, monkeypatch):
+def test_https_origin_and_no_login_cookie(auth_app, monkeypatch):
     app = auth_app[0]
     app.config.pop("AUTH_COOKIE_SECURE")
     monkeypatch.delenv("SESSION_COOKIE_SECURE", raising=False)
@@ -264,7 +480,8 @@ def test_https_cookie_defaults_and_origin(auth_app, monkeypatch):
                            json={"username": "alice", "password": "correct"},
                            headers={"Origin": "https://localhost"})
     assert response.status_code == 200
-    assert "Secure;" in response.headers["Set-Cookie"]
+    assert "Set-Cookie" not in response.headers
+    client.environ_base["HTTP_AUTHORIZATION"] = "Bearer " + response.json["session_token"]
     assert client.post("/permission/logout", base_url="https://localhost",
                        headers={"Origin": "https://localhost"}).status_code == 200
 
@@ -319,12 +536,47 @@ def test_main_guards_all_registered_routes_and_socket_connect(auth_app, monkeypa
     assert count >= 40
     anonymous_socket = main.socketio.test_client(main.app, flask_test_client=client)
     assert not anonymous_socket.is_connected()
-    token = login(client).json["csrf_token"]
-    socket = main.socketio.test_client(main.app, flask_test_client=client)
+    credentials = login(client).json
+    token = credentials["csrf_token"]
+    socket_auth = {"session_token": credentials["session_token"]}
+    with client.session_transaction() as legacy:
+        legacy["sid"] = credentials["session_token"]
+    socket = main.socketio.test_client(main.app, flask_test_client=client, auth=socket_auth)
     assert socket.is_connected()
-    socket.disconnect()
+    for invalid_auth in (None, [], {"session_token": None}, {"session_token": "invalid"}):
+        assert not main.socketio.test_client(main.app, flask_test_client=client,
+                                             auth=invalid_auth).is_connected()
+    # A second tab shares the browser but sends no first-tab bearer on login.
+    admin = client.post("/permission/login", headers={"Authorization": ""},
+                        json={"username": "admin", "password": "correct"}).json
+    admin_socket = main.socketio.test_client(main.app, flask_test_client=client,
+                                             auth={"session_token": admin["session_token"]})
+    assert socket.is_connected() and admin_socket.is_connected()
+    # Rotating this tab revokes its old socket without disconnecting the other.
+    credentials = login(client).json
+    assert not socket.is_connected()
+    assert admin_socket.is_connected()
+    socket_auth = {"session_token": credentials["session_token"]}
+    socket = main.socketio.test_client(main.app, flask_test_client=client, auth=socket_auth)
+    token = credentials["csrf_token"]
     assert client.post("/permission/logout", headers={"X-CSRF-Token": token}).status_code == 200
-    assert not main.socketio.test_client(main.app, flask_test_client=client).is_connected()
+    assert not socket.is_connected()
+    assert admin_socket.is_connected()
+    # Force logout selects the stored hash, and disconnects only its sockets.
+    victim = login(client).json
+    victim_socket = main.socketio.test_client(main.app, flask_test_client=client,
+                                              auth={"session_token": victim["session_token"]})
+    admin_headers = {"Authorization": "Bearer " + admin["session_token"],
+                     "X-CSRF-Token": admin["csrf_token"]}
+    rows = client.get("/permission/sessions", headers=admin_headers).json["sessions"]
+    victim_id = next(row["session_id"] for row in rows if row["username"] == "alice")
+    assert client.post("/permission/sessions/revoke", headers=admin_headers,
+                       json={"session_id": victim_id}).status_code == 200
+    assert not victim_socket.is_connected()
+    assert admin_socket.is_connected()
+    assert client.get("/permission/session").status_code == 401
+    admin_socket.disconnect()
+    assert not main.socketio.test_client(main.app, flask_test_client=client, auth=socket_auth).is_connected()
 
 
 @pytest.fixture
@@ -364,8 +616,7 @@ def test_upgrade_shares_login_and_revocation(auth_app, upgrade_service):
     reader.assert_not_called()
     main_client = auth_app[0].test_client()
     token = login(main_client).json["csrf_token"]
-    cookie = main_client.get_cookie("lc_session").value
-    client.set_cookie("lc_session", cookie)
+    client.environ_base["HTTP_AUTHORIZATION"] = main_client.environ_base["HTTP_AUTHORIZATION"]
     response = client.get(path)
     assert response.status_code == 200
     assert response.json["process"] == [100]
@@ -375,14 +626,30 @@ def test_upgrade_shares_login_and_revocation(auth_app, upgrade_service):
     assert reader.call_count == 1
 
 
+def test_force_logout_also_invalidates_upgrade_queries(auth_app, upgrade_service):
+    module, reader = upgrade_service
+    app = auth_app[0]
+    admin, target = (app.test_client() for _ in range(2))
+    credentials = login(admin, "admin").json
+    login(target)
+    upgrade_client = module.app.test_client()
+    upgrade_client.environ_base["HTTP_AUTHORIZATION"] = target.environ_base["HTTP_AUTHORIZATION"]
+    assert upgrade_client.get("/api/upgrade/process?taskName=task").status_code == 200
+    rows = admin.get("/permission/sessions").json["sessions"]
+    target_id = next(row["session_id"] for row in rows if row["username"] == "alice")
+    assert admin.post("/permission/sessions/revoke", json={"session_id": target_id},
+                      headers={"X-CSRF-Token": credentials["csrf_token"]}).status_code == 200
+    assert upgrade_client.get("/api/upgrade/process?taskName=task").status_code == 401
+    assert reader.call_count == 1
+
+
 @pytest.mark.parametrize("failure", ["tampered", "expired", "password", "database"])
 def test_upgrade_rejects_invalid_sessions(auth_app, upgrade_service, monkeypatch, failure):
     module, reader = upgrade_service
     main_client = auth_app[0].test_client()
-    login(main_client)
-    cookie = main_client.get_cookie("lc_session").value
+    token = login(main_client).json["session_token"]
     if failure == "tampered":
-        cookie = "tampered" + cookie
+        token = "tampered" + token
     elif failure in ("expired", "password"):
         with auth_app[1].begin() as connection:
             connection.execute(text("UPDATE login_sessions SET expires_at=0" if failure == "expired"
@@ -390,7 +657,7 @@ def test_upgrade_rejects_invalid_sessions(auth_app, upgrade_service, monkeypatch
     else:
         monkeypatch.setattr(auth_app[1], "begin", Mock(side_effect=RuntimeError("database down")))
     client = module.app.test_client()
-    client.set_cookie("lc_session", cookie)
+    client.environ_base["HTTP_AUTHORIZATION"] = "Bearer " + token
     assert client.get("/api/upgrade/process?taskName=task").status_code == (503 if failure == "database" else 401)
     reader.assert_not_called()
 
@@ -400,13 +667,14 @@ def test_upgrade_socket_requires_shared_login(auth_app, upgrade_service):
     client = module.app.test_client()
     assert not module.socketio.test_client(module.app, flask_test_client=client).is_connected()
     main_client = auth_app[0].test_client()
-    token = login(main_client).json["csrf_token"]
-    client.set_cookie("lc_session", main_client.get_cookie("lc_session").value)
-    socket = module.socketio.test_client(module.app, flask_test_client=client)
+    credentials = login(main_client).json
+    token = credentials["csrf_token"]
+    socket_auth = {"session_token": credentials["session_token"]}
+    socket = module.socketio.test_client(module.app, flask_test_client=client, auth=socket_auth)
     assert socket.is_connected()
     socket.disconnect()
     main_client.post("/permission/logout", headers={"X-CSRF-Token": token})
-    assert not module.socketio.test_client(module.app, flask_test_client=client).is_connected()
+    assert not module.socketio.test_client(module.app, flask_test_client=client, auth=socket_auth).is_connected()
 
 
 def test_developer_account_disabled_at_startup(auth_app):

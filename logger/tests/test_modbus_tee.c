@@ -57,7 +57,7 @@ TEEC_Result TEEC_InvokeCommand(TEEC_Session *session, uint32_t command,
         }
         return 0;
     }
-    assert(software[role]);
+    if (!software[role]) return TEEC_ERROR_ITEM_NOT_FOUND;
     if (command == CRYPTO_MODBUS_GET_PUBLIC) {
         const BIGNUM *n, *e;
         assert(op->paramTypes == TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_OUTPUT, TEEC_MEMREF_TEMP_OUTPUT, TEEC_VALUE_INPUT, 0));

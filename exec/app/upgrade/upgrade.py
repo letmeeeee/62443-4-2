@@ -581,7 +581,8 @@ def main():
 @socketio.on('connect')
 def on_connect(auth=None):
     try:
-        if not authenticate_session():
+        token = auth.get("session_token", "") if isinstance(auth, dict) else ""
+        if not authenticate_session(token):
             return False
     except Exception:
         app.logger.exception("SocketIO authentication failed")

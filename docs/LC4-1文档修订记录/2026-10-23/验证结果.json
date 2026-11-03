@@ -1,0 +1,23 @@
+{
+  "original_files": 31,
+  "modified_files": 29,
+  "unchanged_files": [
+    "01 安全管理/TES-62443-GI-0001-12 A 事后回顾AAR模板.xlsx",
+    "04 安全测试/TES-62443-GI-0004-03 A 已验证漏洞列表.xlsx"
+  ],
+  "body_word_paragraphs": 80,
+  "body_excel_cells": 180,
+  "total_ledger_records": 301,
+  "validation": "PASS",
+  "checked": [
+    "原件备份及SHA-256",
+    "全部Office XML与内部关系",
+    "Word逐段修订前后文本及原段落保真",
+    "Excel逐格变化与台账一致",
+    "原公式、合并区域、列宽、打印范围及原样式保留",
+    "2个未修改文件逐字节一致",
+    "中英文测试条目同步",
+    "本轮确认范围排除项"
+  ],
+  "limits": "未使用Word/Excel/LibreOffice做分页或屏幕渲染验证；本轮未执行设备部署、控制或实机安全测试。"
+}
