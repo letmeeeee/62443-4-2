@@ -213,7 +213,7 @@ class TLSTests(unittest.TestCase):
         import subprocess
         import sys
         folder = generate_device(self.temp.name)
-        manager = Path(__file__).resolve().parents[2] / 'logger/scripts/modbus_certs.py'
+        manager = Path(__file__).resolve().parents[2] / 'exec/app/script/modbus_certs.py'
         trust_dir = Path(self.temp.name) / 'device-trust'
         result = subprocess.run([sys.executable, str(manager), '--dir', str(trust_dir),
                                  'trust-add', '--cert', str(folder / 'client.crt')],
@@ -238,7 +238,7 @@ class TLSTests(unittest.TestCase):
                     folder = generate_device(self.temp.name) if device else generate_demo(self.temp.name)
                     self.assertIn('SHA256=', inspect(folder / 'server.crt'))
                 if device:
-                    manager = Path(__file__).resolve().parents[2] / 'logger/scripts/modbus_certs.py'
+                    manager = Path(__file__).resolve().parents[2] / 'exec/app/script/modbus_certs.py'
                     result = subprocess.run([sys.executable, str(manager), '--dir', str(folder / 'trust'),
                                              'trust-add', '--cert', str(folder / 'client.crt')],
                                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)

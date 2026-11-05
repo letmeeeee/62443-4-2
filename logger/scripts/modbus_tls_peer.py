@@ -9,24 +9,32 @@ import sys
 from pathlib import Path
 
 
-def context(role, directory, no_cert=False):
-    required = ['master-ca.crt'] if role == 'slave' else []
+for helper_directory in (Path(__file__).resolve().parents[2]/'exec/app/script',
+                         Path(__file__).resolve().parent.parent/'script'):
+    if (helper_directory/'pki_common.py').is_file():
+        sys.path.insert(0,str(helper_directory))
+        break
+import pki_common as pki
+
+
+def context(role, directory, no_cert=False, ca_file=Path('/etc/ems/pki/ca-roots.crt')):
+    required = []
     if not no_cert:
         required += [role + '.crt', role + '.key']
     missing = [str(directory / name) for name in required if not (directory / name).is_file()]
     if missing:
         raise ValueError('缺少证书文件：' + '、'.join(missing) +
-                         '。请先用 modbus_certs.py generate 生成本机身份；'
-                         '从机还需用 trust-add 导入对端主机公开证书，生成 master-ca.crt。')
+                         '。请先生成各自 CSR，并导入外部 CA 签发的本机证书及中间链。')
+    pki.validate_roots(Path(ca_file).read_bytes())
+    if not no_cert:
+        pki.validate_identity((directory/(role+'.crt')).read_bytes(),None,ca_file,'sslclient' if role=='master' else 'sslserver')
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER if role == 'slave' else ssl.PROTOCOL_TLS_CLIENT)
     ctx.minimum_version = ssl.TLSVersion.TLSv1_2
+    ctx.verify_mode = ssl.CERT_REQUIRED
+    ctx.load_verify_locations(str(ca_file))
     if role == 'master':
-        # 与项目一致：只要求主动方证明身份，不验证从机身份。
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-    else:
-        ctx.verify_mode = ssl.CERT_REQUIRED
-        ctx.load_verify_locations(str(directory / 'master-ca.crt'))
+        ctx.check_hostname = True
+        ctx.hostname_checks_common_name = False
     if not no_cert:
         ctx.load_cert_chain(str(directory / (role + '.crt')), str(directory / (role + '.key')))
     return ctx
@@ -61,11 +69,11 @@ def describe(conn, server=False):
         print('主机身份验证通过：', cert['subject'], flush=True)
         print('主机证书 SHA256：', hashlib.sha256(conn.getpeercert(binary_form=True)).hexdigest().upper(), flush=True)
     else:
-        print('已进入 TLS 通道；继续读取 Modbus 响应确认通信（从机身份未校验）。', flush=True)
+        print('从机 CA 证书链与主机名/IP 校验通过，继续读取 Modbus 响应。', flush=True)
 
 
 def master(args):
-    ctx = context('master', args.cert_dir, args.no_cert)
+    ctx = context('master', args.cert_dir, args.no_cert, args.ca_file)
     print('主动连接 {}:{}，{}'.format(args.host, args.port, '不携带证书（反例）' if args.no_cert else '携带主机证书'), flush=True)
     with socket.create_connection((args.host, args.port), timeout=args.timeout) as raw:
         with ctx.wrap_socket(raw, server_hostname=args.host) as conn:
@@ -98,7 +106,7 @@ def reply(pdu):
 
 
 def slave(args):
-    ctx = context('slave', args.cert_dir)
+    ctx = context('slave', args.cert_dir, ca_file=args.ca_file)
     with socket.socket() as listener:
         listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         listener.bind((args.bind, args.port))
@@ -126,6 +134,7 @@ def main():
     sub = parser.add_subparsers(dest='role', required=True)
     for role in ('master', 'slave'):
         p = sub.add_parser(role, help='主动读取寄存器' if role == 'master' else '验证主机身份并返回模拟寄存器')
+        p.add_argument('--ca-file', type=Path, default=Path('/etc/ems/pki/ca-roots.crt'))
         p.add_argument('--cert-dir', type=Path, default=Path('/etc/ems/modbus'))
         p.add_argument('--port', type=int, default=18020)
         p.add_argument('--timeout', type=float, default=5)

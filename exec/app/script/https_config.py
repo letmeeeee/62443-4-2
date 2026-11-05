@@ -25,7 +25,11 @@ def read_device_ips(path):
 
 if __name__ == "__main__":
     try:
-        print(" ".join(read_device_ips(sys.argv[1])))
+        if sys.argv[1]=='--certificate-mode':
+            from pki_common import read_config
+            print(read_config(sys.argv[2])['mode'])
+        else:
+            print(" ".join(read_device_ips(sys.argv[1])))
     except (OSError, ValueError, configparser.Error) as exc:
         print("HTTPS 配置错误: " + str(exc), file=sys.stderr)
         sys.exit(1)

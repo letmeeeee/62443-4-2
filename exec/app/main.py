@@ -25,6 +25,8 @@ def create_app():
     app = Flask(__name__, static_folder=static_folder_path, static_url_path="/")
     configure_session(app)
     init_auth(app)
+    from utils.security_audit import init_security_http
+    init_security_http(app)
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def serve_spa(path):
@@ -40,6 +42,8 @@ def create_app():
     app.register_blueprint(g3_bp)
     app.register_blueprint(permission_bp)
     app.register_blueprint(system_bp)
+    from routes.route_security import security_bp
+    app.register_blueprint(security_bp)
     return app
 
 app = create_app()

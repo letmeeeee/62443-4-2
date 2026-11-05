@@ -105,16 +105,16 @@ python3 logger/tests/test_modbus_transport.py
 
 ## 直接自签证书管理脚本
 
-脚本：`logger/scripts/modbus_certs.py`，依赖 Python 3.8+ 与 OpenSSL 1.1.1+，不依赖 Python 第三方包。以下命令从仓库根目录执行。默认目录 `/etc/ems/modbus`；如编译宏使用其他路径，可用 `--dir /your/directory` 指定目录（放在子命令前）。用有目录写权限的账号执行，不会自动提权或重启服务。
+脚本：`exec/app/script/modbus_certs.py`，依赖 Python 3.8+ 与 OpenSSL 1.1.1+，不依赖 Python 第三方包。以下命令从仓库根目录执行。默认目录 `/etc/ems/modbus`；如编译宏使用其他路径，可用 `--dir /your/directory` 指定目录（放在子命令前）。用有目录写权限的账号执行，不会自动提权或重启服务。
 
 ### 首次配置
 
 在主机本机生成身份并导出**公开证书**：
 
 ```sh
-python3 logger/scripts/modbus_certs.py generate --role master --name master-001
-python3 logger/scripts/modbus_certs.py check --role master
-python3 logger/scripts/modbus_certs.py export --role master --out /tmp/master-001.crt
+python3 exec/app/script/modbus_certs.py generate --role master --name master-001
+python3 exec/app/script/modbus_certs.py check --role master
+python3 exec/app/script/modbus_certs.py export --role master --out /tmp/master-001.crt
 ```
 
 通过可信渠道把 `/tmp/master-001.crt` 传给从机，并核对脚本输出的 SHA-256 指纹。主机私钥不离开主机。
@@ -122,10 +122,10 @@ python3 logger/scripts/modbus_certs.py export --role master --out /tmp/master-00
 在从机本机生成身份，导入对端主机证书：
 
 ```sh
-python3 logger/scripts/modbus_certs.py generate --role slave --name slave-001 --ip 192.168.1.100
-python3 logger/scripts/modbus_certs.py trust-add --cert /tmp/master-001.crt
-python3 logger/scripts/modbus_certs.py check --role slave
-python3 logger/scripts/modbus_certs.py trust-list
+python3 exec/app/script/modbus_certs.py generate --role slave --name slave-001 --ip 192.168.1.100
+python3 exec/app/script/modbus_certs.py trust-add --cert /tmp/master-001.crt
+python3 exec/app/script/modbus_certs.py check --role slave
+python3 exec/app/script/modbus_certs.py trust-list
 ```
 
 `--ip` 改为实际从机 IP，也可省略或用 `--dns ems.example`，两者可重复。`--days` 默认 365，允许 1～3650 天。设备名称应唯一。同一设备承担两种角色时分别生成两套身份；本机作为从机时导入的是**上级主机**证书，本机 `master.crt` 则交给下级从机信任。脚本不会自动信任本机主机证书。
@@ -136,16 +136,16 @@ python3 logger/scripts/modbus_certs.py trust-list
 
 ```sh
 # 查看主体、签发者、有效期及指纹（不显示私钥）
-python3 logger/scripts/modbus_certs.py show --role master
+python3 exec/app/script/modbus_certs.py show --role master
 
 # 检查自签名、有效期、角色用途、证书/私钥匹配和私钥权限
-python3 logger/scripts/modbus_certs.py check --role master
+python3 exec/app/script/modbus_certs.py check --role master
 
 # 备份旧证书并复用 TA 密钥续期，IP/DNS 需重新显式传入
-python3 logger/scripts/modbus_certs.py renew --role master --name master-001 --days 365
+python3 exec/app/script/modbus_certs.py renew --role master --name master-001 --days 365
 
 # 从机删除指定可信主机证书
-python3 logger/scripts/modbus_certs.py trust-remove --fingerprint 完整SHA256指纹
+python3 exec/app/script/modbus_certs.py trust-remove --fingerprint 完整SHA256指纹
 ```
 
 `generate` 拒绝覆盖已有证书；`renew` 将旧公开证书保存到 `backups/时间-随机编号/`，复用 TA 密钥。信任文件修改前也自动备份。公开证书以 644 权限保存，默认新目录为 700，运行 `tems` 的账号须能读取证书并访问 TEE。旧文件私钥不参与新流程，也不会自动删除。

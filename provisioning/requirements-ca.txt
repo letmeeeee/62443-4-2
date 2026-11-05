@@ -1,0 +1,2 @@
+# GUI uses the Python standard library tkinter (OS package python3-tk on Linux).
+cryptography>=42.0.8

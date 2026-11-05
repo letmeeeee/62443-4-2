@@ -1,2 +1,10 @@
 # Ignore build directories at any level.
 build*/
+
+# Device-local secrets, credentials and encrypted backups.
+exec/instance/
+exec/app/instance/
+
+# New Python bytecode should not be committed.
+__pycache__/
+*.py[cod]

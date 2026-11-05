@@ -849,98 +849,13 @@ def GetFault():
 # 操作日志查询
 @g3_bp.route('/api/history/getOperationlog', methods=['GET'])
 def GetOperationlog():
-    """
-    查询操作日志接口。
-
-    请求示例:
-      GET /api/history/getOperationlog?beginDt=2026-05-08T00:00:00&endDt=2026-05-08T09:01:21&pageNum=1&pageSize=10
-
-    参数:
-    beginDt: 2026-05-08T00:00:00
-    endDt: 2026-05-08T09:01:21
-    pageNum: 1
-    pageSize: 10
-    """
+    from utils.security_audit import query_records
     try:
-        begin_dt = str(request.args.get("beginDt", "")).strip()
-        end_dt = str(request.args.get("endDt", "")).strip()
-        page_num = int(request.args.get("pageNum", 1))
-        page_size = int(request.args.get("pageSize", 10))
-        operator = str(request.args.get("operator", "")).strip() or None
-        _type = str(request.args.get("operationType", "")).strip() or None
-        _target = str(request.args.get("operationTarget", "")).strip() or None
-        result_arg = str(request.args.get("result", "")).strip()
+        return jsonify(query_records(request.args))
+    except (ValueError, TypeError):
+        return jsonify(ok=False, code='INVALID_QUERY', message='Invalid audit query'), 400
 
-        if not begin_dt or not end_dt:
-            return jsonify({"error": "Missing beginDt or endDt"}), 400
 
-        if page_num <= 0 or page_size <= 0:
-            return jsonify({"error": "Missing page_num or page_size"}), 400
-
-        begin_dt = begin_dt.replace('T', ' ')
-        end_dt = end_dt.replace('T', ' ')
-        begin_dt = datetime.strptime(begin_dt, "%Y-%m-%d %H:%M:%S")
-        end_dt = datetime.strptime(end_dt, "%Y-%m-%d %H:%M:%S")
-        operation_target = None
-        sort = None
-        operation_type = None
-        result = int(result_arg) if result_arg != "" else None
-        if _type is not None:
-            try:
-                op_type = int(_type)
-            except ValueError:
-                return jsonify({"success": False, "msg": "operationType必须是整数"}), 400
-            operation_type = operationLog.OP_NUM_MAP.get(op_type)
-            if operation_type is None:
-                return jsonify({"success": False, "msg": "operationType非法枚举"}), 400
-        if result is not None and result not in (0, 1):
-            return jsonify({"error": "result must be 0 or 1"}), 400
-        if _target is not None:
-            try:
-                deviceid = int(_target)
-                ini_data = read_ini_all()
-                pcs_num = _ini_get_int(ini_data, "SYSTEM", "pcsNum", 0)
-                device_info = None
-                device_info = find_device(deviceid)
-                if not device_info:
-                    return jsonify({"code": 1, "msg": f"查询设备不存在: {deviceid}"}), 400
-                device_type = device_info.get("deviceType")
-                sort = device_info.get("sort")
-                device_name = device_info.get("name")
-                operation_target = device_name
-                DPrint(f"query: device_type:{device_type},device_name:{device_name}")
-                if operation_target not in ["G3_PCS","MV"]:
-                    return jsonify({"code": 1, "msg": f"不支持查询该设备: {device_name} {sort}"}), 400
-                if (sort < 1) or (sort > pcs_num):
-                    return jsonify({"code": 1, "msg": f"查询设备不存在: {device_name} {sort}"}), 400
-            except ValueError:
-                return jsonify({"success": False, "msg": "operation_target必须为整数"}), 400
-        offset = (page_num - 1) * page_size
-        total, results = operationLog.query_operation_log(
-            begin_dt=begin_dt,
-            end_dt=end_dt,
-            offset=offset,
-            page_size=page_size,
-            operator=operator,
-            operation_type=operation_type,
-            operation_target=operation_target,
-            sort=sort,
-            result=result,
-        )
-
-        return jsonify({
-            "total": total,
-            "pageNum": page_num,
-            "pageSize": page_size,
-            "operationLogList": results
-        }), 200
-    except ValueError as e:
-        return jsonify({"ok": False, "error": f"参数格式错误: {e}"}), 400
-    except Exception as e:
-        DPrint(f"[{now_str()}] [/api/history/getOperationlog] 服务器异常: {e}")
-        return jsonify({"ok": False, "error": str(e)}), 500
-
-# 设备数据查询
 @g3_bp.route('/api/history/getDeviceData', methods=['GET'])
 def GetDeviceData():
     """

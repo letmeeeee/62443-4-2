@@ -1,0 +1,179 @@
+{
+  "rows": 154,
+  "edited_columns": [
+    "K",
+    "L",
+    "M",
+    "AF",
+    "AG"
+  ],
+  "edited_cells": 775,
+  "edited_parts": [
+    "xl/worksheets/sheet4.xml"
+  ],
+  "checks": [
+    "所有XML/ZIP结构通过",
+    "目标单元格文本逐格校验",
+    "非目标单元格逐一保持",
+    "原评分/公式与合并单元格保持",
+    "TOE Design及其他工作表/图片逐字节保持"
+  ],
+  "duplicate_analysis": {
+    "K": {
+      "before_unique": 116,
+      "after_unique": 120,
+      "remaining_exact_duplicate_rows": [
+        [
+          3,
+          4
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          23,
+          24
+        ],
+        [
+          25,
+          26,
+          27
+        ],
+        [
+          28,
+          29
+        ],
+        [
+          35,
+          36
+        ],
+        [
+          38,
+          39
+        ],
+        [
+          40,
+          41
+        ],
+        [
+          42,
+          43
+        ],
+        [
+          44,
+          45
+        ],
+        [
+          46,
+          47,
+          48
+        ],
+        [
+          49,
+          50
+        ],
+        [
+          60,
+          61
+        ],
+        [
+          64,
+          65
+        ],
+        [
+          66,
+          67
+        ],
+        [
+          79,
+          80,
+          81
+        ],
+        [
+          91,
+          92
+        ],
+        [
+          97,
+          98
+        ],
+        [
+          99,
+          100,
+          101
+        ],
+        [
+          102,
+          103
+        ],
+        [
+          104,
+          105
+        ],
+        [
+          121,
+          122
+        ],
+        [
+          124,
+          137
+        ],
+        [
+          139,
+          140
+        ],
+        [
+          141,
+          142
+        ],
+        [
+          143,
+          144
+        ]
+      ]
+    },
+    "L": {
+      "before_unique": 131,
+      "after_unique": 154,
+      "remaining_exact_duplicate_rows": []
+    },
+    "M": {
+      "before_unique": 81,
+      "after_unique": 154,
+      "remaining_exact_duplicate_rows": []
+    },
+    "AF": {
+      "before_unique": 154,
+      "after_unique": 154,
+      "remaining_exact_duplicate_rows": []
+    },
+    "AG": {
+      "before_unique": 154,
+      "after_unique": 154,
+      "remaining_exact_duplicate_rows": []
+    }
+  },
+  "before_sha256": "134460ff90f0f55b98f689345a266c42b0cdb66afce1e4412e698c6054d6ebde",
+  "after_sha256": "187e08e46ff6fa8589be9fdfb4070f277cb50dcd1b70139b2ea3bcb8d896b92a",
+  "device_test": "未执行；攻击行为为分析假设及测试变体，不是已证实漏洞",
+  "requirement_body_unique_excluding_ids_and_refs": 154,
+  "risk_note": "既有重复条目按不同攻击/测试变体细化，未删行或移动编号；原评分保留，细化后由风险责任人复核适用性及评分。",
+  "visual_check": "未完成Office可视化检查；本轮已验证结构、单元格内容及保留项。"
+}

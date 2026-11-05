@@ -4,7 +4,7 @@
 # compile C with /usr/bin/aarch64-linux-gnu-gcc
 C_FLAGS =  -g -Wall   -std=gnu99
 
-C_DEFINES = 
+C_DEFINES = -DMODBUS_WITH_TEE=1
 
 C_INCLUDES = -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/.deps/openssl-arm64/include -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/base -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/bms -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/dido -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/logic -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/serival_device -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/tcp_server -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/cJSON -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/web_server -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/cem9000 -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/dsp -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/sort -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/whitelist -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/p2p_server -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/mysqlib/include -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/.deps/optee-arm64/include -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/../optee_ta_examples/ta/crypto_ta/include 
 

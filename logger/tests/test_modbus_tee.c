@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <openssl/pem.h>
+#include <openssl/x509v3.h>
 #include <stdlib.h>
 
 static EVP_PKEY *software[2];
@@ -93,6 +94,34 @@ TEEC_Result TEEC_InvokeCommand(TEEC_Session *session, uint32_t command,
 }
 
 #ifndef MODBUS_TEE_STUB_ONLY
+static EVP_PKEY *ca_key;
+static X509 *ca_certificate;
+static void add_extension(X509 *cert, int nid, const char *value)
+{
+    X509_EXTENSION *extension = X509V3_EXT_conf_nid(NULL, NULL, nid, (char *)value);
+    assert(extension && X509_add_ext(cert, extension, -1));
+    X509_EXTENSION_free(extension);
+}
+
+static void create_test_ca(void)
+{
+    EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
+    assert(ctx && EVP_PKEY_keygen_init(ctx) > 0 && EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, 2048) > 0);
+    assert(EVP_PKEY_keygen(ctx, &ca_key) > 0); EVP_PKEY_CTX_free(ctx);
+    ca_certificate = X509_new(); assert(ca_certificate);
+    assert(X509_set_version(ca_certificate, 2));
+    ASN1_INTEGER_set(X509_get_serialNumber(ca_certificate), 1);
+    assert(X509_gmtime_adj(X509_getm_notBefore(ca_certificate), 0));
+    assert(X509_gmtime_adj(X509_getm_notAfter(ca_certificate), 86400));
+    assert(X509_NAME_add_entry_by_txt(X509_get_subject_name(ca_certificate), "CN", MBSTRING_ASC,
+        (const unsigned char *)"offline-test-CA", -1, -1, 0));
+    assert(X509_set_issuer_name(ca_certificate, X509_get_subject_name(ca_certificate)));
+    assert(X509_set_pubkey(ca_certificate, ca_key));
+    add_extension(ca_certificate, NID_basic_constraints, "critical,CA:TRUE");
+    add_extension(ca_certificate, NID_key_usage, "critical,keyCertSign,cRLSign");
+    assert(X509_sign(ca_certificate, ca_key, EVP_sha256()) > 0);
+}
+
 static X509 *certificate(EVP_PKEY *key, const char *cn)
 {
     X509 *cert = X509_new(); assert(cert);
@@ -101,9 +130,12 @@ static X509 *certificate(EVP_PKEY *key, const char *cn)
     assert(X509_gmtime_adj(X509_getm_notAfter(cert), 86400));
     assert(X509_NAME_add_entry_by_txt(X509_get_subject_name(cert), "CN", MBSTRING_ASC,
         (const unsigned char *)cn, -1, -1, 0));
-    assert(X509_set_issuer_name(cert, X509_get_subject_name(cert)));
-    assert(X509_set_pubkey(cert, key)); assert(X509_sign(cert, key, EVP_sha256()) > 0);
-    assert(X509_verify(cert, software[!strcmp(cn, "slave")]) == 1);
+    assert(X509_set_issuer_name(cert, X509_get_subject_name(ca_certificate)));
+    add_extension(cert, NID_basic_constraints, "critical,CA:FALSE");
+    add_extension(cert, NID_key_usage, "critical,digitalSignature,keyEncipherment");
+    add_extension(cert, NID_ext_key_usage, !strcmp(cn, "slave") ? "serverAuth" : "clientAuth");
+    assert(X509_set_pubkey(cert, key)); assert(X509_sign(cert, ca_key, EVP_sha256()) > 0);
+    assert(X509_verify(cert, ca_key) == 1);
     return cert;
 }
 
@@ -115,9 +147,10 @@ static void handshake(int version, X509 *master, EVP_PKEY *mk, X509 *slave, EVP_
     assert(SSL_CTX_set_min_proto_version(server, version)); assert(SSL_CTX_set_max_proto_version(server, version));
     assert(SSL_CTX_use_certificate(client, master)); assert(SSL_CTX_use_PrivateKey(client, mk));
     assert(SSL_CTX_use_certificate(server, slave)); assert(SSL_CTX_use_PrivateKey(server, sk));
-    assert(X509_STORE_add_cert(SSL_CTX_get_cert_store(server), master));
+    assert(X509_STORE_add_cert(SSL_CTX_get_cert_store(server), ca_certificate));
+    assert(X509_STORE_add_cert(SSL_CTX_get_cert_store(client), ca_certificate));
     SSL_CTX_set_verify(server, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
-    SSL_CTX_set_verify(client, SSL_VERIFY_NONE, NULL);
+    SSL_CTX_set_verify(client, SSL_VERIFY_PEER, NULL);
     assert(SSL_CTX_set_cipher_list(client, "ECDHE-RSA-AES128-GCM-SHA256"));
     assert(SSL_CTX_set_cipher_list(server, "ECDHE-RSA-AES128-GCM-SHA256"));
     SSL *c = SSL_new(client), *s = SSL_new(server); BIO *cb, *sb;
@@ -144,6 +177,7 @@ static void handshake(int version, X509 *master, EVP_PKEY *mk, X509 *slave, EVP_
 
 int main(void)
 {
+    create_test_ca();
     assert(Modbus_TEE_Ensure(0) && Modbus_TEE_Ensure(1));
     EVP_PKEY *mk = Modbus_TEE_Key(0), *sk = Modbus_TEE_Key(1); assert(mk && sk);
     const BIGNUM *d; RSA_get0_key(EVP_PKEY_get0_RSA(mk), NULL, NULL, &d); assert(!d);
@@ -179,6 +213,7 @@ int main(void)
     handshake(TLS1_3_VERSION, master, mk, slave, sk);
     fail_ta = 1; assert(!Modbus_TEE_Key(0)); assert(!Modbus_TEE_Check(master, 0));
     X509_free(master); X509_free(slave); EVP_PKEY_free(mk); EVP_PKEY_free(sk);
+    X509_free(ca_certificate); EVP_PKEY_free(ca_key);
     puts("PASS: separate TA roles, no private export, matching/mismatched identity, all six signature schemes, TLS1.2/1.3 mTLS, fail closed");
     return 0;
 }

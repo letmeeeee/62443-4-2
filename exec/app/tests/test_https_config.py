@@ -45,11 +45,12 @@ def deployment(tmp_path):
         'export PATH="' + str(root / "bin") + ':$PATH"' if line.startswith("export PATH=") else line
         for line in script.splitlines()) + "\n"
     (script_dir / "enable_https.sh").write_text(script)
-    (script_dir / "https_config.py").write_text((SOURCE / "https_config.py").read_text())
+    for helper in ("https_config.py", "https_certificates.py", "pki_common.py"):
+        (script_dir / helper).write_text((SOURCE / helper).read_text())
     stubs = {
         "id": "echo 0",
         "nginx": 'echo nginx "$@" >> "$CALL_LOG"\n[ "${FAIL_NGINX:-0}" != 1 ]',
-        "systemctl": 'echo systemctl "$@" >> "$CALL_LOG"\nexit 0',
+        "systemctl": 'echo systemctl "$@" >> "$CALL_LOG"\nif [ "$1" = reload ] && [ "${FAIL_RELOAD:-0}" = 1 ]; then exit 1; fi\nexit 0',
         "ss": "exit 0",
     }
     for name, body in stubs.items():
@@ -66,88 +67,117 @@ def deployment(tmp_path):
     return root, config, run
 
 
-def test_prepare_idempotence_and_changed_san(deployment):
-    root, config, run = deployment
-    result = run()
-    assert result.returncode == 0, result.stderr + result.stdout
-    cert = root / "etc/ssl/g3/g3.crt"
-    key = root / "etc/ssl/g3/g3.key"
-    original = cert.read_bytes()
-    assert key.stat().st_mode & 0o777 == 0o600
-    output = subprocess.check_output(["openssl", "x509", "-in", str(cert), "-noout", "-ext", "subjectAltName"], text=True)
-    assert "IP Address:192.168.2.136" in output
-    assert "IP Address:192.168.3.136" in output
-    assert run().returncode == 0
-    assert cert.read_bytes() == original
-    assert "systemctl" not in (root / "calls").read_text()
-    nginx = (root / "etc/nginx/conf.d/g3_https.conf").read_text()
-    assert "location = /api/upgrade/process" in nginx
-    assert "proxy_pass http://127.0.0.1:9000;" in nginx
-    assert "proxy_pass http://127.0.0.1:8000;" in nginx
-    config.write_text("[HTTPS]\ndevice_ips=192.168.3.136\n")
-    assert run().returncode == 0
-    assert cert.read_bytes() != original
-    output = subprocess.check_output(["openssl", "x509", "-in", str(cert), "-noout", "-ext", "subjectAltName"], text=True)
-    assert "192.168.2.136" not in output
+def provision(deployment,days=365):
+    from pki_test_helpers import make_ca,sign_csr
+    root,config,run=deployment
+    ca=make_ca(root/'offline-ca')
+    ca_file=root/'etc/ems/pki/ca-roots.crt'
+    ca_file.parent.mkdir(parents=True)
+    ca_file.write_bytes(ca['root'].read_bytes())
+    with config.open('a') as stream:
+        stream.write('\n[TLS]\nca_file='+str(ca_file)+'\n')
+    script=root/'home/zlg/app/script/https_certificates.py'
+    directory=root/'etc/ssl/g3'
+    def tool(*args,success=True):
+        result=subprocess.run(['python3',str(script),'--config',str(config),'--dir',str(directory),*map(str,args)],
+                              capture_output=True,text=True,timeout=60)
+        assert (result.returncode==0)==success,result.stderr
+        return result
+    tool('csr')
+    leaf=sign_csr(directory/'g3.csr',root/'issued.crt',ca,ips=['192.168.2.136','192.168.3.136'],days=days)
+    tool('identity-import','--cert',leaf,'--chain',ca['intermediate'])
+    return root,config,run,tool,ca
 
 
-def test_invalid_nginx_restores_files(deployment):
-    root, config, run = deployment
-    assert run().returncode == 0
-    paths = [root / p for p in ("etc/ssl/g3/g3.crt", "etc/ssl/g3/g3.key", "etc/nginx/conf.d/g3_https.conf")]
-    originals = [path.read_bytes() for path in paths]
-    config.write_text("[HTTPS]\ndevice_ips=192.168.4.136\n")
-    assert run(FAIL_NGINX="1").returncode != 0
-    assert [path.read_bytes() for path in paths] == originals
-    config.write_text("[HTTPS]\ndevice_ips=invalid\n")
-    assert run().returncode != 0
-    assert [path.read_bytes() for path in paths] == originals
+def test_prepare_preserves_ca_identity_and_private_key(deployment):
+    root,config,run,tool,ca=provision(deployment)
+    certificate=root/'etc/ssl/g3/g3.crt'
+    key=root/'etc/ssl/g3/g3.key'
+    original,private=certificate.read_bytes(),key.read_bytes()
+    assert run().returncode==0
+    assert run().returncode==0
+    assert certificate.read_bytes()==original and key.read_bytes()==private
+    assert original.count(b'BEGIN CERTIFICATE')==2
+    assert key.stat().st_mode&0o777==0o600
+    nginx=(root/'etc/nginx/conf.d/g3_https.conf').read_text()
+    assert 'location = /api/upgrade/process' in nginx
+    assert 'systemctl' not in (root/'calls').read_text()
+    config.write_text(config.read_text().replace('192.168.3.136,192.168.2.136','192.168.4.136'))
+    assert run().returncode!=0
+    assert certificate.read_bytes()==original and key.read_bytes()==private
+    request=root/'etc/ssl/g3/g3.csr'
+    leaf=sign_csr_local(request,root/'reissued.crt',ca,['192.168.4.136'])
+    tool('identity-import','--cert',leaf,'--chain',ca['intermediate'])
+    assert run().returncode==0
+    assert key.read_bytes()==private
 
 
-def test_install_and_apply(deployment):
-    root, config, run = deployment
-    result = run("--install-service")
-    assert result.returncode == 0, result.stderr + result.stdout
-    assert (root / "usr/local/lib/g3-https/https_config.py").is_file()
-    unit = (root / "etc/systemd/system/g3-https.service").read_text()
-    assert "Before=nginx.service" in unit
-    assert "--prepare" in unit
-    assert "RemainAfterExit=yes" in unit
-    dropin = (root / "etc/systemd/system/nginx.service.d/g3-https.conf").read_text()
-    assert "Requires=g3-https.service" in dropin
-    calls = root / "calls"
-    calls.write_text("")
-    assert run("--apply").returncode == 0
-    assert "reload nginx" not in calls.read_text()
-    config.write_text("[HTTPS]\ndevice_ips=192.168.4.136\n")
-    assert run("--apply").returncode == 0
-    assert "reload nginx" in calls.read_text()
+def sign_csr_local(request,path,ca,ips):
+    from pki_test_helpers import sign_csr
+    return sign_csr(request,path,ca,ips=ips)
 
 
-@pytest.mark.parametrize("days,cn", [(1, "logger"), (398, "192.168.2.136")])
-def test_expiry_or_old_subject_certificate_renewed(deployment, days, cn):
-    root, _, run = deployment
-    assert run().returncode == 0
-    cert = root / "etc/ssl/g3/g3.crt"
-    key = root / "etc/ssl/g3/g3.key"
-    subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes",
-                    "-keyout", str(key), "-out", str(cert), "-days", str(days),
-                    "-subj", "/CN=" + cn,
-                    "-addext", "subjectAltName=IP:192.168.2.136,IP:192.168.3.136"],
-                   check=True, capture_output=True)
-    original = cert.read_bytes()
-    assert run().returncode == 0
-    assert cert.read_bytes() != original
-    identity = subprocess.check_output(["openssl", "x509", "-in", str(cert), "-noout",
-                                        "-subject", "-issuer", "-nameopt", "RFC2253"], text=True)
-    assert "subject=CN=logger" in identity
-    assert "issuer=CN=logger" in identity
-    assert subprocess.run(["openssl", "x509", "-in", str(cert), "-noout", "-checkend", "2592000"],
-                          capture_output=True).returncode == 0
+def test_invalid_nginx_restores_configuration_and_preserves_identity(deployment):
+    root,config,run,_,_=provision(deployment)
+    assert run().returncode==0
+    paths=[root/p for p in ('etc/ssl/g3/g3.crt','etc/ssl/g3/g3.key','etc/nginx/conf.d/g3_https.conf')]
+    originals=[path.read_bytes() for path in paths]
+    (root/'etc/nginx/conf.d/g3_https.conf').write_text('previous config')
+    expected=paths[-1].read_bytes()
+    assert run(FAIL_NGINX='1').returncode!=0
+    assert paths[-1].read_bytes()==expected
+    assert [path.read_bytes() for path in paths[:2]]==originals[:2]
 
 
-def test_first_setup_failure_leaves_no_partial_config(deployment):
-    root, _, run = deployment
-    assert run(FAIL_NGINX="1").returncode != 0
-    for name in ("etc/ssl/g3/g3.crt", "etc/ssl/g3/g3.key", "etc/nginx/conf.d/g3_https.conf"):
-        assert not (root / name).exists()
+def test_install_and_apply_ca_certificate(deployment):
+    root,_,run,tool,ca=provision(deployment)
+    result=run('--install-service')
+    assert result.returncode==0,result.stdout+result.stderr
+    for helper in ('https_config.py','https_certificates.py','pki_common.py'):
+        assert (root/'usr/local/lib/g3-https'/helper).is_file()
+    calls=root/'calls';calls.write_text('')
+    assert run('--apply').returncode==0
+    assert 'reload nginx' not in calls.read_text()
+    tool('identity-import','--cert',root/'issued.crt','--chain',ca['intermediate'])
+    assert run('--apply').returncode==0
+    assert 'reload nginx' in calls.read_text()
+
+
+def test_near_expiry_only_creates_csr_and_never_replaces_identity(deployment):
+    import json
+    root,_,run,_,_=provision(deployment,days=1)
+    directory=root/'etc/ssl/g3'
+    original=(directory/'g3.crt').read_bytes()
+    key=(directory/'g3.key').read_bytes()
+    assert run().returncode==0
+    assert (directory/'g3.crt').read_bytes()==original
+    assert (directory/'g3.key').read_bytes()==key
+    assert json.loads((directory/'renewal-status.json').read_text())['renewal_required']
+
+
+def test_missing_ca_identity_creates_csr_but_no_leaf_or_nginx_configuration(deployment):
+    root,_,run=deployment
+    result=run()
+    assert result.returncode!=0
+    assert (root/'etc/ssl/g3/g3.csr').is_file()
+    assert not (root/'etc/ssl/g3/g3.crt').exists()
+    assert not (root/'etc/nginx/conf.d/g3_https.conf').exists()
+
+
+def test_certificate_digest_recovers_missing_reload_marker_and_failed_reload_retries(deployment):
+    root,_,run,tool,ca=provision(deployment)
+    assert run('--apply').returncode==0
+    from pki_test_helpers import sign_csr
+    leaf=sign_csr(root/'etc/ssl/g3/g3.csr',root/'new-identity.crt',ca,
+                  ips=['192.168.2.136','192.168.3.136'])
+    tool('identity-import','--cert',leaf,'--chain',ca['intermediate'])
+    marker=root/'etc/ssl/g3/.reload-required'
+    marker.unlink()
+    calls=root/'calls';calls.write_text('')
+    assert run('--apply').returncode==0
+    assert 'reload nginx' in calls.read_text()
+    tool('identity-import','--cert',leaf,'--chain',ca['intermediate'])
+    assert run('--apply',FAIL_RELOAD='1').returncode!=0
+    assert marker.exists()
+    assert run('--apply').returncode==0
+    assert not marker.exists()

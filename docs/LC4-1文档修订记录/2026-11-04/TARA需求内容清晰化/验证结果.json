@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-04",
+  "scope": "TARA & Rational网络安全需求（措施与验收）列",
+  "modified_cells": "AG3:AG156",
+  "requirement_count": 154,
+  "changed_parts": [
+    "xl/worksheets/sheet4.xml"
+  ],
+  "cross_references": "全部设计编号在当前TOE Design中存在，原引用保持",
+  "technical_correction": "升级包发布者身份改用包签名及受信发布公钥验证，不套用TLS证书检查",
+  "checks": [
+    "154条需求逐格文字核对通过",
+    "仅AG3:AG156内容变更，必要行高增加",
+    "原需求编号及设计引用保持",
+    "其他单元格、评分、公式、样式及合并单元格保持",
+    "TOE Design及其余工作表/图片等其他部件逐字节保持",
+    "ZIP完整性及全部XML解析通过",
+    "无TEE、MySQL Bearer及未展开的指定代码字段"
+  ],
+  "limitations": "文档措辞同步和一致性核对；未执行实机安全测试或Office可视化检查",
+  "before_sha256": "f92f1d1a8f198218d1caed198f9db2d5fe28dcf7a6a952e30ba63137c3362509",
+  "after_sha256": "bd2a8143456006bac6c45682f62dcf9ccf2f06ec0a0cbe7b8d62592ce194e681",
+  "estimated_max_row_height": 182.0
+}

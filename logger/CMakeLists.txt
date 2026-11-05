@@ -133,6 +133,9 @@ target_include_directories(modbus_tee_identity PRIVATE "${CMAKE_CURRENT_SOURCE_D
 target_link_libraries(modbus_tee_identity PRIVATE -l:libcrypto.so.1.1 Threads::Threads dl)
 set_target_properties(modbus_tee_identity PROPERTIES INSTALL_RPATH "\$ORIGIN/../lib;\$ORIGIN/../mysqlib/lib")
 install(TARGETS modbus_tee_identity RUNTIME DESTINATION bin)
+install(PROGRAMS scripts/modbus_tls_peer.py DESTINATION scripts)
+install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/../exec/app/script/modbus_certs.py" DESTINATION script)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../exec/app/script/pki_common.py" DESTINATION script)
 
 # === 关键：用 C++ 链接器，并指定库顺序 ===
 # - libmysqlclient.a 静态（避免链接到 .so）

@@ -110,6 +110,8 @@ def enqueue_operation_log(
         })
         return True
     except queue.Full:
+        from utils.security_audit import mark_write_failed
+        mark_write_failed()
         DPrint("操作日志队列已满，丢弃本次日志")
         return False
 
@@ -194,6 +196,8 @@ def record_operation_log(
             })
 
     except Exception as e:
+        from utils.security_audit import mark_write_failed
+        mark_write_failed()
         DPrint(f"记录操作日志失败：{e}")
 
 # 查询操作日志

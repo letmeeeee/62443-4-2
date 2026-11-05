@@ -1,0 +1,601 @@
+{
+  "tls": {
+    "points": [
+      "仅对已接入logger的Modbus TLS传输层且启用TLS的链路，使用TLS 1.2及以上版本。",
+      "建立连接时，应验证外部签发机构的信任链、证书有效期及认证用途。",
+      "从机应要求主机提供客户端证书；主机应核对从机证书中的IP地址与实际连接地址一致。",
+      "身份或安全连接校验失败时，应拒绝该连接，不自动改用明文。"
+    ],
+    "cr": [
+      "CR 1.2",
+      "CR 1.8",
+      "CR 1.9",
+      "CR 3.1",
+      "CR 4.1",
+      "CR 4.3"
+    ],
+    "source": [
+      "logger/lib/modbus_transport.c:164-191",
+      "logger/lib/modbus_transport.c:230-283",
+      "logger/lib/tcp_socket.c:73"
+    ]
+  },
+  "mparse": {
+    "points": [
+      "北向Modbus服务在启用TLS时，应检查报文头、实际长度及报文声明长度是否一致。",
+      "该入口支持功能码03、04、06和16；03、04读取数量为1至125，16写入数量为1至123，06应为单寄存器写入。",
+      "报文不满足当前入口的长度、数量或支持功能码检查时，应拒绝继续处理该连接。"
+    ],
+    "cr": [
+      "CR 3.5"
+    ],
+    "source": [
+      "logger/tcp_server/modbus_tcp_server.c:298-320"
+    ]
+  },
+  "mconnections": {
+    "points": [
+      "北向Modbus监听入口应将已连接及握手中的客户端总数限制为20，达到上限时关闭新连接。",
+      "当前Modbus TLS实现的握手截止时间为5000毫秒；收到一帧数据后的组帧截止时间为3000毫秒。"
+    ],
+    "cr": [
+      "CR 7.2"
+    ],
+    "source": [
+      "logger/lib/app_config.h:66",
+      "logger/tcp_server/modbus_tcp_server.c:989-998",
+      "logger/lib/modbus_transport.h:21-24"
+    ]
+  },
+  "mlog": {
+    "points": [
+      "北向Modbus服务应记录连接接入、TLS认证失败及已检查到的报文长度异常等运行事件。"
+    ],
+    "cr": [
+      "CR 2.8"
+    ],
+    "source": [
+      "logger/tcp_server/modbus_tcp_server.c:251-259",
+      "logger/tcp_server/modbus_tcp_server.c:298-303",
+      "logger/tcp_server/modbus_tcp_server.c:998-1034"
+    ]
+  },
+  "https": {
+    "points": [
+      "启用HTTPS部署时，Web入口应由Nginx提供加密连接，8000和9000端口的后端服务仅监听本机回环地址。",
+      "主应用受保护接口和独立升级状态查询均应检查有效登录会话。"
+    ],
+    "cr": [
+      "CR 1.1",
+      "CR 3.1",
+      "CR 4.1",
+      "CR 4.3"
+    ],
+    "source": [
+      "exec/app/main.py:95-102",
+      "exec/app/upgrade/upgrade.py:573-579",
+      "exec/app/script/enable_https.sh:111-129"
+    ]
+  },
+  "auth": {
+    "points": [
+      "Web受保护请求应检查会话凭据、账号是否存在、账号启停状态及口令是否发生变化。",
+      "无效、过期或已撤销会话应返回HTTP 401；认证存储故障应返回HTTP 503，不放行业务请求。",
+      "HTTP登录身份仅从请求头中显式提交的会话凭据识别，不接受网址参数或旧登录Cookie作为替代凭据。"
+    ],
+    "cr": [
+      "CR 1.1",
+      "CR 1.3",
+      "CR 3.8"
+    ],
+    "source": [
+      "exec/app/utils/auth.py:239-271",
+      "exec/app/utils/auth.py:343-350"
+    ]
+  },
+  "session": {
+    "points": [
+      "默认自最后一次有效认证请求起15分钟后失效，自登录起30分钟达到绝对期限；两者先到者生效，后台认证轮询属于请求活动。",
+      "Web系统各后端进程应共享有效会话数量，最多20个；超限应返回HTTP 429，不终止其他有效会话。"
+    ],
+    "cr": [
+      "CR 2.6",
+      "CR 3.8",
+      "CR 7.2"
+    ],
+    "source": [
+      "exec/app/utils/auth.py:197-230",
+      "exec/app/utils/auth.py:254-260",
+      "exec/app/utils/auth.py:301-306"
+    ]
+  },
+  "revoke": {
+    "points": [
+      "用户退出、账号改密、删除、禁用或管理员撤销会话后，相应旧凭据应按当前规则失效。",
+      "管理员撤销应仅作用于选定会话；后续HTTP访问应重新检查数据库中的会话及账号状态。"
+    ],
+    "cr": [
+      "CR 1.3",
+      "CR 2.6",
+      "CR 3.8"
+    ],
+    "source": [
+      "exec/app/utils/auth.py:117-131",
+      "exec/app/utils/auth.py:152-195",
+      "exec/app/routes/route_permission.py:387-449"
+    ]
+  },
+  "lock": {
+    "points": [
+      "Web用户可对当前会话设置服务端锁屏；锁屏期间受保护HTTP操作应返回拒绝结果。",
+      "解锁应重新验证当前用户口令，锁屏状态由服务端会话记录控制。"
+    ],
+    "cr": [
+      "CR 2.5"
+    ],
+    "source": [
+      "exec/app/routes/route_permission.py:177-190",
+      "exec/app/routes/route_permission.py:503-517",
+      "exec/app/utils/auth.py:361-363"
+    ]
+  },
+  "password": {
+    "points": [
+      "新建账号、修改或重置口令时，应使用随机盐及PBKDF2-HMAC-SHA256保存摘要，当前迭代次数为600000次。",
+      "新增和修改口令应为12至128位，包含大写字母、小写字母、数字及特殊字符，不得包含用户名或复用最近5次口令。",
+      "旧MD5摘要仅在原口令成功验证后迁移，不能将尚未迁移的账号认定为已采用新摘要。"
+    ],
+    "cr": [
+      "CR 1.5",
+      "CR 1.7",
+      "CR 4.3"
+    ],
+    "source": [
+      "exec/app/utils/security_store.py:42-82",
+      "exec/app/routes/route_permission.py:141-149",
+      "exec/app/routes/route_permission.py:219-245"
+    ]
+  },
+  "loginlock": {
+    "points": [
+      "登录失败计数及锁定状态应由数据库共享；达到当前账号或来源计数阈值5次时，应锁定300秒。",
+      "用户名大小写变化不得绕过对应账号的锁定或禁用检查。"
+    ],
+    "cr": [
+      "CR 1.11"
+    ],
+    "source": [
+      "exec/app/routes/route_permission.py:97-121",
+      "exec/app/utils/security_store.py:108-155"
+    ]
+  },
+  "developer": {
+    "points": [
+      "生产配置默认应禁止名单中的开发调试账号登录，并撤销其原有会话。"
+    ],
+    "cr": [
+      "CR 1.3"
+    ],
+    "source": [
+      "exec/app/script/session_config.py",
+      "exec/app/utils/auth.py:63-86"
+    ]
+  },
+  "account_roles": {
+    "points": [
+      "账号管理、证书管理、应用备份和应用身份清除操作应限制为权限等级4。",
+      "本人修改口令时应验证原口令，普通用户不得提高自身角色或修改无权管理的其他账号。"
+    ],
+    "cr": [
+      "CR 2.1",
+      "CR 1.3"
+    ],
+    "source": [
+      "exec/app/utils/access.py:5-12",
+      "exec/app/routes/route_permission.py:250-320"
+    ]
+  },
+  "param_roles": {
+    "points": [
+      "Web参数修改应限制为权限等级2、3或4；应使用实际认证后的用户身份检查权限。"
+    ],
+    "cr": [
+      "CR 2.1"
+    ],
+    "source": [
+      "exec/app/utils/access.py:5-12",
+      "exec/app/utils/access.py:15-44",
+      "exec/app/utils/auth.py:370-376"
+    ]
+  },
+  "upgrade_roles": {
+    "points": [
+      "应用升级上传和启动应使用已认证的操作者身份，并仅允许配置中具备升级权限的等级3或4执行。"
+    ],
+    "cr": [
+      "CR 2.1"
+    ],
+    "source": [
+      "exec/app/config.py:60-65",
+      "exec/app/routes/route_g3.py:1182-1190",
+      "exec/app/routes/route_g3.py:1285-1292",
+      "exec/app/routes/route_g3.py:1677-1691"
+    ]
+  },
+  "csrf": {
+    "points": [
+      "Web修改请求应通过同源来源检查；不能通过同源检查时，应提交与当前会话匹配的防跨站请求伪造凭据。",
+      "来源及防伪造检查不能替代登录身份和操作权限检查。"
+    ],
+    "cr": [
+      "CR 3.8",
+      "CR 2.1"
+    ],
+    "source": [
+      "exec/app/utils/auth.py:276-284",
+      "exec/app/utils/auth.py:350-354"
+    ]
+  },
+  "web_input": {
+    "points": [
+      "Web通用协议接口/api应逐条检查设备号、功能码、地址、数量及写入值的数据格式和范围。",
+      "该Web接口允许功能码03、04和06；设备号为1至247，每批最多100条，03、04读取数量为1至125，06写入数量必须为1。",
+      "地址应为0至65535且请求范围不能越界；不符合这些检查的请求应返回错误。"
+    ],
+    "cr": [
+      "CR 3.5"
+    ],
+    "source": [
+      "exec/app/utils/access.py:55-84",
+      "exec/app/utils/auth.py:364-369"
+    ]
+  },
+  "http_rate": {
+    "points": [
+      "登录及受保护业务HTTP请求应按实际来源IP共享分钟窗口计数，默认每个来源每分钟最多3000次。",
+      "超过配置阈值时应返回HTTP 429；代理来源地址仅按现有回环受信规则处理。"
+    ],
+    "cr": [
+      "CR 7.2"
+    ],
+    "source": [
+      "exec/app/utils/auth.py:330-338",
+      "exec/app/utils/security_store.py:114-127",
+      "exec/app/utils/security_store.py:158-173"
+    ]
+  },
+  "query": {
+    "points": [
+      "旧的任意数据库语句GET入口应关闭，通用历史导出仅允许当前白名单中的业务历史表。",
+      "审计查询应使用预定义筛选条件和分离处理的参数，非法时间、分页或表名应返回错误。"
+    ],
+    "cr": [
+      "CR 3.5",
+      "CR 2.1"
+    ],
+    "source": [
+      "exec/app/utils/auth.py:356-367",
+      "exec/app/utils/security_audit.py:80-126"
+    ]
+  },
+  "private": {
+    "points": [
+      "应用安全目录应检查运行账号归属及0700访问权限，创建的安全文件权限应为0600。",
+      "会话持久配置首次创建时应生成随机应用密钥并以0600保存，不在接口中返回该密钥。"
+    ],
+    "cr": [
+      "CR 1.5",
+      "CR 4.1"
+    ],
+    "source": [
+      "exec/app/utils/security_files.py:9-41",
+      "exec/app/script/session_config.py:35-56"
+    ]
+  },
+  "ini": {
+    "points": [
+      "Web应用应在监测启动时及其后默认每60秒，将设备INI文件的SHA-256摘要与现有摘要文件比较。",
+      "内容不符、基准缺失或格式错误时应记录失败；当前该检查只记录结果，不阻止配置生效或自动修复。"
+    ],
+    "cr": [
+      "CR 3.4"
+    ],
+    "source": [
+      "exec/app/utils/ini_integrity.py:12-54",
+      "exec/app/main.py"
+    ]
+  },
+  "package": {
+    "points": [
+      "应用升级包应在安装前验证内层安装归档的RSA-PSS-SHA256签名，错误或缺少签名时应拒绝使用该包。",
+      "应用tar归档解包应限定为目标目录内的普通文件和目录，拒绝越界路径、链接及设备文件。"
+    ],
+    "cr": [
+      "CR 3.4",
+      "CR 3.10",
+      "EDR 3.10 RE(1)",
+      "CR 3.5"
+    ],
+    "source": [
+      "exec/app/utils/method.py:959-1155",
+      "exec/app/utils/method.py:652-669",
+      "exec/app/routes/route_g3.py:1313",
+      "exec/app/routes/route_g3.py:1495"
+    ]
+  },
+  "rollback": {
+    "points": [
+      "应用升级脚本应备份待替换的旧文件，并对重启后的服务执行当前健康检查。",
+      "服务启动失败时应尝试恢复备份文件并重启；应记录实际失败或回退结果。"
+    ],
+    "cr": [
+      "CR 7.3",
+      "CR 7.4",
+      "CR 2.8"
+    ],
+    "source": [
+      "exec/app/script/upgrade.sh:svc_restart",
+      "exec/app/script/upgrade.sh:do_rollback"
+    ]
+  },
+  "upgrade_status": {
+    "points": [
+      "独立9000端口服务应在有效会话认证后提供升级任务状态；启用HTTPS部署时应通过同源代理访问。",
+      "在认证数据库正常且凭据有效时，查询不依赖8000端口主应用继续运行。"
+    ],
+    "cr": [
+      "CR 1.1",
+      "CR 2.8"
+    ],
+    "source": [
+      "exec/app/upgrade/upgrade.py:558-585",
+      "exec/app/script/enable_https.sh:111-129"
+    ]
+  },
+  "audit": {
+    "points": [
+      "Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。",
+      "审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。"
+    ],
+    "cr": [
+      "CR 2.8",
+      "CR 2.11",
+      "CR 3.9",
+      "CR 6.1"
+    ],
+    "source": [
+      "exec/app/utils/security_audit.py:49-75",
+      "exec/app/utils/security_audit.py:80-153",
+      "exec/app/utils/access.py:5-12"
+    ]
+  },
+  "audit_fail": {
+    "points": [
+      "审计写入失败时应报告故障；本地存储可写时应持久保存失败标志，否则至少保留进程内故障状态。",
+      "单次查询成功不得自动清除该失败标志。"
+    ],
+    "cr": [
+      "CR 2.10"
+    ],
+    "source": [
+      "exec/app/utils/security_audit.py:33-42",
+      "exec/app/utils/security_audit.py:65-75",
+      "exec/app/utils/operationLog.py"
+    ]
+  },
+  "audit_capacity": {
+    "points": [
+      "新增审计写入时应按默认180天策略清理过期新增记录；原业务日志不自动按该策略删除。",
+      "容量统计应包括新增审计表及原业务操作日志表，默认使用256MiB作为使用率基准；安全状态查询达到90%时报告高容量告警。"
+    ],
+    "cr": [
+      "CR 2.9"
+    ],
+    "source": [
+      "exec/app/utils/security_audit.py:65-71",
+      "exec/app/utils/security_audit.py:156-170",
+      "exec/app/routes/route_security.py:330-335"
+    ]
+  },
+  "csv": {
+    "points": [
+      "审计CSV导出应对可能触发电子表格公式的起始字符进行安全处理，将事件字段作为数据文本输出。"
+    ],
+    "cr": [
+      "CR 3.5",
+      "CR 6.1"
+    ],
+    "source": [
+      "exec/app/utils/security_audit.py:137-153"
+    ]
+  },
+  "backup": {
+    "points": [
+      "应用备份应采用AES-GCM加密并校验完整性，仅允许权限等级4创建、下载或管理。",
+      "备份只包含应用账号、安全设置、设备INI及公开证书指纹引用，不包含可重放会话凭据、私钥、业务历史库或平台镜像。",
+      "备份目录和文件应使用应用安全目录的0700及0600权限；备份密钥由持久应用密钥按独立用途派生。"
+    ],
+    "cr": [
+      "CR 7.3",
+      "CR 4.1",
+      "CR 4.3",
+      "CR 2.1"
+    ],
+    "source": [
+      "exec/app/utils/security_backup.py:35-95",
+      "exec/app/utils/security_files.py",
+      "exec/app/utils/access.py:5-12"
+    ]
+  },
+  "backup_check": {
+    "points": [
+      "恢复前应检查备份加密认证、设备身份、格式、账号结构、有效管理员及公开证书指纹引用是否兼容。",
+      "实际执行时应核对当前所选备份已校验的SHA-256摘要；检查失败不执行恢复。"
+    ],
+    "cr": [
+      "CR 7.3 RE(1)",
+      "CR 3.4",
+      "CR 2.1"
+    ],
+    "source": [
+      "exec/app/utils/security_backup.py:98-134",
+      "exec/app/routes/route_security.py:396-409"
+    ]
+  },
+  "backup_threshold": {
+    "points": [
+      "创建备份前，应检查现有备份数量及总量；已有20份或已有总量达到128MiB时，应拒绝新增。",
+      "待加密备份内容超过16MiB时应拒绝创建；该数值不包括最终加密文件附加的格式和认证开销。"
+    ],
+    "cr": [
+      "CR 7.2"
+    ],
+    "source": [
+      "exec/app/utils/security_backup.py:66-93"
+    ]
+  },
+  "restore_gate": {
+    "points": [
+      "应用恢复默认只预览；实际执行应满足本地执行开关、有效管理员、限时维护模式、适用防伪造检查、二次口令及明确确认内容。",
+      "应用恢复前应创建检查点及未完成恢复标志；应用启动发现该标志时应拒绝启动。"
+    ],
+    "cr": [
+      "CR 2.1",
+      "CR 7.4"
+    ],
+    "source": [
+      "exec/app/routes/route_security.py:377-409",
+      "exec/app/utils/security_backup.py:137-190",
+      "exec/app/script/security_config.py:33-34"
+    ]
+  },
+  "factory": {
+    "points": [
+      "应用出厂恢复应仅使用本地配置中明确指定的备份编号及摘要；未配置基准时应返回错误。",
+      "基准备份应通过现有备份校验，包含有效管理员及强摘要口令；恢复后设置首次改密要求。"
+    ],
+    "cr": [
+      "CR 7.4",
+      "CR 1.5"
+    ],
+    "source": [
+      "exec/app/routes/route_security.py:411-428"
+    ]
+  },
+  "clear": {
+    "points": [
+      "应用身份清除应在有效管理员和现有维护确认门槛通过后执行，并记录审计。",
+      "当前操作清除应用账号、会话、安全设置、本地备份及临时凭据，保留设备INI、业务数据库、证书、平台密钥及日志。"
+    ],
+    "cr": [
+      "CR 1.3",
+      "CR 1.5",
+      "CR 2.1",
+      "CR 2.8"
+    ],
+    "source": [
+      "exec/app/routes/route_security.py:431-473"
+    ]
+  },
+  "reset": {
+    "points": [
+      "管理员重置应生成随机临时口令，仅将明文写入0600的受控凭据文件；Web接口仅返回领取编号。",
+      "本地领取应检查文件归属、权限及24小时有效期，成功领取后删除该凭据文件。",
+      "使用临时口令的账号应受有效期及首次改密检查约束。"
+    ],
+    "cr": [
+      "CR 1.3",
+      "CR 1.5",
+      "CR 4.1"
+    ],
+    "source": [
+      "exec/app/routes/route_permission.py:458-501",
+      "exec/app/script/collect_credential.py",
+      "exec/app/utils/security_files.py:45"
+    ]
+  },
+  "components": {
+    "points": [
+      "组件查询应返回实际后端运行时、已安装依赖及当前可采集的版本信息。",
+      "配置外部组件清单后可加载其允许字段作为补充；未配置补充清单时应返回清单不完整状态。",
+      "该接口应输出运行时组件及已配置补充字段的数据列表。"
+    ],
+    "cr": [
+      "CR 7.8"
+    ],
+    "source": [
+      "exec/app/routes/route_security.py:248-270"
+    ]
+  },
+  "whitelist": {
+    "points": [
+      "单独的白名单通信入口应查询来源地址是否在白名单中，并分流到已登记和未登记来源的处理路径。"
+    ],
+    "cr": [
+      "CR 2.1"
+    ],
+    "source": [
+      "logger/whitelist/whitelist.c:1025-1060",
+      "logger/logic/acl_db.c:90-133"
+    ]
+  },
+  "account_view": {
+    "points": [
+      "Web账号列表应仅返回当前公开字段，不返回口令摘要或盐；账号管理查询应限制为等级4。"
+    ],
+    "cr": [
+      "CR 2.1",
+      "CR 4.1"
+    ],
+    "source": [
+      "exec/app/routes/route_permission.py:196-217"
+    ]
+  },
+  "security_view": {
+    "points": [
+      "应用安全配置汇总及网络规则只读快照应限制为等级3或4访问；命令采集不可用时应返回不可用状态。"
+    ],
+    "cr": [
+      "CR 2.1",
+      "CR 7.6"
+    ],
+    "source": [
+      "exec/app/routes/route_security.py:237-246",
+      "exec/app/routes/route_security.py:273-293",
+      "exec/app/utils/access.py"
+    ]
+  },
+  "config_input": {
+    "points": [
+      "当前设备INI写接口应检查允许的字段、设备编号、IPv4地址和端口范围。",
+      "网络地址设置应解析合法的接口地址及网段；非法输入应返回错误。"
+    ],
+    "cr": [
+      "CR 3.5"
+    ],
+    "source": [
+      "exec/app/utils/input_validation.py:15-56",
+      "exec/app/routes/route_g2.py:653",
+      "exec/app/routes/route_g2.py:820-821"
+    ]
+  },
+  "file_cert": {
+    "points": [
+      "文件私钥后端应持久保存RSA-3072私钥，并校验运行账号归属、0600文件权限及目录权限。",
+      "设备可生成证书签名请求，由外部证书机构签发证书；导入时应核对信任链、有效期、用途及其公钥是否与本机私钥匹配。",
+      "证书和文件私钥应从持久目录加载；错误证书或私钥应拒绝使用。"
+    ],
+    "cr": [
+      "CR 1.5",
+      "CR 1.8",
+      "CR 1.9",
+      "CR 4.1",
+      "CR 4.3"
+    ],
+    "source": [
+      "logger/lib/modbus_identity.c:116-230",
+      "logger/scripts/modbus_certs.py",
+      "exec/app/routes/route_cert.py"
+    ]
+  }
+}

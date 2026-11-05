@@ -9,6 +9,16 @@ from utils.system_usage import cpu_usage as measure_cpu_usage
 system_bp = Blueprint("system", __name__)
 
 
+@system_bp.route('/api/system/memory-usage', methods=['GET'])
+def memory_usage():
+    from routes.route_security import memory_usage as measure_memory
+    try:
+        return jsonify(measure_memory())
+    except (OSError, ValueError, KeyError):
+        current_app.logger.exception('Failed to read memory usage')
+        return jsonify(ok=False, code='MEMORY_UNAVAILABLE'), 503
+
+
 @system_bp.route('/api/system/cpu-usage', methods=['GET'])
 def cpu_usage():
     """Return Linux host CPU utilization across all cores (0 to 100%)."""

@@ -1,5 +1,5 @@
 #!/bin/bash
-# 从 /home/zlg/lc_data_set.ini 的 [HTTPS] device_ips 生成自签名证书及代理配置。
+# 从设备 INI 校验 CA 签发的 HTTPS 身份及代理配置；设备只生成 CSR。
 # 支持逗号或空白分隔的多个设备 IPv4 地址；仍监听所有 IPv4 网口。
 # sudo ./enable_https.sh --install-service  安装开机初始化服务和每日续期 timer
 # sudo ./enable_https.sh                    读取 INI、按需更新并启动/reload nginx
@@ -9,12 +9,11 @@
 set -Eeuo pipefail
 export PATH="/home/zlg/myenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_FILE=/home/zlg/lc_data_set.ini
-CERT_DIR=/etc/ssl/g3
+CONFIG_FILE="${LC_INI_PATH:-/home/zlg/lc_data_set.ini}"
+CERT_DIR="${HTTPS_CERT_DIR:-/etc/ssl/g3}"
+[[ "$CERT_DIR" =~ ^/[[:alnum:]_./-]+$ ]] || { echo "Invalid HTTPS certificate directory" >&2; exit 1; }
 CERT_FILE="$CERT_DIR/g3.crt"
 KEY_FILE="$CERT_DIR/g3.key"
-CERT_DAYS=398
-CERT_CN=logger
 RENEW_WINDOW_DAYS=30
 MODE="${1:---apply}"
 log(){ echo "[$(date '+%F %T')] $*"; }
@@ -43,6 +42,7 @@ done
 [ -f /home/zlg/app/main.py ] || die "未检测到目标设备 /home/zlg/app/main.py"
 # 校验配置先于文件修改；配置缺失不猜测 IP、不覆盖原 INI。
 DEVICE_IPS="$(python3 "$SCRIPT_DIR/https_config.py" "$CONFIG_FILE")" || exit 1
+CERTIFICATE_MODE="$(python3 "$SCRIPT_DIR/https_config.py" --certificate-mode "$CONFIG_FILE")" || exit 1
 read -r -a IP_ARRAY <<< "$DEVICE_IPS"
 SAN="$(printf 'IP:%s\n' "${IP_ARRAY[@]}" | paste -sd, -)"
 if [ -d /etc/nginx/conf.d ]; then
@@ -54,7 +54,8 @@ else
 fi
 NGINX_CONF="$NGINX_CONF_DIR/g3_https.conf"
 if [ "$MODE" = --check ]; then
-    log "INI 设备 IP: $DEVICE_IPS"
+    log "INI 设备 IP: $DEVICE_IPS；证书模式: $CERTIFICATE_MODE"
+    python3 "$SCRIPT_DIR/https_certificates.py" --config "$CONFIG_FILE" --dir "$CERT_DIR" check
     openssl x509 -in "$CERT_FILE" -noout -subject -enddate -ext subjectAltName
     nginx -t
     systemctl status --no-pager nginx g3-https.service g3-cert-renew.timer
@@ -69,19 +70,11 @@ chmod 700 "$STAGING"
 PUBLISHED=0
 COMMITTED=0
 restore_files() {
-    local item destination
-    for item in cert key nginx; do
-        case "$item" in
-            cert) destination="$CERT_FILE" ;;
-            key) destination="$KEY_FILE" ;;
-            nginx) destination="$NGINX_CONF" ;;
-        esac
-        if [ -f "$STAGING/old.$item" ]; then
-            cp -p "$STAGING/old.$item" "$destination"
-        else
-            rm -f -- "$destination"
-        fi
-    done
+    if [ -f "$STAGING/old.nginx" ]; then
+        cp -p "$STAGING/old.nginx" "$NGINX_CONF"
+    else
+        rm -f -- "$NGINX_CONF"
+    fi
 }
 cleanup() {
     local status=$?
@@ -97,37 +90,20 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
-# 比较实际证书 SAN、有效期和公钥，避免重启时无条件生成新证书。
-renew=1
-if [ -s "$CERT_FILE" ] && [ -s "$KEY_FILE" ]; then
-    actual_san="$(openssl x509 -in "$CERT_FILE" -noout -ext subjectAltName 2>/dev/null | tail -n +2 | tr -d '[:space:]' || true)"
-    expected_san="${SAN//IP:/IPAddress:}"
-    actual_subject="$(openssl x509 -in "$CERT_FILE" -noout -subject -nameopt RFC2253 2>/dev/null || true)"
-    if [ "$actual_subject" = "subject=CN=$CERT_CN" ] &&
-       [ "$actual_san" = "$expected_san" ] &&
-       openssl x509 -in "$CERT_FILE" -noout -checkend "$((RENEW_WINDOW_DAYS*86400))" >/dev/null 2>&1 &&
-       openssl x509 -in "$CERT_FILE" -pubkey -noout > "$STAGING/cert.pub" 2>/dev/null &&
-       openssl pkey -in "$KEY_FILE" -pubout > "$STAGING/key.pub" 2>/dev/null &&
-       cmp -s "$STAGING/cert.pub" "$STAGING/key.pub"; then
-        renew=0
-    fi
-fi
-if [ "$renew" = 1 ]; then
-    log "生成证书，SAN=$SAN"
-    (umask 077; openssl req -x509 -newkey rsa:2048 -nodes \
-        -keyout "$STAGING/key" -out "$STAGING/cert" -days "$CERT_DAYS" \
-        -subj "/CN=$CERT_CN" -addext "subjectAltName=$SAN")
-else
-    log "证书仍有效且 IP 未变化，复用现有证书"
-fi
+# Only CA-issued identities may be deployed. Renewal never creates a local leaf certificate.
+python3 "$SCRIPT_DIR/https_certificates.py" --config "$CONFIG_FILE" --dir "$CERT_DIR" reconcile \
+    --renew-window-days "$RENEW_WINDOW_DAYS" || die "CA 证书尚未就绪；请签发并导入 CSR 对应的身份证书"
+CURRENT_CERT_HASH="$(openssl dgst -sha256 -r "$CERT_FILE")"
+CURRENT_CERT_HASH="${CURRENT_CERT_HASH%% *}"
+APPLIED_CERT_HASH="$(cat "$CERT_DIR/.applied-cert.sha256" 2>/dev/null || true)"
 cat > "$STAGING/nginx.conf" <<'NGINX_EOF'
 # G3 EMS HTTPS 反向代理（由 enable_https.sh 生成，勿手改；重跑脚本会覆盖）
 server {
     listen 443 ssl;
     server_name __DEVICE_IP__;
 
-    ssl_certificate     /etc/ssl/g3/g3.crt;
-    ssl_certificate_key /etc/ssl/g3/g3.key;
+    ssl_certificate     __HTTPS_CERTIFICATE__;
+    ssl_certificate_key __HTTPS_KEY__;
     ssl_protocols TLSv1.2 TLSv1.3;
 
     # 独立升级状态服务：主应用升级停机期间仍可查询，共享登录 Cookie
@@ -159,7 +135,7 @@ server {
     }
 }
 NGINX_EOF
-sed -i "s|__DEVICE_IP__|${DEVICE_IPS}|g" "$STAGING/nginx.conf"
+sed -i "s|__DEVICE_IP__|${DEVICE_IPS}|g; s|__HTTPS_CERTIFICATE__|${CERT_FILE}|g; s|__HTTPS_KEY__|${KEY_FILE}|g" "$STAGING/nginx.conf"
 
 # 保留已有行为：80 被其他服务占用时不添加 HTTP 跳转。
 if ! command -v ss >/dev/null || ! ss -ltnp | grep -E ':80\s' | grep -qv nginx; then
@@ -170,12 +146,10 @@ server {
     return 301 https://$host$request_uri;
 }
 HTTP_EOF
-    sed -i "s|__DEVICE_IP__|${DEVICE_IPS}|g" "$STAGING/nginx.conf"
+    sed -i "s|__DEVICE_IP__|${DEVICE_IPS}|g; s|__HTTPS_CERTIFICATE__|${CERT_FILE}|g; s|__HTTPS_KEY__|${KEY_FILE}|g" "$STAGING/nginx.conf"
 fi
 changed=0
-if [ "$renew" = 1 ] || ! cmp -s "$STAGING/nginx.conf" "$NGINX_CONF"; then
-    [ ! -f "$CERT_FILE" ] || cp -p "$CERT_FILE" "$STAGING/old.cert"
-    [ ! -f "$KEY_FILE" ] || cp -p "$KEY_FILE" "$STAGING/old.key"
+if [ "$CURRENT_CERT_HASH" != "$APPLIED_CERT_HASH" ] || [ -f "$CERT_DIR/.reload-required" ] || ! cmp -s "$STAGING/nginx.conf" "$NGINX_CONF"; then
     [ ! -f "$NGINX_CONF" ] || cp -p "$NGINX_CONF" "$STAGING/old.nginx"
     backup="$CERT_DIR/backup/$(date '+%Y%m%d%H%M%S')-$$"
     mkdir -m 700 "$backup"
@@ -183,10 +157,6 @@ if [ "$renew" = 1 ] || ! cmp -s "$STAGING/nginx.conf" "$NGINX_CONF"; then
         [ ! -f "$old" ] || cp -p "$old" "$backup/"
     done
     PUBLISHED=1
-    if [ "$renew" = 1 ]; then
-        install -m 600 "$STAGING/key" "$KEY_FILE"
-        install -m 644 "$STAGING/cert" "$CERT_FILE"
-    fi
     install -m 644 "$STAGING/nginx.conf" "$NGINX_CONF"
     changed=1
 fi
@@ -198,6 +168,8 @@ if [ "$MODE" = --install-service ]; then
     if [ "$SCRIPT_DIR" != /usr/local/lib/g3-https ]; then
         install -m 755 "$SCRIPT_DIR/enable_https.sh" /usr/local/lib/g3-https/enable_https.sh
         install -m 644 "$SCRIPT_DIR/https_config.py" /usr/local/lib/g3-https/https_config.py
+        install -m 644 "$SCRIPT_DIR/https_certificates.py" /usr/local/lib/g3-https/https_certificates.py
+        install -m 644 "$SCRIPT_DIR/pki_common.py" /usr/local/lib/g3-https/pki_common.py
     fi
     if ! systemctl cat nginx.service >/dev/null 2>&1; then
         NGINX_BIN="$(command -v nginx)"
@@ -236,7 +208,7 @@ After=g3-https.service
 UNIT
     cat > /etc/systemd/system/g3-cert-renew.service <<'UNIT'
 [Unit]
-Description=Reconcile G3 HTTPS INI and renew certificate
+Description=Check G3 CA identity and prepare external renewal CSR
 Wants=network-online.target
 After=network-online.target nginx.service
 [Service]
@@ -273,4 +245,9 @@ if [ "$MODE" != --prepare ]; then
         systemctl start g3-cert-renew.timer
     fi
 fi
+APPLIED_HASH_STAGING="$(mktemp "$CERT_DIR/.applied.XXXXXX")"
+chmod 600 "$APPLIED_HASH_STAGING"
+printf '%s' "$CURRENT_CERT_HASH" > "$APPLIED_HASH_STAGING"
+mv -f -- "$APPLIED_HASH_STAGING" "$CERT_DIR/.applied-cert.sha256"
+rm -f -- "$CERT_DIR/.reload-required"
 log "HTTPS 配置完成：IP=$DEVICE_IPS；9000 查询接口与 8000 共用 443"

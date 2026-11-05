@@ -21,7 +21,7 @@ REQUIRED = {
     'home/zlg/app/main.py': b'# new main',
     'home/zlg/app/bin/modbus_tee_identity': b'new identity',
     'home/zlg/app/bin/crypto_ta_client': b'new client',
-    'home/zlg/app/scripts/modbus_certs.py': b'# new cert script',
+    'home/zlg/app/script/modbus_certs.py': b'# new cert script',
     'home/zlg/app/script/sign_ini.py': b'# new baseline script',
 }
 

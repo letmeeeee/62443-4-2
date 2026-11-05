@@ -3,9 +3,11 @@
 #include "app_config.h"
 #include <errno.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 #include <openssl/ssl.h>
+#include <openssl/x509v3.h>
 #include "modbus_identity.h"
 #include <openssl/err.h>
 #include "zlog.h"
@@ -87,9 +89,76 @@ static void library_init(void)
     OPENSSL_init_ssl(0, NULL);
 }
 
+static int identity_purpose(X509 *certificate, int server_identity)
+{
+    BASIC_CONSTRAINTS *constraints = X509_get_ext_d2i(certificate, NID_basic_constraints, NULL, NULL);
+    EXTENDED_KEY_USAGE *usage = X509_get_ext_d2i(certificate, NID_ext_key_usage, NULL, NULL);
+    ASN1_BIT_STRING *key_usage = X509_get_ext_d2i(certificate, NID_key_usage, NULL, NULL);
+    int valid = constraints && !constraints->ca && key_usage && ASN1_BIT_STRING_get_bit(key_usage, 0), found = 0, other = 0;
+    int expected = server_identity ? NID_server_auth : NID_client_auth;
+    if (usage) for (int i = 0; i < sk_ASN1_OBJECT_num(usage); i++) {
+        int nid = OBJ_obj2nid(sk_ASN1_OBJECT_value(usage, i));
+        if (nid == expected) found = 1;
+        if (nid == (server_identity ? NID_client_auth : NID_server_auth)) other = 1;
+    }
+    BASIC_CONSTRAINTS_free(constraints); EXTENDED_KEY_USAGE_free(usage); ASN1_BIT_STRING_free(key_usage);
+    return valid && found && !other;
+}
+
+static int ca_store_valid(X509_STORE *store)
+{
+    STACK_OF(X509_OBJECT) *objects = X509_STORE_get0_objects(store);
+    int anchors = 0;
+    for (int i = 0; i < sk_X509_OBJECT_num(objects); i++) {
+        X509_OBJECT *object = sk_X509_OBJECT_value(objects, i);
+        if (X509_OBJECT_get_type(object) != X509_LU_X509) continue;
+        X509 *root = X509_OBJECT_get0_X509(object);
+        BASIC_CONSTRAINTS *constraints = X509_get_ext_d2i(root, NID_basic_constraints, NULL, NULL);
+        ASN1_BIT_STRING *usage = X509_get_ext_d2i(root, NID_key_usage, NULL, NULL);
+        EVP_PKEY *key = X509_get_pubkey(root);
+        int valid = constraints && constraints->ca && usage && ASN1_BIT_STRING_get_bit(usage, 5) && key &&
+            X509_NAME_cmp(X509_get_subject_name(root), X509_get_issuer_name(root)) == 0 && X509_verify(root, key) == 1 &&
+            X509_cmp_current_time(X509_get0_notBefore(root)) < 0 && X509_cmp_current_time(X509_get0_notAfter(root)) > 0;
+        BASIC_CONSTRAINTS_free(constraints); ASN1_BIT_STRING_free(usage); EVP_PKEY_free(key);
+        if (!valid) return 0;
+        anchors++;
+    }
+    return anchors > 0;
+}
+
+static int verify_peer(int verified, X509_STORE_CTX *context)
+{
+    if (!verified || X509_STORE_CTX_get_error_depth(context) != 0) return verified;
+    SSL *ssl = X509_STORE_CTX_get_ex_data(context, SSL_get_ex_data_X509_STORE_CTX_idx());
+    /* A slave expects a clientAuth master; a master expects a serverAuth slave. */
+    return ssl && identity_purpose(X509_STORE_CTX_get_current_cert(context), !SSL_is_server(ssl));
+}
+
+static int verify_local_chain(SSL_CTX *context, int server)
+{
+    X509_STORE_CTX *verification = X509_STORE_CTX_new();
+    STACK_OF(X509) *chain = NULL;
+    X509 *identity = SSL_CTX_get0_certificate(context);
+    int ok = 0;
+    SSL_CTX_get0_chain_certs(context, &chain);
+    if (!verification || !identity_purpose(identity, server) ||
+        X509_STORE_CTX_init(verification, SSL_CTX_get_cert_store(context), identity, chain) != 1 ||
+        X509_STORE_CTX_set_purpose(verification, server ? X509_PURPOSE_SSL_SERVER : X509_PURPOSE_SSL_CLIENT) != 1)
+        goto out;
+    X509_VERIFY_PARAM *parameters = X509_STORE_CTX_get0_param(verification);
+    X509_VERIFY_PARAM_set_auth_level(parameters, 2);
+    X509_VERIFY_PARAM_set_depth(parameters, 8);
+    ok = X509_verify_cert(verification) == 1;
+out:
+    X509_STORE_CTX_free(verification);
+    return ok;
+}
+
 static SSL_CTX *make_context(int server)
 {
     pthread_once(&library_once, library_init);
+    int ca_mode = Modbus_Certificate_Mode();
+    if (ca_mode < 0) { errno = EINVAL; return NULL; }
     SSL_CTX *ctx = SSL_CTX_new(server ? TLS_server_method() : TLS_client_method());
     if (!ctx) {
         log_tls_errors("context allocation", server, -1);
@@ -106,19 +175,20 @@ static SSL_CTX *make_context(int server)
         SSL_CTX_set_cipher_list(ctx, "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384") != 1 ||
         SSL_CTX_set1_sigalgs_list(ctx, "rsa_pss_rsae_sha256:rsa_pss_rsae_sha384:rsa_pss_rsae_sha512:rsa_pkcs1_sha256:rsa_pkcs1_sha384:rsa_pkcs1_sha512") != 1)
         goto fail;
-    if (server) {
-        if (SSL_CTX_load_verify_locations(ctx, MODBUS_TLS_CLIENT_CA, NULL) != 1)
+    {
+        if (SSL_CTX_load_verify_locations(ctx, Modbus_CA_File(), NULL) != 1 ||
+            !ca_store_valid(SSL_CTX_get_cert_store(ctx)) || !verify_local_chain(ctx, server))
             goto fail;
-        STACK_OF(X509_NAME) *names = SSL_load_client_CA_file(MODBUS_TLS_CLIENT_CA);
-        if (!names) goto fail;
-        SSL_CTX_set_client_CA_list(ctx, names);
-        SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
-        /* Every new connection must authenticate with a current certificate. */
+        if (server) {
+            STACK_OF(X509_NAME) *names = SSL_load_client_CA_file(Modbus_CA_File());
+            if (!names) goto fail;
+            SSL_CTX_set_client_CA_list(ctx, names);
+        }
+        SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | (server ? SSL_VERIFY_FAIL_IF_NO_PEER_CERT : 0), verify_peer);
         SSL_CTX_set_session_cache_mode(ctx, SSL_SESS_CACHE_OFF);
         SSL_CTX_set_options(ctx, SSL_OP_NO_TICKET);
-    } else {
-        /* Requirement: present client identity, do not verify slave identity. */
-        SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, NULL);
+        X509_VERIFY_PARAM_set_auth_level(SSL_CTX_get0_param(ctx), 2);
+        SSL_CTX_set_verify_depth(ctx, 8);
     }
     return ctx;
 fail:
@@ -176,6 +246,17 @@ static int attach(int fd, int server)
     c->target = 6;
     c->ssl = SSL_new(ctx);
     if (!c->ssl || SSL_set_fd(c->ssl, fd) != 1) goto fail;
+    if (!server) {
+        struct sockaddr_storage peer;
+        socklen_t length = sizeof(peer);
+        char address[INET6_ADDRSTRLEN];
+        if (getpeername(fd, (struct sockaddr *)&peer, &length) < 0) goto fail;
+        const void *binary = peer.ss_family == AF_INET ?
+            (const void *)&((struct sockaddr_in *)&peer)->sin_addr : peer.ss_family == AF_INET6 ?
+            (const void *)&((struct sockaddr_in6 *)&peer)->sin6_addr : NULL;
+        if (!binary || !inet_ntop(peer.ss_family, binary, address, sizeof(address)) ||
+            X509_VERIFY_PARAM_set1_ip_asc(SSL_get0_param(c->ssl), address) != 1) goto fail;
+    }
     int64_t deadline = now_ms() + MODBUS_TLS_HANDSHAKE_MS;
     for (;;) {
         ERR_clear_error();

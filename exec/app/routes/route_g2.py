@@ -817,6 +817,8 @@ def ini_update():
 
     try:
         operatorName = g.current_user["username"]
+        from utils.input_validation import validate_ini_payload
+        payload = validate_ini_payload(payload)
         result = method.update_ini_from_payload(payload)
         verify = method.verify_ini_matches_payload(payload, result["path"])
         if not verify["ok"]:
@@ -919,7 +921,8 @@ def ini_system_counts():
 def ini_all():
     try:
         data = read_ini_all()
-        resp = {"ok": True, "path": str(get_ini_path()), "data": data}
+        from utils.input_validation import public_configuration
+        resp = {"ok": True, "data": public_configuration(data)}
         DPrint(f"[{now_str()}] [/ini/all] 返回全部内容")
         return jsonify(resp)
     except FileNotFoundError as e:

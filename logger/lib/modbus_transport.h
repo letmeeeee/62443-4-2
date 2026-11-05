@@ -5,7 +5,7 @@
 #include <sys/types.h>
 
 /* Mode comes from SysConf_GetInfo()->modbus_tls_enabled:
- * 0: plaintext Modbus TCP; 1: TLS 1.2+, slave verifies master certificate.
+ * 0: plaintext Modbus TCP; 1: TLS 1.2+, mutual CA chain verification and slave SAN IP verification.
  * Load configuration before starting communication threads and keep it fixed
  * until process exit. Mode/certificate changes require restarting the process.
  * TLS with ISPLANT_V RTU transport is rejected at runtime.
@@ -13,9 +13,7 @@
 #ifndef MODBUS_TLS_SERVER_CERT
 #define MODBUS_TLS_SERVER_CERT "/etc/ems/modbus/slave.crt"
 #endif
-#ifndef MODBUS_TLS_CLIENT_CA
-#define MODBUS_TLS_CLIENT_CA "/etc/ems/modbus/master-ca.crt"
-#endif
+
 #ifndef MODBUS_TLS_CLIENT_CERT
 #define MODBUS_TLS_CLIENT_CERT "/etc/ems/modbus/master.crt"
 #endif

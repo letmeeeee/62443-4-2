@@ -1,0 +1,3 @@
+# Additional runtime dependency for structured certificates and encrypted backups.
+# The existing Flask / SQLAlchemy / Flask-SocketIO / device dependencies remain required.
+cryptography>=42.0.8

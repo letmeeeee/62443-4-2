@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-04",
+  "modified_cells": [
+    {
+      "sheet": "TARA & Rational",
+      "cell": "AG147"
+    },
+    {
+      "sheet": "TOE Design",
+      "cell": "C5"
+    },
+    {
+      "sheet": "TOE Design",
+      "cell": "C11"
+    },
+    {
+      "sheet": "TOE Design",
+      "cell": "C19"
+    }
+  ],
+  "modified_shared_strings": 4,
+  "checks": [
+    "整个工作簿XML文本中无TEE/OP-TEE/可信执行环境相关措辞",
+    "仅4个共享文本条目修改",
+    "全部工作表XML、公式、合并单元格、样式及图片等其他部件逐字节保持",
+    "ZIP CRC及全部XML解析通过"
+  ],
+  "sha256": "d4be0527047f45d6c97c4e2dcacb71237973fbd9f36cd6d6ce5c2aaf7e399192"
+}

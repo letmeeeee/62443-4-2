@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-03",
+  "modified_cells": "TOE Design!D3:D28",
+  "count": 26,
+  "source": "IEC 62443-4-2:2019 Edition 1.0公开预览条款目录；中文为主题释义",
+  "source_url": "https://assets.vde-verlag.de/iec-normen/preview-pdf/info_iec62443-4-2%7Bed1.0%7Db.pdf",
+  "mapping_status": "关联映射，不是符合性或SL/RE适用性判定",
+  "changed_parts": [
+    "xl/worksheets/sheet6.xml"
+  ],
+  "checks": [
+    "26个备注文本逐格校验通过",
+    "仅D3:D28单元格内容变更；必要行高自适应",
+    "需求正文/编号/表头/公式及合并单元格保持",
+    "TARA及其余工作表/图片等所有其他部件逐字节保持",
+    "ZIP CRC及全部XML解析通过"
+  ],
+  "before_sha256": "187e08e46ff6fa8589be9fdfb4070f277cb50dcd1b70139b2ea3bcb8d896b92a",
+  "after_sha256": "41c075e1584821d049ef6a0e9878c9903ef356318727c5ca4c9d87ea418bbc86"
+}

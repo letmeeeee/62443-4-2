@@ -16,8 +16,78 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <ctype.h>
+
+#ifndef MODBUS_TLS_CONFIG_PATH
+#define MODBUS_TLS_CONFIG_PATH "/home/zlg/lc_data_set.ini"
+#endif
+#ifndef MODBUS_TLS_CA_CERT
+#define MODBUS_TLS_CA_CERT "/etc/ems/pki/ca-roots.crt"
+#endif
+static pthread_once_t certificate_once = PTHREAD_ONCE_INIT;
+static int certificate_mode = 1;
+static char ca_file[PATH_MAX] = MODBUS_TLS_CA_CERT;
+
+static char *trim(char *value)
+{
+    while (isspace((unsigned char)*value)) value++;
+    size_t length = strlen(value);
+    while (length && isspace((unsigned char)value[length - 1])) value[--length] = '\0';
+    return value;
+}
+
+static void load_certificate_mode(void)
+{
+    const char *explicit_path = getenv("LC_INI_PATH");
+    FILE *stream = fopen(explicit_path ? explicit_path : MODBUS_TLS_CONFIG_PATH, "r");
+    char buffer[4096];
+    int tls = 0, first = 1;
+    if (!stream) {
+        if (explicit_path || errno != ENOENT) certificate_mode = -1;
+        return;
+    }
+    while (fgets(buffer, sizeof(buffer), stream)) {
+        if (!strchr(buffer, '\n') && !feof(stream)) { certificate_mode = -1; break; }
+        char *line = buffer;
+        if (first && !strncmp(line, "\xef\xbb\xbf", 3)) line += 3;
+        first = 0;
+        line = trim(line);
+        if (!*line || *line == '#' || *line == ';') continue;
+        if (*line == '[') {
+            char *end = strchr(line, ']');
+            if (!end) { certificate_mode = -1; break; }
+            *end = '\0'; tls = !strcmp(line + 1, "TLS");
+        } else if (tls) {
+            char *separator = strchr(line, '=');
+            if (!separator) { certificate_mode = -1; break; }
+            *separator = '\0';
+            char *name = trim(line), *value = trim(separator + 1);
+            if (!strcasecmp(name, "certificate_mode")) {
+                if (!strcmp(value, "external_ca")) certificate_mode = 1;
+                else { certificate_mode = -1; break; }
+            } else if (!strcasecmp(name, "ca_file")) {
+                if (*value != '/' || strlen(value) >= sizeof(ca_file)) { certificate_mode = -1; break; }
+                strcpy(ca_file, value);
+            }
+        }
+    }
+    if (ferror(stream)) certificate_mode = -1;
+    fclose(stream);
+}
+
+int Modbus_Certificate_Mode(void)
+{
+    pthread_once(&certificate_once, load_certificate_mode);
+    return certificate_mode;
+}
+
+const char *Modbus_CA_File(void)
+{
+    return Modbus_Certificate_Mode() < 0 ? NULL : ca_file;
+}
 
 static pthread_once_t backend_once = PTHREAD_ONCE_INIT;
 static const char *backend;

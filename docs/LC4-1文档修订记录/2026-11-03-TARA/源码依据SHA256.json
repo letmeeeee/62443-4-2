@@ -1,0 +1,20 @@
+{
+  "exec/app/main.py": "985d63e2d0b3aa6c5ae50c8c62a99ac9b2ef6c24f945d24d7b5e306dc5032c6d",
+  "exec/app/utils/auth.py": "0a971fefb8db929a42b18c9cb98e59404c4acfce5a8c0034553921f0927c40c5",
+  "exec/app/utils/access.py": "1497029ba794c5b1a4a10bae1a659ccb927dfb85d7167e45e309164e9a20f54c",
+  "exec/app/utils/security_store.py": "13b073912349b8618a87e5a893a11d40ca6b792d51dcd1b6fa16110b44b9a0d0",
+  "exec/app/utils/security_audit.py": "f6733738ee8b146f46fba798b5971fbe820502295a1ecee00536b8476da78153",
+  "exec/app/utils/security_backup.py": "709c8cbd67b514c7f6f5dab78eb27312edf4a67e47990fdac63d29fcc9636449",
+  "exec/app/utils/ini_integrity.py": "6f905c0077326093bb8203b406207afdba6f97fc42a09ebe362b36bbbde5fc86",
+  "exec/app/utils/method.py": "18503a8e7243ca5cb122ab0cf256b63ae4094122be24aa1982d6ffbe706026ad",
+  "exec/app/routes/route_security.py": "714938bcc440c50767326d07947595401ff9813591077b984f560343d44cc5cf",
+  "exec/app/routes/route_permission.py": "192adca8751bd1e891e39b05cbb0f566b1bb2f08a6162de89b8425cd7d478489",
+  "exec/app/routes/route_g3.py": "cba4abdd5f1822cca22c4a3e2eb19ea6b6c540ea13d09a1a0f77d095ed85a9a8",
+  "exec/app/script/security_config.py": "d2af6e507e09399eefd57604bcd036cf86cb96cd23228db04949f64fc49fdb20",
+  "exec/app/script/enable_https.sh": "0218b03710ed8455972953560e1eece15275129ac5771e0c4039634c50056052",
+  "logger/lib/modbus_transport.c": "a7e1259213bbf782e01fe7948416fdcebde62f03cedd404e4a1c50c5b6d913fe",
+  "logger/lib/modbus_identity.c": "af750367a3000ee4185a052153714f91e16b2fcbb86863509b2b6fe53979ba14",
+  "logger/scripts/MODBUS_KEY_BACKENDS.md": "60f6c8cb19c139886cfa34535470029d37a123f4de20794fa46a3d7f50bf2d6c",
+  "exec/app/SECURITY_CENTER.md": "ac7a5767bbb558b6cc7107c2e5ee7a919f18516f23130f45e313b5e6e14f27f3",
+  "exec/app/SESSION.md": "047187880cf256c53e083e6f98a56a7635bb1e96d50a6304b9b87f290838c2e5"
+}

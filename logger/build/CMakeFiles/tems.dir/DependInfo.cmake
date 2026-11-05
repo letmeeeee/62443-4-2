@@ -30,6 +30,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/app_config.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/app_config.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/assist_func.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/assist_func.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/ini.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/ini.c.o"
+  "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_identity.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/modbus_identity.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_protocol.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/modbus_protocol.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_rtu_poll.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o"
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_tee.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/lib/modbus_tee.c.o"
@@ -112,6 +113,11 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/wx/WorkStation/ItemCode/62443-4-2/logger/whitelist/whitelist.c" "/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/tems.dir/whitelist/whitelist.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
+
+# Preprocessor definitions for this target.
+set(CMAKE_TARGET_DEFINITIONS_C
+  "MODBUS_WITH_TEE=1"
+  )
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH

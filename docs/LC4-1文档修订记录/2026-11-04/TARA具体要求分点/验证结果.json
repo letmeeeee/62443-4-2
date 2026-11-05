@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-04",
+  "scope": "TARA & Rational网络安全需求列",
+  "modified_requirements": 154,
+  "modified_cells": [
+    "AG1",
+    "AG3:AG156"
+  ],
+  "format": "仅按①②③逐项列出具体要求；不附测试验收、场景模拟、证据清单或设计追溯",
+  "point_count_range": [
+    3,
+    8
+  ],
+  "checks": [
+    "154条要求逐格核对，分点格式通过",
+    "无测试验收及设计追溯段落",
+    "仅目标列文字及必要行高变更",
+    "其他单元格、风险评分、公式、样式、合并单元格保持",
+    "TOE Design及其他工作表/图片等部件逐字节保持",
+    "ZIP完整性及全部XML解析通过"
+  ],
+  "limitations": "仅文档表达调整，未执行实机安全测试或Office可视化检查",
+  "before_sha256": "bd2a8143456006bac6c45682f62dcf9ccf2f06ec0a0cbe7b8d62592ce194e681",
+  "after_sha256": "3df36cd9e472adb4a7c55576b250b21e40e352eec2acba7c46c1c18b50abb199"
+}

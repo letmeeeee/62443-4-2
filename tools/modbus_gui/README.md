@@ -35,7 +35,7 @@ python3 -m tools.modbus_gui --role server
 设备脚本只接受直接自签客户端证书；旧版本 GUI 生成的 CA 签发 `client.crt` 不能用于设备 `trust-add`。需使用更新后的 GUI 勾选设备模式重新生成，把新的 `client.crt` 传到设备 `/tmp/client.crt`，再执行：
 
 ```bash
-python app/scripts/modbus_certs.py trust-add --cert /tmp/client.crt
+python app/script/modbus_certs.py trust-add --cert /tmp/client.crt
 sudo systemctl restart tems
 ```
 

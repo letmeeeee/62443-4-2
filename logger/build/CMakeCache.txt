@@ -206,6 +206,10 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 //Target OpenSSL 1.1 include directory
 MODBUS_OPENSSL_INCLUDE_DIR:PATH=
 
+//Include optional TEE identity backend (runtime default remains
+// file)
+MODBUS_WITH_TEE:BOOL=ON
+
 //Target tee_client_api.h directory
 OPTEE_CLIENT_INCLUDE_DIR:PATH=
 

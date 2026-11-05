@@ -25,6 +25,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/tems.dir/lib/app_config.c.o"
   "CMakeFiles/tems.dir/lib/assist_func.c.o"
   "CMakeFiles/tems.dir/lib/ini.c.o"
+  "CMakeFiles/tems.dir/lib/modbus_identity.c.o"
   "CMakeFiles/tems.dir/lib/modbus_protocol.c.o"
   "CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o"
   "CMakeFiles/tems.dir/lib/modbus_tee.c.o"

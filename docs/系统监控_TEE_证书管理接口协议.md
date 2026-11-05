@@ -296,7 +296,7 @@ valid=true/false表示签名通过/不通过，false不是HTTP错误。不接收
 
 这些接口管理Modbus TLS身份证书、从机的可信主机证书，**不是Nginx用于网页HTTPS的证书**。所有接口含GET查询及导出均要求管理员权限4。
 
-运行时调用 `/home/zlg/app/scripts/modbus_certs.py`，证书目录 `/etc/ems/modbus`，单次脚本超时60秒。指定仓库中的脚本源码位于 `logger/scripts/modbus_certs.py`；部署需保证API硬编码的运行路径和证书目录实际存在。这里只整理接口，没有执行部署。
+运行时调用 `/home/zlg/app/script/modbus_certs.py`，证书目录 `/etc/ems/modbus`，单次脚本超时60秒。指定仓库中的脚本源码位于 `exec/app/script/modbus_certs.py`；部署需保证API硬编码的运行路径和证书目录实际存在。这里只整理接口，没有执行部署。
 
 ### 5.1 公共证书参数
 
@@ -604,6 +604,6 @@ curl 'https://<设备IP>/api/cert/trust-add'   -H 'Authorization: Bearer <sessio
 - [登录及会话响应](</home/wx/WorkStation/ItemCode/62443-4-2/exec/app/routes/route_permission.py>).
 - [CPU采样](</home/wx/WorkStation/ItemCode/62443-4-2/exec/app/utils/system_usage.py>).
 - [角色与状态常量](</home/wx/WorkStation/ItemCode/62443-4-2/exec/app/config.py>).
-- [证书脚本源码](</home/wx/WorkStation/ItemCode/62443-4-2/logger/scripts/modbus_certs.py>): 证书和信任文件的实际处理逻辑。
+- [证书脚本源码](</home/wx/WorkStation/ItemCode/62443-4-2/exec/app/script/modbus_certs.py>): 证书和信任文件的实际处理逻辑。
 
 已静态核对17个路由及参数/响应、认证钩子和脚本输出；示例为协议展示，未运行设备侧密码学或证书操作。此文档不覆盖该仓库其他业务接口，也不将历史技能说明或旧文档中的Cookie示例作为当前认证依据。

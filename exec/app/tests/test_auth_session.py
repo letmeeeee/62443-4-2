@@ -1,4 +1,5 @@
 """Authentication integration tests; no device or external MySQL is required."""
+import hashlib
 import ast
 import importlib.util
 import sys
@@ -20,12 +21,12 @@ def auth_app(tmp_path, monkeypatch):
         connection.execute(text(
             "CREATE TABLE users (username TEXT PRIMARY KEY, password TEXT, salt TEXT, "
             "permission INTEGER, first_login INTEGER, password_created_at DATETIME, "
-            "password_expire_at DATETIME)"
+            "password_expire_at DATETIME, last_notify_at DATETIME)"
         ))
         for username, permission in (("alice", 1), ("admin", 4)):
             connection.execute(text(
-                "INSERT INTO users VALUES (:name, 'hash:correct:salt', 'salt', :level, 0, NULL, NULL)"
-            ), {"name": username, "level": permission})
+                "INSERT INTO users VALUES (:name, :hash, 'salt', :level, 0, NULL, NULL, NULL)"
+            ), {"name": username, "level": permission, "hash": hashlib.md5(b"correctsalt").hexdigest()})
     config = types.ModuleType("config")
     config.engine = engine
     config.PERM_TABLE = "users"
@@ -53,6 +54,7 @@ def auth_app(tmp_path, monkeypatch):
         "session_test_permission", Path(__file__).parents[1] / "routes/route_permission.py")
     permission = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(permission)
+    monkeypatch.setitem(sys.modules, 'routes.route_permission', permission)
 
     app = Flask(__name__, static_folder=str(tmp_path / "static"))
     app.config.update(TESTING=True, SECRET_KEY="test-only-secret-" * 4,
@@ -255,7 +257,7 @@ def test_admin_lists_and_revokes_one_session_without_affecting_same_user(auth_ap
     assert len(rows) == 3
     assert sum(row["current"] for row in rows) == 1
     assert next(row for row in rows if row["current"])["username"] == "admin"
-    assert all(set(row) == {"session_id", "username", "expires_at", "expired", "current"} for row in rows)
+    assert all(set(row) == {"session_id", "username", "expires_at", "expired", "current", "last_activity", "tab_id"} for row in rows)
     for credentials in (administrator, victim, another):
         assert credentials["session_token"] not in str(rows)
         assert credentials["csrf_token"] not in str(rows)
@@ -531,6 +533,9 @@ def test_main_guards_all_registered_routes_and_socket_connect(auth_app, monkeypa
         if rule.endpoint in ("static", "serve_spa", "permission.permission_login"):
             continue
         for method in rule.methods - {"HEAD", "OPTIONS"}:
+            if rule.rule == '/permission/login-notice' and method == 'GET':
+                assert client.open(rule.rule, method=method).status_code == 200
+                continue
             assert client.open(rule.rule, method=method).status_code == 401, rule.rule
             count += 1
     assert count >= 40
@@ -683,7 +688,7 @@ def test_developer_account_disabled_at_startup(auth_app):
     app, engine, log = auth_app
     with engine.begin() as connection:
         connection.execute(text(
-            "INSERT INTO users VALUES ('trinastorage', 'hash:correct:salt', 'salt', 4, 0, NULL, NULL)"
+            "INSERT INTO users VALUES ('trinastorage', 'ea16c7be51164c2f92e97e22ce79f9ca', 'salt', 4, 0, NULL, NULL, NULL)"
         ))
     developer = app.test_client()
     personal = app.test_client()

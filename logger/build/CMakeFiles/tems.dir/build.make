@@ -395,9 +395,22 @@ CMakeFiles/tems.dir/lib/ini.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/tems.dir/lib/ini.c.s"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/ini.c -o CMakeFiles/tems.dir/lib/ini.c.s
 
+CMakeFiles/tems.dir/lib/modbus_identity.c.o: CMakeFiles/tems.dir/flags.make
+CMakeFiles/tems.dir/lib/modbus_identity.c.o: ../lib/modbus_identity.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building C object CMakeFiles/tems.dir/lib/modbus_identity.c.o"
+	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/modbus_identity.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_identity.c
+
+CMakeFiles/tems.dir/lib/modbus_identity.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/tems.dir/lib/modbus_identity.c.i"
+	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_identity.c > CMakeFiles/tems.dir/lib/modbus_identity.c.i
+
+CMakeFiles/tems.dir/lib/modbus_identity.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/tems.dir/lib/modbus_identity.c.s"
+	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_identity.c -o CMakeFiles/tems.dir/lib/modbus_identity.c.s
+
 CMakeFiles/tems.dir/lib/modbus_protocol.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/modbus_protocol.c.o: ../lib/modbus_protocol.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building C object CMakeFiles/tems.dir/lib/modbus_protocol.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building C object CMakeFiles/tems.dir/lib/modbus_protocol.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/modbus_protocol.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_protocol.c
 
 CMakeFiles/tems.dir/lib/modbus_protocol.c.i: cmake_force
@@ -410,7 +423,7 @@ CMakeFiles/tems.dir/lib/modbus_protocol.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o: ../lib/modbus_rtu_poll.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building C object CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building C object CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_rtu_poll.c
 
 CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.i: cmake_force
@@ -423,7 +436,7 @@ CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/modbus_tee.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/modbus_tee.c.o: ../lib/modbus_tee.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building C object CMakeFiles/tems.dir/lib/modbus_tee.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building C object CMakeFiles/tems.dir/lib/modbus_tee.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/modbus_tee.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_tee.c
 
 CMakeFiles/tems.dir/lib/modbus_tee.c.i: cmake_force
@@ -436,7 +449,7 @@ CMakeFiles/tems.dir/lib/modbus_tee.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/modbus_transport.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/modbus_transport.c.o: ../lib/modbus_transport.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building C object CMakeFiles/tems.dir/lib/modbus_transport.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building C object CMakeFiles/tems.dir/lib/modbus_transport.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/modbus_transport.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/modbus_transport.c
 
 CMakeFiles/tems.dir/lib/modbus_transport.c.i: cmake_force
@@ -449,7 +462,7 @@ CMakeFiles/tems.dir/lib/modbus_transport.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/port.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/port.c.o: ../lib/port.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building C object CMakeFiles/tems.dir/lib/port.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building C object CMakeFiles/tems.dir/lib/port.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/port.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/port.c
 
 CMakeFiles/tems.dir/lib/port.c.i: cmake_force
@@ -462,7 +475,7 @@ CMakeFiles/tems.dir/lib/port.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/serial.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/serial.c.o: ../lib/serial.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building C object CMakeFiles/tems.dir/lib/serial.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building C object CMakeFiles/tems.dir/lib/serial.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/serial.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/serial.c
 
 CMakeFiles/tems.dir/lib/serial.c.i: cmake_force
@@ -475,7 +488,7 @@ CMakeFiles/tems.dir/lib/serial.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/tcp_socket.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/tcp_socket.c.o: ../lib/tcp_socket.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building C object CMakeFiles/tems.dir/lib/tcp_socket.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building C object CMakeFiles/tems.dir/lib/tcp_socket.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/tcp_socket.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/tcp_socket.c
 
 CMakeFiles/tems.dir/lib/tcp_socket.c.i: cmake_force
@@ -488,7 +501,7 @@ CMakeFiles/tems.dir/lib/tcp_socket.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/timer.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/timer.c.o: ../lib/timer.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building C object CMakeFiles/tems.dir/lib/timer.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building C object CMakeFiles/tems.dir/lib/timer.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/timer.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/timer.c
 
 CMakeFiles/tems.dir/lib/timer.c.i: cmake_force
@@ -501,7 +514,7 @@ CMakeFiles/tems.dir/lib/timer.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/trina_log.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/trina_log.c.o: ../lib/trina_log.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building C object CMakeFiles/tems.dir/lib/trina_log.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building C object CMakeFiles/tems.dir/lib/trina_log.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/trina_log.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/trina_log.c
 
 CMakeFiles/tems.dir/lib/trina_log.c.i: cmake_force
@@ -514,7 +527,7 @@ CMakeFiles/tems.dir/lib/trina_log.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/user_debug.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/user_debug.c.o: ../lib/user_debug.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building C object CMakeFiles/tems.dir/lib/user_debug.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Building C object CMakeFiles/tems.dir/lib/user_debug.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/user_debug.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/user_debug.c
 
 CMakeFiles/tems.dir/lib/user_debug.c.i: cmake_force
@@ -527,7 +540,7 @@ CMakeFiles/tems.dir/lib/user_debug.c.s: cmake_force
 
 CMakeFiles/tems.dir/lib/user_log.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/lib/user_log.c.o: ../lib/user_log.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Building C object CMakeFiles/tems.dir/lib/user_log.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_38) "Building C object CMakeFiles/tems.dir/lib/user_log.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/lib/user_log.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/lib/user_log.c
 
 CMakeFiles/tems.dir/lib/user_log.c.i: cmake_force
@@ -540,7 +553,7 @@ CMakeFiles/tems.dir/lib/user_log.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/MCU_AI.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/MCU_AI.c.o: ../logic/MCU_AI.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_38) "Building C object CMakeFiles/tems.dir/logic/MCU_AI.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building C object CMakeFiles/tems.dir/logic/MCU_AI.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/MCU_AI.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/MCU_AI.c
 
 CMakeFiles/tems.dir/logic/MCU_AI.c.i: cmake_force
@@ -553,7 +566,7 @@ CMakeFiles/tems.dir/logic/MCU_AI.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/acl_db.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/acl_db.c.o: ../logic/acl_db.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building C object CMakeFiles/tems.dir/logic/acl_db.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building C object CMakeFiles/tems.dir/logic/acl_db.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/acl_db.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/acl_db.c
 
 CMakeFiles/tems.dir/logic/acl_db.c.i: cmake_force
@@ -566,7 +579,7 @@ CMakeFiles/tems.dir/logic/acl_db.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/blackstart_sys.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/blackstart_sys.c.o: ../logic/blackstart_sys.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building C object CMakeFiles/tems.dir/logic/blackstart_sys.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building C object CMakeFiles/tems.dir/logic/blackstart_sys.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/blackstart_sys.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/blackstart_sys.c
 
 CMakeFiles/tems.dir/logic/blackstart_sys.c.i: cmake_force
@@ -579,7 +592,7 @@ CMakeFiles/tems.dir/logic/blackstart_sys.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/crypto_util.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/crypto_util.c.o: ../logic/crypto_util.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building C object CMakeFiles/tems.dir/logic/crypto_util.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building C object CMakeFiles/tems.dir/logic/crypto_util.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/crypto_util.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/crypto_util.c
 
 CMakeFiles/tems.dir/logic/crypto_util.c.i: cmake_force
@@ -592,7 +605,7 @@ CMakeFiles/tems.dir/logic/crypto_util.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/global_mcu_ai.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/global_mcu_ai.c.o: ../logic/global_mcu_ai.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building C object CMakeFiles/tems.dir/logic/global_mcu_ai.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building C object CMakeFiles/tems.dir/logic/global_mcu_ai.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/global_mcu_ai.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/global_mcu_ai.c
 
 CMakeFiles/tems.dir/logic/global_mcu_ai.c.i: cmake_force
@@ -605,7 +618,7 @@ CMakeFiles/tems.dir/logic/global_mcu_ai.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/pf_convert_final.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/pf_convert_final.c.o: ../logic/pf_convert_final.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building C object CMakeFiles/tems.dir/logic/pf_convert_final.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building C object CMakeFiles/tems.dir/logic/pf_convert_final.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/pf_convert_final.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/pf_convert_final.c
 
 CMakeFiles/tems.dir/logic/pf_convert_final.c.i: cmake_force
@@ -618,7 +631,7 @@ CMakeFiles/tems.dir/logic/pf_convert_final.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/state_sub.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/state_sub.c.o: ../logic/state_sub.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building C object CMakeFiles/tems.dir/logic/state_sub.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building C object CMakeFiles/tems.dir/logic/state_sub.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/state_sub.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/state_sub.c
 
 CMakeFiles/tems.dir/logic/state_sub.c.i: cmake_force
@@ -631,7 +644,7 @@ CMakeFiles/tems.dir/logic/state_sub.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/state_sys.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/state_sys.c.o: ../logic/state_sys.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building C object CMakeFiles/tems.dir/logic/state_sys.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building C object CMakeFiles/tems.dir/logic/state_sys.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/state_sys.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/state_sys.c
 
 CMakeFiles/tems.dir/logic/state_sys.c.i: cmake_force
@@ -644,7 +657,7 @@ CMakeFiles/tems.dir/logic/state_sys.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/state_sys_trina.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/state_sys_trina.c.o: ../logic/state_sys_trina.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building C object CMakeFiles/tems.dir/logic/state_sys_trina.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building C object CMakeFiles/tems.dir/logic/state_sys_trina.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/state_sys_trina.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/state_sys_trina.c
 
 CMakeFiles/tems.dir/logic/state_sys_trina.c.i: cmake_force
@@ -657,7 +670,7 @@ CMakeFiles/tems.dir/logic/state_sys_trina.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/state_task.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/state_task.c.o: ../logic/state_task.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building C object CMakeFiles/tems.dir/logic/state_task.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building C object CMakeFiles/tems.dir/logic/state_task.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/state_task.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/state_task.c
 
 CMakeFiles/tems.dir/logic/state_task.c.i: cmake_force
@@ -670,7 +683,7 @@ CMakeFiles/tems.dir/logic/state_task.c.s: cmake_force
 
 CMakeFiles/tems.dir/logic/xxtea.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/logic/xxtea.c.o: ../logic/xxtea.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building C object CMakeFiles/tems.dir/logic/xxtea.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building C object CMakeFiles/tems.dir/logic/xxtea.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/logic/xxtea.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/logic/xxtea.c
 
 CMakeFiles/tems.dir/logic/xxtea.c.i: cmake_force
@@ -683,7 +696,7 @@ CMakeFiles/tems.dir/logic/xxtea.c.s: cmake_force
 
 CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/p2p_server/p2p_server.c.o: ../p2p_server/p2p_server.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building C object CMakeFiles/tems.dir/p2p_server/p2p_server.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_50) "Building C object CMakeFiles/tems.dir/p2p_server/p2p_server.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/p2p_server/p2p_server.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/p2p_server/p2p_server.c
 
 CMakeFiles/tems.dir/p2p_server/p2p_server.c.i: cmake_force
@@ -696,7 +709,7 @@ CMakeFiles/tems.dir/p2p_server/p2p_server.c.s: cmake_force
 
 CMakeFiles/tems.dir/pcs/pcs_globals.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/pcs/pcs_globals.c.o: ../pcs/pcs_globals.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_50) "Building C object CMakeFiles/tems.dir/pcs/pcs_globals.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_51) "Building C object CMakeFiles/tems.dir/pcs/pcs_globals.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/pcs/pcs_globals.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_globals.c
 
 CMakeFiles/tems.dir/pcs/pcs_globals.c.i: cmake_force
@@ -709,7 +722,7 @@ CMakeFiles/tems.dir/pcs/pcs_globals.c.s: cmake_force
 
 CMakeFiles/tems.dir/pcs/pcs_pe.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/pcs/pcs_pe.c.o: ../pcs/pcs_pe.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_51) "Building C object CMakeFiles/tems.dir/pcs/pcs_pe.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_52) "Building C object CMakeFiles/tems.dir/pcs/pcs_pe.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/pcs/pcs_pe.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_pe.c
 
 CMakeFiles/tems.dir/pcs/pcs_pe.c.i: cmake_force
@@ -722,7 +735,7 @@ CMakeFiles/tems.dir/pcs/pcs_pe.c.s: cmake_force
 
 CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o: ../pcs/pcs_pe_write.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_52) "Building C object CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_53) "Building C object CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/pcs/pcs_pe_write.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_pe_write.c
 
 CMakeFiles/tems.dir/pcs/pcs_pe_write.c.i: cmake_force
@@ -735,7 +748,7 @@ CMakeFiles/tems.dir/pcs/pcs_pe_write.c.s: cmake_force
 
 CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o: ../pcs/pcs_shangneng.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_53) "Building C object CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_54) "Building C object CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/pcs/pcs_shangneng.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_shangneng.c
 
 CMakeFiles/tems.dir/pcs/pcs_shangneng.c.i: cmake_force
@@ -748,7 +761,7 @@ CMakeFiles/tems.dir/pcs/pcs_shangneng.c.s: cmake_force
 
 CMakeFiles/tems.dir/pcs/pcs_taida.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/pcs/pcs_taida.c.o: ../pcs/pcs_taida.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_54) "Building C object CMakeFiles/tems.dir/pcs/pcs_taida.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_55) "Building C object CMakeFiles/tems.dir/pcs/pcs_taida.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/pcs/pcs_taida.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_taida.c
 
 CMakeFiles/tems.dir/pcs/pcs_taida.c.i: cmake_force
@@ -761,7 +774,7 @@ CMakeFiles/tems.dir/pcs/pcs_taida.c.s: cmake_force
 
 CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o: ../pcs/pcs_taida_write.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_55) "Building C object CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_56) "Building C object CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/pcs/pcs_taida_write.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_taida_write.c
 
 CMakeFiles/tems.dir/pcs/pcs_taida_write.c.i: cmake_force
@@ -774,7 +787,7 @@ CMakeFiles/tems.dir/pcs/pcs_taida_write.c.s: cmake_force
 
 CMakeFiles/tems.dir/pcs/pcs_trina.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/pcs/pcs_trina.c.o: ../pcs/pcs_trina.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_56) "Building C object CMakeFiles/tems.dir/pcs/pcs_trina.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_57) "Building C object CMakeFiles/tems.dir/pcs/pcs_trina.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/pcs/pcs_trina.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_trina.c
 
 CMakeFiles/tems.dir/pcs/pcs_trina.c.i: cmake_force
@@ -787,7 +800,7 @@ CMakeFiles/tems.dir/pcs/pcs_trina.c.s: cmake_force
 
 CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o: ../pcs/pcs_trina_write.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_57) "Building C object CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_58) "Building C object CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/pcs/pcs_trina_write.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_trina_write.c
 
 CMakeFiles/tems.dir/pcs/pcs_trina_write.c.i: cmake_force
@@ -800,7 +813,7 @@ CMakeFiles/tems.dir/pcs/pcs_trina_write.c.s: cmake_force
 
 CMakeFiles/tems.dir/pcs/pcs_write_queue.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/pcs/pcs_write_queue.c.o: ../pcs/pcs_write_queue.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_58) "Building C object CMakeFiles/tems.dir/pcs/pcs_write_queue.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_59) "Building C object CMakeFiles/tems.dir/pcs/pcs_write_queue.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/pcs/pcs_write_queue.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/pcs/pcs_write_queue.c
 
 CMakeFiles/tems.dir/pcs/pcs_write_queue.c.i: cmake_force
@@ -813,7 +826,7 @@ CMakeFiles/tems.dir/pcs/pcs_write_queue.c.s: cmake_force
 
 CMakeFiles/tems.dir/serival_device/eth_measure.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/serival_device/eth_measure.c.o: ../serival_device/eth_measure.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_59) "Building C object CMakeFiles/tems.dir/serival_device/eth_measure.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_60) "Building C object CMakeFiles/tems.dir/serival_device/eth_measure.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/serival_device/eth_measure.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/serival_device/eth_measure.c
 
 CMakeFiles/tems.dir/serival_device/eth_measure.c.i: cmake_force
@@ -826,7 +839,7 @@ CMakeFiles/tems.dir/serival_device/eth_measure.c.s: cmake_force
 
 CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/serival_device/meter_device_task.c.o: ../serival_device/meter_device_task.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_60) "Building C object CMakeFiles/tems.dir/serival_device/meter_device_task.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_61) "Building C object CMakeFiles/tems.dir/serival_device/meter_device_task.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/serival_device/meter_device_task.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/serival_device/meter_device_task.c
 
 CMakeFiles/tems.dir/serival_device/meter_device_task.c.i: cmake_force
@@ -839,7 +852,7 @@ CMakeFiles/tems.dir/serival_device/meter_device_task.c.s: cmake_force
 
 CMakeFiles/tems.dir/serival_device/mv_ups.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/serival_device/mv_ups.c.o: ../serival_device/mv_ups.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_61) "Building C object CMakeFiles/tems.dir/serival_device/mv_ups.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_62) "Building C object CMakeFiles/tems.dir/serival_device/mv_ups.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/serival_device/mv_ups.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/serival_device/mv_ups.c
 
 CMakeFiles/tems.dir/serival_device/mv_ups.c.i: cmake_force
@@ -852,7 +865,7 @@ CMakeFiles/tems.dir/serival_device/mv_ups.c.s: cmake_force
 
 CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o: ../serival_device/sensor_device_task.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_62) "Building C object CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_63) "Building C object CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/serival_device/sensor_device_task.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/serival_device/sensor_device_task.c
 
 CMakeFiles/tems.dir/serival_device/sensor_device_task.c.i: cmake_force
@@ -865,7 +878,7 @@ CMakeFiles/tems.dir/serival_device/sensor_device_task.c.s: cmake_force
 
 CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/serival_device/ups_device_task.c.o: ../serival_device/ups_device_task.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_63) "Building C object CMakeFiles/tems.dir/serival_device/ups_device_task.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_64) "Building C object CMakeFiles/tems.dir/serival_device/ups_device_task.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/serival_device/ups_device_task.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/serival_device/ups_device_task.c
 
 CMakeFiles/tems.dir/serival_device/ups_device_task.c.i: cmake_force
@@ -878,7 +891,7 @@ CMakeFiles/tems.dir/serival_device/ups_device_task.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_d_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_idx_d_rt.c.o: ../sort/sort_ins_idx_d_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_64) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_d_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_65) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_d_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_idx_d_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_idx_d_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_d_rt.c.i: cmake_force
@@ -891,7 +904,7 @@ CMakeFiles/tems.dir/sort/sort_ins_idx_d_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_r_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_idx_r_rt.c.o: ../sort/sort_ins_idx_r_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_65) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_r_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_66) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_r_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_idx_r_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_idx_r_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_r_rt.c.i: cmake_force
@@ -904,7 +917,7 @@ CMakeFiles/tems.dir/sort/sort_ins_idx_r_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_s08_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_idx_s08_rt.c.o: ../sort/sort_ins_idx_s08_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_66) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_s08_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_67) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_s08_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_idx_s08_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_idx_s08_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_s08_rt.c.i: cmake_force
@@ -917,7 +930,7 @@ CMakeFiles/tems.dir/sort/sort_ins_idx_s08_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_s16_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_idx_s16_rt.c.o: ../sort/sort_ins_idx_s16_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_67) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_s16_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_68) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_s16_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_idx_s16_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_idx_s16_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_s16_rt.c.i: cmake_force
@@ -930,7 +943,7 @@ CMakeFiles/tems.dir/sort/sort_ins_idx_s16_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_s32_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_idx_s32_rt.c.o: ../sort/sort_ins_idx_s32_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_68) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_s32_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_69) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_s32_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_idx_s32_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_idx_s32_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_s32_rt.c.i: cmake_force
@@ -943,7 +956,7 @@ CMakeFiles/tems.dir/sort/sort_ins_idx_s32_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_u08_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_idx_u08_rt.c.o: ../sort/sort_ins_idx_u08_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_69) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_u08_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_70) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_u08_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_idx_u08_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_idx_u08_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_u08_rt.c.i: cmake_force
@@ -956,7 +969,7 @@ CMakeFiles/tems.dir/sort/sort_ins_idx_u08_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_u16_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_idx_u16_rt.c.o: ../sort/sort_ins_idx_u16_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_70) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_u16_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_71) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_u16_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_idx_u16_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_idx_u16_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_u16_rt.c.i: cmake_force
@@ -969,7 +982,7 @@ CMakeFiles/tems.dir/sort/sort_ins_idx_u16_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_u32_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_idx_u32_rt.c.o: ../sort/sort_ins_idx_u32_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_71) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_u32_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building C object CMakeFiles/tems.dir/sort/sort_ins_idx_u32_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_idx_u32_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_idx_u32_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_idx_u32_rt.c.i: cmake_force
@@ -982,7 +995,7 @@ CMakeFiles/tems.dir/sort/sort_ins_idx_u32_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_val_d_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_val_d_rt.c.o: ../sort/sort_ins_val_d_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_d_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_d_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_val_d_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_val_d_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_val_d_rt.c.i: cmake_force
@@ -995,7 +1008,7 @@ CMakeFiles/tems.dir/sort/sort_ins_val_d_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_val_r_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_val_r_rt.c.o: ../sort/sort_ins_val_r_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_r_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_74) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_r_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_val_r_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_val_r_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_val_r_rt.c.i: cmake_force
@@ -1008,7 +1021,7 @@ CMakeFiles/tems.dir/sort/sort_ins_val_r_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_val_s08_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_val_s08_rt.c.o: ../sort/sort_ins_val_s08_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_74) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_s08_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_75) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_s08_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_val_s08_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_val_s08_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_val_s08_rt.c.i: cmake_force
@@ -1021,7 +1034,7 @@ CMakeFiles/tems.dir/sort/sort_ins_val_s08_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_val_s16_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_val_s16_rt.c.o: ../sort/sort_ins_val_s16_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_75) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_s16_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_76) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_s16_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_val_s16_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_val_s16_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_val_s16_rt.c.i: cmake_force
@@ -1034,7 +1047,7 @@ CMakeFiles/tems.dir/sort/sort_ins_val_s16_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_val_s32_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_val_s32_rt.c.o: ../sort/sort_ins_val_s32_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_76) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_s32_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_77) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_s32_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_val_s32_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_val_s32_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_val_s32_rt.c.i: cmake_force
@@ -1047,7 +1060,7 @@ CMakeFiles/tems.dir/sort/sort_ins_val_s32_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_val_u08_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_val_u08_rt.c.o: ../sort/sort_ins_val_u08_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_77) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_u08_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_78) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_u08_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_val_u08_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_val_u08_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_val_u08_rt.c.i: cmake_force
@@ -1060,7 +1073,7 @@ CMakeFiles/tems.dir/sort/sort_ins_val_u08_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_val_u16_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_val_u16_rt.c.o: ../sort/sort_ins_val_u16_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_78) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_u16_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_79) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_u16_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_val_u16_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_val_u16_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_val_u16_rt.c.i: cmake_force
@@ -1073,7 +1086,7 @@ CMakeFiles/tems.dir/sort/sort_ins_val_u16_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_ins_val_u32_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_ins_val_u32_rt.c.o: ../sort/sort_ins_val_u32_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_79) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_u32_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_80) "Building C object CMakeFiles/tems.dir/sort/sort_ins_val_u32_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_ins_val_u32_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_ins_val_u32_rt.c
 
 CMakeFiles/tems.dir/sort/sort_ins_val_u32_rt.c.i: cmake_force
@@ -1086,7 +1099,7 @@ CMakeFiles/tems.dir/sort/sort_ins_val_u32_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_d_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_idx_d_rt.c.o: ../sort/sort_qk_idx_d_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_80) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_d_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_81) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_d_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_idx_d_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_idx_d_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_d_rt.c.i: cmake_force
@@ -1099,7 +1112,7 @@ CMakeFiles/tems.dir/sort/sort_qk_idx_d_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_r_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_idx_r_rt.c.o: ../sort/sort_qk_idx_r_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_81) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_r_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_82) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_r_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_idx_r_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_idx_r_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_r_rt.c.i: cmake_force
@@ -1112,7 +1125,7 @@ CMakeFiles/tems.dir/sort/sort_qk_idx_r_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_s08_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_idx_s08_rt.c.o: ../sort/sort_qk_idx_s08_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_82) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_s08_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_83) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_s08_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_idx_s08_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_idx_s08_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_s08_rt.c.i: cmake_force
@@ -1125,7 +1138,7 @@ CMakeFiles/tems.dir/sort/sort_qk_idx_s08_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_s16_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_idx_s16_rt.c.o: ../sort/sort_qk_idx_s16_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_83) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_s16_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_s16_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_idx_s16_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_idx_s16_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_s16_rt.c.i: cmake_force
@@ -1138,7 +1151,7 @@ CMakeFiles/tems.dir/sort/sort_qk_idx_s16_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_s32_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_idx_s32_rt.c.o: ../sort/sort_qk_idx_s32_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_s32_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_s32_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_idx_s32_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_idx_s32_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_s32_rt.c.i: cmake_force
@@ -1151,7 +1164,7 @@ CMakeFiles/tems.dir/sort/sort_qk_idx_s32_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_u08_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_idx_u08_rt.c.o: ../sort/sort_qk_idx_u08_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_u08_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_86) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_u08_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_idx_u08_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_idx_u08_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_u08_rt.c.i: cmake_force
@@ -1164,7 +1177,7 @@ CMakeFiles/tems.dir/sort/sort_qk_idx_u08_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_u16_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_idx_u16_rt.c.o: ../sort/sort_qk_idx_u16_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_86) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_u16_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_87) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_u16_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_idx_u16_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_idx_u16_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_u16_rt.c.i: cmake_force
@@ -1177,7 +1190,7 @@ CMakeFiles/tems.dir/sort/sort_qk_idx_u16_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_u32_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_idx_u32_rt.c.o: ../sort/sort_qk_idx_u32_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_87) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_u32_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_88) "Building C object CMakeFiles/tems.dir/sort/sort_qk_idx_u32_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_idx_u32_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_idx_u32_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_idx_u32_rt.c.i: cmake_force
@@ -1190,7 +1203,7 @@ CMakeFiles/tems.dir/sort/sort_qk_idx_u32_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_val_d_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_val_d_rt.c.o: ../sort/sort_qk_val_d_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_88) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_d_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_89) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_d_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_val_d_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_val_d_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_val_d_rt.c.i: cmake_force
@@ -1203,7 +1216,7 @@ CMakeFiles/tems.dir/sort/sort_qk_val_d_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_val_r_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_val_r_rt.c.o: ../sort/sort_qk_val_r_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_89) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_r_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_90) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_r_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_val_r_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_val_r_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_val_r_rt.c.i: cmake_force
@@ -1216,7 +1229,7 @@ CMakeFiles/tems.dir/sort/sort_qk_val_r_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_val_s08_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_val_s08_rt.c.o: ../sort/sort_qk_val_s08_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_90) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_s08_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_91) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_s08_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_val_s08_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_val_s08_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_val_s08_rt.c.i: cmake_force
@@ -1229,7 +1242,7 @@ CMakeFiles/tems.dir/sort/sort_qk_val_s08_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_val_s16_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_val_s16_rt.c.o: ../sort/sort_qk_val_s16_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_91) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_s16_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_92) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_s16_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_val_s16_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_val_s16_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_val_s16_rt.c.i: cmake_force
@@ -1242,7 +1255,7 @@ CMakeFiles/tems.dir/sort/sort_qk_val_s16_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_val_s32_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_val_s32_rt.c.o: ../sort/sort_qk_val_s32_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_92) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_s32_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_93) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_s32_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_val_s32_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_val_s32_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_val_s32_rt.c.i: cmake_force
@@ -1255,7 +1268,7 @@ CMakeFiles/tems.dir/sort/sort_qk_val_s32_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_val_u08_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_val_u08_rt.c.o: ../sort/sort_qk_val_u08_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_93) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_u08_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_94) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_u08_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_val_u08_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_val_u08_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_val_u08_rt.c.i: cmake_force
@@ -1268,7 +1281,7 @@ CMakeFiles/tems.dir/sort/sort_qk_val_u08_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_val_u16_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_val_u16_rt.c.o: ../sort/sort_qk_val_u16_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_94) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_u16_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_95) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_u16_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_val_u16_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_val_u16_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_val_u16_rt.c.i: cmake_force
@@ -1281,7 +1294,7 @@ CMakeFiles/tems.dir/sort/sort_qk_val_u16_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/sort_qk_val_u32_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/sort_qk_val_u32_rt.c.o: ../sort/sort_qk_val_u32_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_95) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_u32_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_96) "Building C object CMakeFiles/tems.dir/sort/sort_qk_val_u32_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/sort_qk_val_u32_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/sort_qk_val_u32_rt.c
 
 CMakeFiles/tems.dir/sort/sort_qk_val_u32_rt.c.i: cmake_force
@@ -1294,7 +1307,7 @@ CMakeFiles/tems.dir/sort/sort_qk_val_u32_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/srt_qid_findpivot_d_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/srt_qid_findpivot_d_rt.c.o: ../sort/srt_qid_findpivot_d_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_96) "Building C object CMakeFiles/tems.dir/sort/srt_qid_findpivot_d_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_97) "Building C object CMakeFiles/tems.dir/sort/srt_qid_findpivot_d_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/srt_qid_findpivot_d_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/srt_qid_findpivot_d_rt.c
 
 CMakeFiles/tems.dir/sort/srt_qid_findpivot_d_rt.c.i: cmake_force
@@ -1307,7 +1320,7 @@ CMakeFiles/tems.dir/sort/srt_qid_findpivot_d_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/srt_qid_findpivot_r_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/srt_qid_findpivot_r_rt.c.o: ../sort/srt_qid_findpivot_r_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_97) "Building C object CMakeFiles/tems.dir/sort/srt_qid_findpivot_r_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_98) "Building C object CMakeFiles/tems.dir/sort/srt_qid_findpivot_r_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/srt_qid_findpivot_r_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/srt_qid_findpivot_r_rt.c
 
 CMakeFiles/tems.dir/sort/srt_qid_findpivot_r_rt.c.i: cmake_force
@@ -1320,7 +1333,7 @@ CMakeFiles/tems.dir/sort/srt_qid_findpivot_r_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/srt_qid_partition_d_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/srt_qid_partition_d_rt.c.o: ../sort/srt_qid_partition_d_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_98) "Building C object CMakeFiles/tems.dir/sort/srt_qid_partition_d_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_99) "Building C object CMakeFiles/tems.dir/sort/srt_qid_partition_d_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/srt_qid_partition_d_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/srt_qid_partition_d_rt.c
 
 CMakeFiles/tems.dir/sort/srt_qid_partition_d_rt.c.i: cmake_force
@@ -1333,7 +1346,7 @@ CMakeFiles/tems.dir/sort/srt_qid_partition_d_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/srt_qid_partition_r_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/srt_qid_partition_r_rt.c.o: ../sort/srt_qid_partition_r_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_99) "Building C object CMakeFiles/tems.dir/sort/srt_qid_partition_r_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_100) "Building C object CMakeFiles/tems.dir/sort/srt_qid_partition_r_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/srt_qid_partition_r_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/srt_qid_partition_r_rt.c
 
 CMakeFiles/tems.dir/sort/srt_qid_partition_r_rt.c.i: cmake_force
@@ -1346,7 +1359,7 @@ CMakeFiles/tems.dir/sort/srt_qid_partition_r_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/srt_qkrec_c_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/srt_qkrec_c_rt.c.o: ../sort/srt_qkrec_c_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_100) "Building C object CMakeFiles/tems.dir/sort/srt_qkrec_c_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_101) "Building C object CMakeFiles/tems.dir/sort/srt_qkrec_c_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/srt_qkrec_c_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/srt_qkrec_c_rt.c
 
 CMakeFiles/tems.dir/sort/srt_qkrec_c_rt.c.i: cmake_force
@@ -1359,7 +1372,7 @@ CMakeFiles/tems.dir/sort/srt_qkrec_c_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/srt_qkrec_d_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/srt_qkrec_d_rt.c.o: ../sort/srt_qkrec_d_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_101) "Building C object CMakeFiles/tems.dir/sort/srt_qkrec_d_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_102) "Building C object CMakeFiles/tems.dir/sort/srt_qkrec_d_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/srt_qkrec_d_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/srt_qkrec_d_rt.c
 
 CMakeFiles/tems.dir/sort/srt_qkrec_d_rt.c.i: cmake_force
@@ -1372,7 +1385,7 @@ CMakeFiles/tems.dir/sort/srt_qkrec_d_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/srt_qkrec_r_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/srt_qkrec_r_rt.c.o: ../sort/srt_qkrec_r_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_102) "Building C object CMakeFiles/tems.dir/sort/srt_qkrec_r_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_103) "Building C object CMakeFiles/tems.dir/sort/srt_qkrec_r_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/srt_qkrec_r_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/srt_qkrec_r_rt.c
 
 CMakeFiles/tems.dir/sort/srt_qkrec_r_rt.c.i: cmake_force
@@ -1385,7 +1398,7 @@ CMakeFiles/tems.dir/sort/srt_qkrec_r_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/sort/srt_qkrec_z_rt.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/sort/srt_qkrec_z_rt.c.o: ../sort/srt_qkrec_z_rt.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_103) "Building C object CMakeFiles/tems.dir/sort/srt_qkrec_z_rt.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_104) "Building C object CMakeFiles/tems.dir/sort/srt_qkrec_z_rt.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/sort/srt_qkrec_z_rt.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/sort/srt_qkrec_z_rt.c
 
 CMakeFiles/tems.dir/sort/srt_qkrec_z_rt.c.i: cmake_force
@@ -1398,7 +1411,7 @@ CMakeFiles/tems.dir/sort/srt_qkrec_z_rt.c.s: cmake_force
 
 CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o: ../tcp_server/modbus_tcp_server.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_104) "Building C object CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_105) "Building C object CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/tcp_server/modbus_tcp_server.c
 
 CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.i: cmake_force
@@ -1411,7 +1424,7 @@ CMakeFiles/tems.dir/tcp_server/modbus_tcp_server.c.s: cmake_force
 
 CMakeFiles/tems.dir/web_server/web_server.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/web_server/web_server.c.o: ../web_server/web_server.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_105) "Building C object CMakeFiles/tems.dir/web_server/web_server.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_106) "Building C object CMakeFiles/tems.dir/web_server/web_server.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/web_server/web_server.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/web_server/web_server.c
 
 CMakeFiles/tems.dir/web_server/web_server.c.i: cmake_force
@@ -1424,7 +1437,7 @@ CMakeFiles/tems.dir/web_server/web_server.c.s: cmake_force
 
 CMakeFiles/tems.dir/whitelist/whitelist.c.o: CMakeFiles/tems.dir/flags.make
 CMakeFiles/tems.dir/whitelist/whitelist.c.o: ../whitelist/whitelist.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_106) "Building C object CMakeFiles/tems.dir/whitelist/whitelist.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_107) "Building C object CMakeFiles/tems.dir/whitelist/whitelist.c.o"
 	/usr/bin/aarch64-linux-gnu-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/tems.dir/whitelist/whitelist.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/whitelist/whitelist.c
 
 CMakeFiles/tems.dir/whitelist/whitelist.c.i: cmake_force
@@ -1463,6 +1476,7 @@ tems_OBJECTS = \
 "CMakeFiles/tems.dir/lib/app_config.c.o" \
 "CMakeFiles/tems.dir/lib/assist_func.c.o" \
 "CMakeFiles/tems.dir/lib/ini.c.o" \
+"CMakeFiles/tems.dir/lib/modbus_identity.c.o" \
 "CMakeFiles/tems.dir/lib/modbus_protocol.c.o" \
 "CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o" \
 "CMakeFiles/tems.dir/lib/modbus_tee.c.o" \
@@ -1573,6 +1587,7 @@ tems: CMakeFiles/tems.dir/dsp/HostLib_FFT.c.o
 tems: CMakeFiles/tems.dir/lib/app_config.c.o
 tems: CMakeFiles/tems.dir/lib/assist_func.c.o
 tems: CMakeFiles/tems.dir/lib/ini.c.o
+tems: CMakeFiles/tems.dir/lib/modbus_identity.c.o
 tems: CMakeFiles/tems.dir/lib/modbus_protocol.c.o
 tems: CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.o
 tems: CMakeFiles/tems.dir/lib/modbus_tee.c.o
@@ -1656,7 +1671,7 @@ tems: CMakeFiles/tems.dir/whitelist/whitelist.c.o
 tems: CMakeFiles/tems.dir/build.make
 tems: ../.deps/optee-arm64/lib/libteec.so
 tems: CMakeFiles/tems.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_107) "Linking CXX executable tems"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_108) "Linking CXX executable tems"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/tems.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

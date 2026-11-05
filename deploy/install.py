@@ -83,7 +83,7 @@ def unpack(bundle, directory):
                 raise ValueError('Checksum mismatch: ' + name)
         required = {'home/zlg/tems', TA, 'home/zlg/app/main.py',
                     'home/zlg/app/bin/modbus_tee_identity', 'home/zlg/app/bin/crypto_ta_client',
-                    'home/zlg/app/scripts/modbus_certs.py', 'home/zlg/app/script/sign_ini.py'}
+                    'home/zlg/app/script/modbus_certs.py', 'home/zlg/app/script/sign_ini.py'}
         if not required <= set(manifest):
             raise ValueError('Incomplete upgrade bundle')
         return manifest
@@ -216,7 +216,7 @@ def main():
             if not checksum.exists():
                 changed.append('home/zlg/signature/lc_data_set.ini.sha256')
                 run('python3', base / 'app/script/sign_ini.py')
-            script = base / 'app/scripts/modbus_certs.py'
+            script = base / 'app/script/modbus_certs.py'
             for role, name in (('master', args.master_name), ('slave', args.slave_name)):
                 cert = Path('/etc/ems/modbus') / (role + '.crt')
                 if name:

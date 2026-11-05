@@ -3658,10 +3658,10 @@ int Deal_database(void)
 		if (mysql_query(&mysql, sqlstr)) {
 			printf("COMMIT failed!\n");
 		}
-		if (0 == Insert_rack_Table(&mysql))
-		{
-			res1 = 0;
-		}
+		// if (0 == Insert_rack_Table(&mysql))
+		// {
+		// 	res1 = 0;
+		// }
 		// if (0 == Insert_cell_temp_Table(&mysql))
 		// {
 		// 	res1 = 0;

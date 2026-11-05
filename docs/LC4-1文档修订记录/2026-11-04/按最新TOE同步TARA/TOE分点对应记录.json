@@ -1,0 +1,2229 @@
+[
+  {
+    "row": 3,
+    "requirements": "① 对已接入logger的Modbus TLS传输层且启用TLS的链路，使用TLS 1.2及以上版本。\n② 建立连接时，应验证外部签发机构的信任链、证书有效期及认证用途。\n③ 从机应要求主机提供客户端证书；主机应核对从机证书中的IP地址与实际连接地址一致。\n④ 身份或安全连接校验失败时，应拒绝该连接，不自动改用明文。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "feature": "tls"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 4,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 5,
+    "requirements": "① 对已接入logger的Modbus TLS传输层且启用TLS的链路，使用TLS 1.2及以上版本。\n② 建立连接时，应验证外部签发机构的信任链、证书有效期及认证用途。\n③ 从机应要求主机提供客户端证书；主机应核对从机证书中的IP地址与实际连接地址一致。\n④ 身份或安全连接校验失败时，应拒绝该连接，不自动改用明文。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "feature": "tls"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 6,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 7,
+    "requirements": "① 北向Modbus监听入口应将已连接及握手中的客户端总数限制为20，达到上限时关闭新连接。\n② 当前Modbus TLS实现的握手截止时间为5000毫秒；收到一帧数据后的组帧截止时间为3000毫秒。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          7,
+          8
+        ],
+        "feature": "mconnections"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 8,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 9,
+    "requirements": "① 对已接入logger的Modbus TLS传输层且启用TLS的链路，使用TLS 1.2及以上版本。\n② 建立连接时，应验证外部签发机构的信任链、证书有效期及认证用途。\n③ 从机应要求主机提供客户端证书；主机应核对从机证书中的IP地址与实际连接地址一致。\n④ 身份或安全连接校验失败时，应拒绝该连接，不自动改用明文。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "feature": "tls"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 10,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 11,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 12,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 13,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 14,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 15,
+    "requirements": "① 对已接入logger的Modbus TLS传输层且启用TLS的链路，使用TLS 1.2及以上版本。\n② 建立连接时，应验证外部签发机构的信任链、证书有效期及认证用途。\n③ 从机应要求主机提供客户端证书；主机应核对从机证书中的IP地址与实际连接地址一致。\n④ 身份或安全连接校验失败时，应拒绝该连接，不自动改用明文。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "feature": "tls"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 16,
+    "requirements": "① 对已接入logger的Modbus TLS传输层且启用TLS的链路，使用TLS 1.2及以上版本。\n② 建立连接时，应验证外部签发机构的信任链、证书有效期及认证用途。\n③ 从机应要求主机提供客户端证书；主机应核对从机证书中的IP地址与实际连接地址一致。\n④ 身份或安全连接校验失败时，应拒绝该连接，不自动改用明文。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "feature": "tls"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 17,
+    "requirements": "① 北向Modbus监听入口应将已连接及握手中的客户端总数限制为20，达到上限时关闭新连接。\n② 当前Modbus TLS实现的握手截止时间为5000毫秒；收到一帧数据后的组帧截止时间为3000毫秒。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          7,
+          8
+        ],
+        "feature": "mconnections"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 18,
+    "requirements": "① 对已接入logger的Modbus TLS传输层且启用TLS的链路，使用TLS 1.2及以上版本。\n② 建立连接时，应验证外部签发机构的信任链、证书有效期及认证用途。\n③ 从机应要求主机提供客户端证书；主机应核对从机证书中的IP地址与实际连接地址一致。\n④ 身份或安全连接校验失败时，应拒绝该连接，不自动改用明文。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "feature": "tls"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 19,
+    "requirements": "① 对已接入logger的Modbus TLS传输层且启用TLS的链路，使用TLS 1.2及以上版本。\n② 建立连接时，应验证外部签发机构的信任链、证书有效期及认证用途。\n③ 从机应要求主机提供客户端证书；主机应核对从机证书中的IP地址与实际连接地址一致。\n④ 身份或安全连接校验失败时，应拒绝该连接，不自动改用明文。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "feature": "tls"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 20,
+    "requirements": "① 北向Modbus监听入口应将已连接及握手中的客户端总数限制为20，达到上限时关闭新连接。\n② 当前Modbus TLS实现的握手截止时间为5000毫秒；收到一帧数据后的组帧截止时间为3000毫秒。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          7,
+          8
+        ],
+        "feature": "mconnections"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 21,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 22,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 23,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 24,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 25,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 26,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 27,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 28,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 29,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 30,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 31,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 32,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 33,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 34,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 35,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 36,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 37,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 38,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 39,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 40,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 41,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 42,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 43,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 44,
+    "requirements": "① Web通用协议接口/api应逐条检查设备号、功能码、地址、数量及写入值的数据格式和范围。\n② 该Web接口允许功能码03、04和06；设备号为1至247，每批最多100条，03、04读取数量为1至125。\n③ 地址应为0至65535且请求范围不能越界；不符合这些检查的请求应返回错误。\n④ 审计查询应使用预定义筛选条件和分离处理的参数，非法时间、分页或表名应返回错误。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "web_input"
+      },
+      {
+        "toeId": "CRA-REG-002",
+        "toeRow": 3,
+        "points": [
+          1
+        ],
+        "feature": "query"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 45,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 46,
+    "requirements": "① 登录及受保护业务HTTP请求应按实际来源IP共享分钟窗口计数，默认每个来源每分钟最多3000次，超过配置阈值时应返回HTTP 429；代理来源地址仅按现有回环受信规则处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          6
+        ],
+        "feature": "http_rate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 47,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 48,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 49,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 50,
+    "requirements": "① 用户退出、账号改密、删除、禁用或管理员撤销会话后，相应旧凭据应按当前规则失效。\n② 管理员撤销应仅作用于选定会话；后续HTTP访问应重新检查数据库中的会话及账号状态。\n③ 本人改密应验证原密码；临时密码账号在完成首次改密前，只能访问当前允许的改密及会话相关接口。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-013",
+        "toeRow": 14,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "revoke"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 51,
+    "requirements": "① 账号管理、证书管理、应用备份和应用身份清除操作应限制为权限等级4。\n② 本人修改密码时应验证原密码，普通用户不得提高自身角色或修改无权管理的其他账号。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-016",
+        "toeRow": 17,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "account_roles"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 52,
+    "requirements": "① Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n② 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 53,
+    "requirements": "① 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 54,
+    "requirements": "① 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 55,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 56,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 57,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 58,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 59,
+    "requirements": "① 默认会话自最后一次有效认证请求起15分钟失效，自登录起30分钟达到绝对期限；后台认证轮询属于请求活动。\n② 全系统有效会话最多20个，超限返回HTTP 429。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "session"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 60,
+    "requirements": "① Web账号列表应仅返回当前公开字段，不返回口令摘要或盐；账号管理查询应限制为等级4。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-002",
+        "toeRow": 3,
+        "points": [
+          2
+        ],
+        "feature": "account_view"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 61,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 62,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 63,
+    "requirements": "① 登录失败达到5次阈值后应锁定300秒。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          3
+        ],
+        "feature": "loginlock"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 64,
+    "requirements": "① 新建、改密及重置口令应使用随机盐PBKDF2-HMAC-SHA256摘要，当前计算600000次；旧MD5摘要在原口令成功验证后迁移。\n② 口令应为12至128位，包含大小写字母、数字和特殊字符，不含用户名且不得复用最近5次口令。\n③ 登录失败达到5次阈值后应锁定300秒。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          2,
+          3
+        ],
+        "feature": "password"
+      },
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          3
+        ],
+        "feature": "loginlock"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 65,
+    "requirements": "① 生产配置默认应禁止名单中的开发调试账号登录，并撤销其原有会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-009",
+        "toeRow": 10,
+        "points": [
+          1
+        ],
+        "feature": "developer"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 66,
+    "requirements": "① 账号管理、证书管理、应用备份和应用身份清除操作应限制为权限等级4。\n② 本人修改密码时应验证原密码，普通用户不得提高自身角色或修改无权管理的其他账号。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-016",
+        "toeRow": 17,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "account_roles"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 67,
+    "requirements": "① 用户退出、账号改密、删除、禁用或管理员撤销会话后，相应旧凭据应按当前规则失效。\n② 管理员撤销应仅作用于选定会话；后续HTTP访问应重新检查数据库中的会话及账号状态。\n③ 本人改密应验证原密码；临时密码账号在完成首次改密前，只能访问当前允许的改密及会话相关接口。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-013",
+        "toeRow": 14,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "revoke"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 68,
+    "requirements": "① Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n② 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 69,
+    "requirements": "① 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 70,
+    "requirements": "① 账号管理、证书管理、应用备份和应用身份清除操作应限制为权限等级4。\n② 本人修改密码时应验证原密码，普通用户不得提高自身角色或修改无权管理的其他账号。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-016",
+        "toeRow": 17,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "account_roles"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 71,
+    "requirements": "① 默认会话自最后一次有效认证请求起15分钟失效，自登录起30分钟达到绝对期限；后台认证轮询属于请求活动。\n② 全系统有效会话最多20个，超限返回HTTP 429。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "session"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 72,
+    "requirements": "① 新建、改密及重置口令应使用随机盐PBKDF2-HMAC-SHA256摘要，当前计算600000次；旧MD5摘要在原口令成功验证后迁移。\n② 口令应为12至128位，包含大小写字母、数字和特殊字符，不含用户名且不得复用最近5次口令。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          2,
+          3
+        ],
+        "feature": "password"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 73,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 74,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 75,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 76,
+    "requirements": "① 应用恢复默认只预览；实际执行应满足本地执行开关、有效管理员、限时维护模式、适用防伪造检查、二次口令及明确确认内容。\n② 实际恢复前，应备份当前应用数据并写入恢复未完成标志；恢复成功后应清除该标志。后端应用启动时若发现该标志，应停止启动并提示进行本地恢复处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          8,
+          9
+        ],
+        "feature": "restore_gate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 77,
+    "requirements": "① Web系统应支持服务端锁屏。\n② 用户退出、账号改密、删除、禁用或管理员撤销会话后，相应旧凭据应按当前规则失效。\n③ 管理员撤销应仅作用于选定会话；后续HTTP访问应重新检查数据库中的会话及账号状态。\n④ 本人改密应验证原密码；临时密码账号在完成首次改密前，只能访问当前允许的改密及会话相关接口。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          5
+        ],
+        "feature": "lock"
+      },
+      {
+        "toeId": "CRA-REG-013",
+        "toeRow": 14,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "revoke"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 78,
+    "requirements": "① 应仅允许已登录且权限等级为3或4的用户查询应用安全配置汇总，以及当前网络接口、IP地址、路由和可读取的防火墙规则；网络规则查询应为只读，无法采集的信息应标明不可用。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-009",
+        "toeRow": 10,
+        "points": [
+          3
+        ],
+        "feature": "security_view"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 79,
+    "requirements": "① 当前设备INI写接口应检查允许的字段、设备编号、IPv4地址和端口范围。\n② 网络地址设置应解析合法的接口地址及网段；非法输入应返回错误。\n③ Web业务参数修改接口应仅允许已登录且权限等级为2、3或4的用户调用；后端应依据有效登录会话对应账号的当前权限进行授权，不得依据客户端提交的操作人名称授权。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "config_input"
+      },
+      {
+        "toeId": "CRA-REG-016",
+        "toeRow": 17,
+        "points": [
+          3
+        ],
+        "feature": "param_roles"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 80,
+    "requirements": "① Web应用应在监测启动时及其后默认每60秒，将设备INI文件的SHA-256摘要与现有摘要文件比较。\n② 内容不符、基准缺失或格式错误时应记录失败；当前该检查只记录结果，不阻止配置生效或自动修复。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-005",
+        "toeRow": 6,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "ini"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 81,
+    "requirements": "① Web应用应在监测启动时及其后默认每60秒，将设备INI文件的SHA-256摘要与现有摘要文件比较。\n② 内容不符、基准缺失或格式错误时应记录失败；当前该检查只记录结果，不阻止配置生效或自动修复。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-005",
+        "toeRow": 6,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "ini"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 82,
+    "requirements": "① 当前设备INI写接口应检查允许的字段、设备编号、IPv4地址和端口范围。\n② 网络地址设置应解析合法的接口地址及网段；非法输入应返回错误。\n③ Web业务参数修改接口应仅允许已登录且权限等级为2、3或4的用户调用；后端应依据有效登录会话对应账号的当前权限进行授权，不得依据客户端提交的操作人名称授权。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "config_input"
+      },
+      {
+        "toeId": "CRA-REG-016",
+        "toeRow": 17,
+        "points": [
+          3
+        ],
+        "feature": "param_roles"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 83,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 84,
+    "requirements": "① Web通用协议接口/api应逐条检查设备号、功能码、地址、数量及写入值的数据格式和范围。\n② 该Web接口允许功能码03、04和06；设备号为1至247，每批最多100条，03、04读取数量为1至125。\n③ 地址应为0至65535且请求范围不能越界；不符合这些检查的请求应返回错误。\n④ Web业务参数修改接口应仅允许已登录且权限等级为2、3或4的用户调用；后端应依据有效登录会话对应账号的当前权限进行授权，不得依据客户端提交的操作人名称授权。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "web_input"
+      },
+      {
+        "toeId": "CRA-REG-016",
+        "toeRow": 17,
+        "points": [
+          3
+        ],
+        "feature": "param_roles"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 85,
+    "requirements": "① Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n② 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 86,
+    "requirements": "① Web应用应在监测启动时及其后默认每60秒，将设备INI文件的SHA-256摘要与现有摘要文件比较。\n② 内容不符、基准缺失或格式错误时应记录失败；当前该检查只记录结果，不阻止配置生效或自动修复。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-005",
+        "toeRow": 6,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "ini"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 87,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 88,
+    "requirements": "① 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 89,
+    "requirements": "① 登录及受保护业务HTTP请求应按实际来源IP共享分钟窗口计数，默认每个来源每分钟最多3000次，超过配置阈值时应返回HTTP 429；代理来源地址仅按现有回环受信规则处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          6
+        ],
+        "feature": "http_rate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 90,
+    "requirements": "① 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 91,
+    "requirements": "① 当前设备INI写接口应检查允许的字段、设备编号、IPv4地址和端口范围。\n② 网络地址设置应解析合法的接口地址及网段；非法输入应返回错误。\n③ Web业务参数修改接口应仅允许已登录且权限等级为2、3或4的用户调用；后端应依据有效登录会话对应账号的当前权限进行授权，不得依据客户端提交的操作人名称授权。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "config_input"
+      },
+      {
+        "toeId": "CRA-REG-016",
+        "toeRow": 17,
+        "points": [
+          3
+        ],
+        "feature": "param_roles"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 92,
+    "requirements": "① 应用恢复默认只预览；实际执行应满足本地执行开关、有效管理员、限时维护模式、适用防伪造检查、二次口令及明确确认内容。\n② 实际恢复前，应备份当前应用数据并写入恢复未完成标志；恢复成功后应清除该标志。后端应用启动时若发现该标志，应停止启动并提示进行本地恢复处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          8,
+          9
+        ],
+        "feature": "restore_gate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 93,
+    "requirements": "① 应用恢复默认只预览；实际执行应满足本地执行开关、有效管理员、限时维护模式、适用防伪造检查、二次口令及明确确认内容。\n② 实际恢复前，应备份当前应用数据并写入恢复未完成标志；恢复成功后应清除该标志。后端应用启动时若发现该标志，应停止启动并提示进行本地恢复处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          8,
+          9
+        ],
+        "feature": "restore_gate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 94,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 95,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 96,
+    "requirements": "① 应用备份应使用AES-GCM进行加密和完整性保护；恢复时应拒绝认证校验失败的备份文件。备份创建、下载和管理操作应仅允许权限等级4的用户执行。\n② 备份只包含应用账号、安全设置、设备INI及公开证书指纹引用，不包含可重放会话凭据、私钥、业务历史库或平台镜像。\n③ 备份目录和文件应使用应用安全目录的0700及0600权限。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "backup"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 97,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。\n③ 应用升级上传和启动应使用已认证的操作者身份，并仅允许配置中具备升级权限的等级3或4执行。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-006",
+        "toeRow": 7,
+        "points": [
+          1
+        ],
+        "feature": "upgrade_roles"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 98,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 99,
+    "requirements": "① 应用升级包应在安装前验证内层安装归档的RSA-PSS-SHA256签名，错误或缺少签名时应拒绝使用该包。\n② 应用tar归档解包应限定为目标目录内的普通文件和目录，拒绝越界路径、链接及设备文件。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-006",
+        "toeRow": 7,
+        "points": [
+          2,
+          3
+        ],
+        "feature": "package"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 100,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 101,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 102,
+    "requirements": "① 登录及受保护业务HTTP请求应按实际来源IP共享分钟窗口计数，默认每个来源每分钟最多3000次，超过配置阈值时应返回HTTP 429；代理来源地址仅按现有回环受信规则处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          6
+        ],
+        "feature": "http_rate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 103,
+    "requirements": "① 应用升级脚本应备份待替换的旧文件，并对重启后的服务执行当前健康检查。\n② 服务启动失败时应尝试恢复备份文件并重启；应记录实际失败或回退结果。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-006",
+        "toeRow": 7,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "rollback"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 104,
+    "requirements": "① 应用升级包应在安装前验证内层安装归档的RSA-PSS-SHA256签名，错误或缺少签名时应拒绝使用该包。\n② 应用tar归档解包应限定为目标目录内的普通文件和目录，拒绝越界路径、链接及设备文件。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-006",
+        "toeRow": 7,
+        "points": [
+          2,
+          3
+        ],
+        "feature": "package"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 105,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 106,
+    "requirements": "① 应用升级上传和启动应使用已认证的操作者身份，并仅允许配置中具备升级权限的等级3或4执行。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-006",
+        "toeRow": 7,
+        "points": [
+          1
+        ],
+        "feature": "upgrade_roles"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 107,
+    "requirements": "① Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n② 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 108,
+    "requirements": "① 应用升级脚本应备份待替换的旧文件，并对重启后的服务执行当前健康检查。\n② 服务启动失败时应尝试恢复备份文件并重启；应记录实际失败或回退结果。\n③ 独立9000端口服务应在有效会话认证后提供升级任务状态；启用HTTPS部署时应通过同源代理访问。\n④ 在认证数据库正常且凭据有效时，查询不依赖8000端口主应用继续运行。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-006",
+        "toeRow": 7,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "rollback"
+      },
+      {
+        "toeId": "CRA-REG-014",
+        "toeRow": 15,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "upgrade_status"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 109,
+    "requirements": "① 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 110,
+    "requirements": "① 应用升级包应在安装前验证内层安装归档的RSA-PSS-SHA256签名，错误或缺少签名时应拒绝使用该包。\n② 应用tar归档解包应限定为目标目录内的普通文件和目录，拒绝越界路径、链接及设备文件。\n③ 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n④ 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-006",
+        "toeRow": 7,
+        "points": [
+          2,
+          3
+        ],
+        "feature": "package"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 111,
+    "requirements": "① 登录及受保护业务HTTP请求应按实际来源IP共享分钟窗口计数，默认每个来源每分钟最多3000次，超过配置阈值时应返回HTTP 429；代理来源地址仅按现有回环受信规则处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          6
+        ],
+        "feature": "http_rate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 112,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 113,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。\n③ 应用升级上传和启动应使用已认证的操作者身份，并仅允许配置中具备升级权限的等级3或4执行。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-006",
+        "toeRow": 7,
+        "points": [
+          1
+        ],
+        "feature": "upgrade_roles"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 114,
+    "requirements": "① 独立9000端口服务应在有效会话认证后提供升级任务状态；启用HTTPS部署时应通过同源代理访问。\n② 在认证数据库正常且凭据有效时，查询不依赖8000端口主应用继续运行。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-014",
+        "toeRow": 15,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "upgrade_status"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 115,
+    "requirements": "① Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 116,
+    "requirements": "① 独立9000端口服务应在有效会话认证后提供升级任务状态；启用HTTPS部署时应通过同源代理访问。\n② 在认证数据库正常且凭据有效时，查询不依赖8000端口主应用继续运行。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-014",
+        "toeRow": 15,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "upgrade_status"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 117,
+    "requirements": "① 登录及受保护业务HTTP请求应按实际来源IP共享分钟窗口计数，默认每个来源每分钟最多3000次，超过配置阈值时应返回HTTP 429；代理来源地址仅按现有回环受信规则处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          6
+        ],
+        "feature": "http_rate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 118,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 119,
+    "requirements": "① 应用升级包应在安装前验证内层安装归档的RSA-PSS-SHA256签名，错误或缺少签名时应拒绝使用该包。\n② 应用tar归档解包应限定为目标目录内的普通文件和目录，拒绝越界路径、链接及设备文件。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-006",
+        "toeRow": 7,
+        "points": [
+          2,
+          3
+        ],
+        "feature": "package"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 120,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 121,
+    "requirements": "① Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n② 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 122,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 123,
+    "requirements": "① 审计查询应使用预定义筛选条件和分离处理的参数，非法时间、分页或表名应返回错误。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-002",
+        "toeRow": 3,
+        "points": [
+          1
+        ],
+        "feature": "query"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 124,
+    "requirements": "① 审计CSV导出应对可能触发电子表格公式的起始字符进行安全处理，将事件字段作为数据文本输出。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-002",
+        "toeRow": 3,
+        "points": [
+          3
+        ],
+        "feature": "csv"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 125,
+    "requirements": "① Web审计写入时应按默认180天策略清理过期新增记录；业务日志不自动按该策略删除。\n② 应监测数据库数据目录所在文件系统的空间使用率；使用率达到80%时报告容量预警，达到95%时报告严重容量告警。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          3,
+          4
+        ],
+        "feature": "audit_capacity"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 126,
+    "requirements": "① 审计日志实际写入失败时，应报告审计写入故障并保留故障标志，单次查询成功不得自动清除该失败标志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          5
+        ],
+        "feature": "audit_fail"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 127,
+    "requirements": "① Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n② 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 128,
+    "requirements": "① Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n② 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 129,
+    "requirements": "① Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n② 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 130,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 131,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 132,
+    "requirements": "① 审计日志实际写入失败时，应报告审计写入故障并保留故障标志，单次查询成功不得自动清除该失败标志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          5
+        ],
+        "feature": "audit_fail"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 133,
+    "requirements": "① Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n② 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。\n③ 审计查询应使用预定义筛选条件和分离处理的参数，非法时间、分页或表名应返回错误。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      },
+      {
+        "toeId": "CRA-REG-002",
+        "toeRow": 3,
+        "points": [
+          1
+        ],
+        "feature": "query"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 134,
+    "requirements": "① 审计查询应使用预定义筛选条件和分离处理的参数，非法时间、分页或表名应返回错误。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-002",
+        "toeRow": 3,
+        "points": [
+          1
+        ],
+        "feature": "query"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 135,
+    "requirements": "① 登录及受保护业务HTTP请求应按实际来源IP共享分钟窗口计数，默认每个来源每分钟最多3000次，超过配置阈值时应返回HTTP 429；代理来源地址仅按现有回环受信规则处理。\n② 审计查询应使用预定义筛选条件和分离处理的参数，非法时间、分页或表名应返回错误。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          6
+        ],
+        "feature": "http_rate"
+      },
+      {
+        "toeId": "CRA-REG-002",
+        "toeRow": 3,
+        "points": [
+          1
+        ],
+        "feature": "query"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 136,
+    "requirements": "① 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。\n③ Web请求审计应记录实际认证用户、时间、来源、目标及结果，请求自报的操作人名称不得覆盖真实身份。\n④ 审计查询和导出应限制为权限等级3或4，并可联合读取新增审计与原业务操作日志。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      },
+      {
+        "toeId": "CRA-REG-008",
+        "toeRow": 9,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "audit"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 137,
+    "requirements": "① 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。\n③ 审计CSV导出应对可能触发电子表格公式的起始字符进行安全处理，将事件字段作为数据文本输出。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      },
+      {
+        "toeId": "CRA-REG-002",
+        "toeRow": 3,
+        "points": [
+          3
+        ],
+        "feature": "csv"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 138,
+    "requirements": "① 登录及受保护业务HTTP请求应按实际来源IP共享分钟窗口计数，默认每个来源每分钟最多3000次，超过配置阈值时应返回HTTP 429；代理来源地址仅按现有回环受信规则处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          6
+        ],
+        "feature": "http_rate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 139,
+    "requirements": "① 应用备份应使用AES-GCM进行加密和完整性保护；恢复时应拒绝认证校验失败的备份文件。备份创建、下载和管理操作应仅允许权限等级4的用户执行。\n② 备份只包含应用账号、安全设置、设备INI及公开证书指纹引用，不包含可重放会话凭据、私钥、业务历史库或平台镜像。\n③ 备份目录和文件应使用应用安全目录的0700及0600权限。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "backup"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 140,
+    "requirements": "① 应用备份应使用AES-GCM进行加密和完整性保护；恢复时应拒绝认证校验失败的备份文件。备份创建、下载和管理操作应仅允许权限等级4的用户执行。\n② 备份只包含应用账号、安全设置、设备INI及公开证书指纹引用，不包含可重放会话凭据、私钥、业务历史库或平台镜像。\n③ 备份目录和文件应使用应用安全目录的0700及0600权限。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "backup"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 141,
+    "requirements": "① 恢复前应检查备份加密认证、设备身份、格式、账号结构、有效管理员及公开证书指纹引用是否兼容。\n② 实际执行时应核对当前所选备份已校验的SHA-256摘要；检查失败不执行恢复。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "backup_check"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 142,
+    "requirements": "① 备份目录和文件应使用应用安全目录的0700及0600权限。\n② 恢复前应检查备份加密认证、设备身份、格式、账号结构、有效管理员及公开证书指纹引用是否兼容。\n③ 实际执行时应核对当前所选备份已校验的SHA-256摘要；检查失败不执行恢复。\n④ 实际恢复前，应备份当前应用数据并写入恢复未完成标志；恢复成功后应清除该标志。后端应用启动时若发现该标志，应停止启动并提示进行本地恢复处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          3,
+          4,
+          5,
+          9
+        ],
+        "feature": "local-recovery-material"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 143,
+    "requirements": "① 应用恢复默认只预览；实际执行应满足本地执行开关、有效管理员、限时维护模式、适用防伪造检查、二次口令及明确确认内容。\n② 实际恢复前，应备份当前应用数据并写入恢复未完成标志；恢复成功后应清除该标志。后端应用启动时若发现该标志，应停止启动并提示进行本地恢复处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          8,
+          9
+        ],
+        "feature": "restore_gate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 144,
+    "requirements": "① 创建备份前，应检查现有备份数量；当前已有20份时，应拒绝新增。\n② 待加密备份内容超过16MiB时应拒绝创建；该数值不包括最终加密文件附加的格式和认证开销。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          6,
+          7
+        ],
+        "feature": "backup_threshold"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 145,
+    "requirements": "① 恢复前应检查备份加密认证、设备身份、格式、账号结构、有效管理员及公开证书指纹引用是否兼容。\n② 实际执行时应核对当前所选备份已校验的SHA-256摘要；检查失败不执行恢复。\n③ 应用恢复、出厂恢复和身份清除的执行开关默认关闭，预览不改变实际数据。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "backup_check"
+      },
+      {
+        "toeId": "CRA-REG-009",
+        "toeRow": 10,
+        "points": [
+          2
+        ],
+        "feature": "factory"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 146,
+    "requirements": "① 应用恢复默认只预览；实际执行应满足本地执行开关、有效管理员、限时维护模式、适用防伪造检查、二次口令及明确确认内容。\n② 实际恢复前，应备份当前应用数据并写入恢复未完成标志；恢复成功后应清除该标志。后端应用启动时若发现该标志，应停止启动并提示进行本地恢复处理。\n③ 账号管理、证书管理、应用备份和应用身份清除操作应限制为权限等级4。\n④ 本人修改密码时应验证原密码，普通用户不得提高自身角色或修改无权管理的其他账号。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          8,
+          9
+        ],
+        "feature": "restore_gate"
+      },
+      {
+        "toeId": "CRA-REG-016",
+        "toeRow": 17,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "account_roles"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 147,
+    "requirements": "① 应用身份清除应在有效管理员和现有维护确认门槛通过后执行，并记录审计。\n② 当前操作清除应用账号、会话、安全设置、本地备份及临时凭据，保留设备INI、业务数据库、证书、平台密钥及日志。\n③ 该操作默认只预览，实际执行受本地开关、维护模式、管理员二次口令及明确确认约束。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-015",
+        "toeRow": 16,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "clear"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 148,
+    "requirements": "① 应用备份应使用AES-GCM进行加密和完整性保护；恢复时应拒绝认证校验失败的备份文件。备份创建、下载和管理操作应仅允许权限等级4的用户执行。\n② 备份只包含应用账号、安全设置、设备INI及公开证书指纹引用，不包含可重放会话凭据、私钥、业务历史库或平台镜像。\n③ 备份目录和文件应使用应用安全目录的0700及0600权限。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          1,
+          2,
+          3
+        ],
+        "feature": "backup"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 149,
+    "requirements": "① 恢复前应检查备份加密认证、设备身份、格式、账号结构、有效管理员及公开证书指纹引用是否兼容。\n② 实际执行时应核对当前所选备份已校验的SHA-256摘要；检查失败不执行恢复。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "backup_check"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 150,
+    "requirements": "—",
+    "toeReferences": [],
+    "uncovered": true
+  },
+  {
+    "row": 151,
+    "requirements": "① 启用HTTPS部署时，Web入口应由Nginx加密转发，8000和9000端口的后端服务仅监听本机回环地址。\n② 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          1,
+          2
+        ],
+        "feature": "https"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 152,
+    "requirements": "① 恢复前应检查备份加密认证、设备身份、格式、账号结构、有效管理员及公开证书指纹引用是否兼容。\n② 实际执行时应核对当前所选备份已校验的SHA-256摘要；检查失败不执行恢复。\n③ 应用恢复默认只预览；实际执行应满足本地执行开关、有效管理员、限时维护模式、适用防伪造检查、二次口令及明确确认内容。\n④ 实际恢复前，应备份当前应用数据并写入恢复未完成标志；恢复成功后应清除该标志。后端应用启动时若发现该标志，应停止启动并提示进行本地恢复处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          4,
+          5
+        ],
+        "feature": "backup_check"
+      },
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          8,
+          9
+        ],
+        "feature": "restore_gate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 153,
+    "requirements": "① 应用恢复默认只预览；实际执行应满足本地执行开关、有效管理员、限时维护模式、适用防伪造检查、二次口令及明确确认内容。\n② 实际恢复前，应备份当前应用数据并写入恢复未完成标志；恢复成功后应清除该标志。后端应用启动时若发现该标志，应停止启动并提示进行本地恢复处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-010",
+        "toeRow": 11,
+        "points": [
+          8,
+          9
+        ],
+        "feature": "restore_gate"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 154,
+    "requirements": "① 组件查询应返回当前后端可采集的运行时、已安装Python依赖及相关版本信息；无法采集的版本信息应标明不可用。\n② Web账号应具有稳定的唯一身份标识，接口应使用实际认证身份检查账号状态和权限。\n③ 主应用受保护接口和独立升级状态查询均应检查有效登录会话。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-011",
+        "toeRow": 12,
+        "points": [
+          1
+        ],
+        "feature": "components"
+      },
+      {
+        "toeId": "CRA-REG-001",
+        "toeRow": 2,
+        "points": [
+          1
+        ],
+        "feature": "auth"
+      },
+      {
+        "toeId": "CRA-REG-003",
+        "toeRow": 4,
+        "points": [
+          2
+        ],
+        "feature": "authenticated-interfaces"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 155,
+    "requirements": "① 组件查询应返回当前后端可采集的运行时、已安装Python依赖及相关版本信息；无法采集的版本信息应标明不可用。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-011",
+        "toeRow": 12,
+        "points": [
+          1
+        ],
+        "feature": "components"
+      }
+    ],
+    "uncovered": false
+  },
+  {
+    "row": 156,
+    "requirements": "① 组件查询应返回当前后端可采集的运行时、已安装Python依赖及相关版本信息；无法采集的版本信息应标明不可用。\n② 登录及受保护业务HTTP请求应按实际来源IP共享分钟窗口计数，默认每个来源每分钟最多3000次，超过配置阈值时应返回HTTP 429；代理来源地址仅按现有回环受信规则处理。",
+    "toeReferences": [
+      {
+        "toeId": "CRA-REG-011",
+        "toeRow": 12,
+        "points": [
+          1
+        ],
+        "feature": "components"
+      },
+      {
+        "toeId": "CRA-REG-007",
+        "toeRow": 8,
+        "points": [
+          6
+        ],
+        "feature": "http_rate"
+      }
+    ],
+    "uncovered": false
+  }
+]

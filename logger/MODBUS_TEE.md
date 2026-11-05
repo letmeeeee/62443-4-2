@@ -45,10 +45,10 @@ make -C optee_ta_examples/ta/crypto_ta \
 密钥，须将新的主机公开证书导入对端从机信任文件，再启动双方。
 
 ```sh
-python3 logger/scripts/modbus_certs.py renew --role master --name master-001
-python3 logger/scripts/modbus_certs.py check --role master
-python3 logger/scripts/modbus_certs.py renew --role slave --name slave-001
-python3 logger/scripts/modbus_certs.py check --role slave
+python3 exec/app/script/modbus_certs.py renew --role master --name master-001
+python3 exec/app/script/modbus_certs.py check --role master
+python3 exec/app/script/modbus_certs.py renew --role slave --name slave-001
+python3 exec/app/script/modbus_certs.py check --role slave
 ```
 
 `route_cert.py` 原有生成/续期/检查接口继续调用此脚本，因此调用相同的 TA

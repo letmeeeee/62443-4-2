@@ -7,15 +7,38 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int extension(X509 *cert, int nid, const char *value)
+static int csr(unsigned role, const char *certificate_path, const char *name, const char *sans, int ensure)
 {
-    X509V3_CTX ctx;
-    X509_EXTENSION *ext;
-    X509V3_set_ctx(&ctx, cert, cert, NULL, NULL, 0);
-    ext = X509V3_EXT_conf_nid(NULL, &ctx, nid, (char *)value);
-    if (!ext) return 0;
-    int ok = X509_add_ext(cert, ext, -1);
-    X509_EXTENSION_free(ext);
+    EVP_PKEY *key = NULL;
+    X509_REQ *request = NULL;
+    STACK_OF(X509_EXTENSION) *extensions = NULL;
+    X509V3_CTX context;
+    int ok = 0;
+    if (!*name || strlen(name) > 64 || (ensure && !Modbus_Identity_Ensure(role, certificate_path))) goto out;
+    key = Modbus_Identity_Key(role, certificate_path);
+    request = X509_REQ_new();
+    extensions = sk_X509_EXTENSION_new_null();
+    if (!key || !request || !extensions || !X509_REQ_set_version(request, 0L) ||
+        !X509_NAME_add_entry_by_txt(X509_REQ_get_subject_name(request), "CN", MBSTRING_ASC,
+            (const unsigned char *)name, -1, -1, 0) || !X509_REQ_set_pubkey(request, key)) goto out;
+    X509V3_set_ctx(&context, NULL, NULL, request, NULL, 0);
+    int nids[] = {NID_basic_constraints, NID_key_usage, NID_ext_key_usage, NID_subject_alt_name};
+    const char *values[] = {"critical,CA:FALSE", "critical,digitalSignature,keyEncipherment",
+                          role ? "serverAuth" : "clientAuth", sans};
+    for (unsigned i = 0; i < sizeof(nids) / sizeof(nids[0]); i++) {
+        if (!*values[i]) continue;
+        X509_EXTENSION *item = X509V3_EXT_conf_nid(NULL, &context, nids[i], (char *)values[i]);
+        if (!item) goto out;
+        if (!sk_X509_EXTENSION_push(extensions, item)) { X509_EXTENSION_free(item); goto out; }
+    }
+    if (!X509_REQ_add_extensions(request, extensions) || !X509_REQ_sign(request, key, EVP_sha256())) goto out;
+    EVP_PKEY *public_key = X509_REQ_get_pubkey(request);
+    ok = public_key && X509_REQ_verify(request, public_key) == 1;
+    EVP_PKEY_free(public_key);
+    if (ok) ok = PEM_write_X509_REQ(stdout, request);
+out:
+    sk_X509_EXTENSION_pop_free(extensions, X509_EXTENSION_free);
+    X509_REQ_free(request); EVP_PKEY_free(key);
     return ok;
 }
 
@@ -37,6 +60,21 @@ int main(int argc, char **argv)
     role = !strcmp(argv[2], "slave");
     int count = snprintf(certificate_path, sizeof(certificate_path), "%s/%s.crt", directory, argv[2]);
     if (count < 0 || count >= (int)sizeof(certificate_path)) goto out;
+    if ((!strcmp(argv[1], "csr") || !strcmp(argv[1], "csr-existing")) && argc == 5) {
+        ok = csr(role, certificate_path, argv[3], argv[4], !strcmp(argv[1], "csr"));
+        goto out;
+    }
+    if (!strcmp(argv[1], "check-csr") && argc == 4) {
+        X509_REQ *request = NULL;
+        EVP_PKEY *public_key = NULL;
+        bio = BIO_new_file(argv[3], "r");
+        if (bio) request = PEM_read_bio_X509_REQ(bio, NULL, NULL, NULL);
+        key = Modbus_Identity_Key(role, certificate_path);
+        if (request) public_key = X509_REQ_get_pubkey(request);
+        ok = key && public_key && EVP_PKEY_cmp(key, public_key) == 1 && X509_REQ_verify(request, public_key) == 1;
+        EVP_PKEY_free(public_key); X509_REQ_free(request);
+        goto out;
+    }
     if (!strcmp(argv[1], "ensure") && argc == 3) {
         ok = Modbus_Identity_Ensure(role, certificate_path);
         goto out;
@@ -47,36 +85,9 @@ int main(int argc, char **argv)
         ok = cert && Modbus_Identity_Check(cert, role, certificate_path);
         goto out;
     }
-    if ((strcmp(argv[1], "cert") && strcmp(argv[1], "cert-existing")) || argc != 6) goto out;
-    char *end = NULL;
-    long days = strtol(argv[4], &end, 10);
-    if (!end || *end || days < 1 || days > 3650 || !*argv[3] || strlen(argv[3]) > 64) goto out;
-    if (!strcmp(argv[1], "cert") && !Modbus_Identity_Ensure(role, certificate_path)) goto out;
-    key = Modbus_Identity_Key(role, certificate_path); cert = X509_new();
-    unsigned char random[16];
-    BIGNUM *serial = NULL;
-    if (!key || !cert || RAND_bytes(random, sizeof(random)) != 1) goto out;
-    random[0] &= 0x7f; random[0] |= 1;
-    serial = BN_bin2bn(random, sizeof(random), NULL);
-    if (!serial) goto out;
-    int serial_ok = BN_to_ASN1_INTEGER(serial, X509_get_serialNumber(cert)) != NULL;
-    BN_free(serial);
-    X509_NAME *name = X509_get_subject_name(cert);
-    if (!serial_ok || !X509_set_version(cert, 2) ||
-        !X509_gmtime_adj(X509_getm_notBefore(cert), 0) ||
-        !X509_gmtime_adj(X509_getm_notAfter(cert), days * 86400) ||
-        !X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC,
-            (const unsigned char *)argv[3], -1, -1, 0) ||
-        !X509_set_issuer_name(cert, name) || !X509_set_pubkey(cert, key) ||
-        !extension(cert, NID_basic_constraints, "critical,CA:FALSE") ||
-        !extension(cert, NID_ext_key_usage, role ? "serverAuth" : "clientAuth") ||
-        !extension(cert, NID_subject_key_identifier, "hash") ||
-        (*argv[5] && !extension(cert, NID_subject_alt_name, argv[5])) ||
-        !X509_sign(cert, key, EVP_sha256()) || !Modbus_Identity_Check(cert, role, certificate_path)) goto out;
-    ok = PEM_write_X509(stdout, cert);
 out:
     if (!ok) {
-        fprintf(stderr, "Modbus identity failed. usage: modbus_tee_identity [--dir DIR] ensure ROLE | check ROLE CERT | cert[-existing] ROLE CN DAYS SAN\n");
+        fprintf(stderr, "Modbus identity failed. usage: modbus_tee_identity [--dir DIR] ensure ROLE | check ROLE CERT | check-csr ROLE CSR | csr[-existing] ROLE CN SAN\n");
         ERR_print_errors_fp(stderr);
     }
     BIO_free(bio); X509_free(cert); EVP_PKEY_free(key);

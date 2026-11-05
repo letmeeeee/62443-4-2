@@ -72,7 +72,7 @@ def main():
         'home/zlg/app/bin/modbus_tee_identity': ROOT / 'logger/build-deploy/modbus_tee_identity',
         'home/zlg/app/bin/crypto_ta_client': ROOT / 'exec/app/tee/build-deploy/crypto_ta_client',
         'lib/optee_armtz/' + UUID + '.ta': ROOT / ('optee_ta_examples/build-deploy/' + UUID + '.ta'),
-        'home/zlg/app/scripts/modbus_certs.py': ROOT / 'logger/scripts/modbus_certs.py',
+        'home/zlg/app/script/modbus_certs.py': ROOT / 'exec/app/script/modbus_certs.py',
     }
     if args.trust_master:
         files['inputs/trusted-master.crt'] = args.trust_master.resolve()

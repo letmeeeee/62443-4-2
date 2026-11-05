@@ -140,7 +140,7 @@ def update_ini_from_payload(payload: dict, path: Optional[Path] = None):
     - pointToPointEnabled -> P2P_EN (bool -> 0/1)
     - pcsList/bmsList: id/ip/port -> pcs{id}_ip, pcs{id}_port / bms{id}_ip, bms{id}_port
     - testCtlList: id/ip/port -> measure{id}_ip, measure{id}_port
-    - bmsBrand -> bms1_brand ~ bms8_brand
+    - bmsBrand -> bms1_brand ~ bms10_brand
     - pcsBrand -> pcs1_brand ~ pcs4_brand
     其余字段保持不变。
     """
@@ -223,7 +223,7 @@ def update_ini_from_payload(payload: dict, path: Optional[Path] = None):
         except (TypeError, ValueError):
             raise ValueError("bmsBrand 需为整数")
 
-        for i in range(1, 9):
+        for i in range(1, 11):
             key = f"bms{i}_brand"
             cfg.set("BMS_NETWORK", key, str(bms_brand_val))
             brand_updates["bms_brand"].append({key: bms_brand_val})
@@ -317,7 +317,7 @@ def verify_ini_matches_payload(payload: dict, path: Optional[Path] = None):
     if "bmsBrand" in payload:
         try:
             expected_bms_brand = int(payload["bmsBrand"])
-            for i in range(1, 9):
+            for i in range(1, 11):
                 actual = cfg.getint("BMS_NETWORK", f"bms{i}_brand", fallback=None)
                 if actual is None or actual != expected_bms_brand:
                     errors.append(f"[BMS_NETWORK]bms{i}_brand={actual} 期望 {expected_bms_brand}")

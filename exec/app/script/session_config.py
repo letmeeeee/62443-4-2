@@ -88,6 +88,8 @@ def configure_session(app):
     app.config["AUTH_SESSION_SECONDS"] = settings["AUTH_SESSION_SECONDS"]
     app.config["DISABLE_DEVELOPER_ACCOUNTS"] = settings.get("DISABLE_DEVELOPER_ACCOUNTS", True)
     app.config["DEVELOPER_ACCOUNTS"] = settings.get("DEVELOPER_ACCOUNTS", ["trinastorage"])
+    from script.security_config import configure_security
+    configure_security(app)
 
 
 if __name__ == "__main__":

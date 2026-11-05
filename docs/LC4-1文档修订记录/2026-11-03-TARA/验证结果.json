@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-03",
+  "threat_rows": 154,
+  "design_rows": 26,
+  "edited_parts": [
+    "xl/worksheets/sheet4.xml",
+    "xl/worksheets/sheet6.xml"
+  ],
+  "backup_sha256": "0c8bd5798450022f1c41a09fb4f03eadeecd46d1bfc398617fd012bb7206ea67",
+  "revised_sha256": "134460ff90f0f55b98f689345a266c42b0cdb66afce1e4412e698c6054d6ebde",
+  "checks": [
+    "ZIP CRC通过",
+    "所有XML可解析",
+    "仅2个目标工作表部件变更",
+    "目标文本逐格校验通过",
+    "公式及合并单元格保持",
+    "其他工作表与嵌入图片逐字节保持"
+  ],
+  "device_test": "未执行实机安全测试；不作为符合性判定",
+  "parsed_xml_parts": 21,
+  "changed_cells": 702,
+  "requirement_ids_unique": true,
+  "physical_or_mixed_rows": 42,
+  "office_open_check": "LibreOffice未能在当前受限环境启动（运行时配置目录不可写），未完成可视化打开检查；交付文件通过OOXML结构/内容校验。"
+}
