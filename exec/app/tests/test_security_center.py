@@ -4,6 +4,7 @@ import json
 import sys
 import time
 from pathlib import Path
+from datetime import datetime
 
 import pytest
 from flask import jsonify, request
@@ -31,7 +32,7 @@ def security_app(auth_app, tmp_path, monkeypatch):
     @app.route('/api/history/getOperationlog')
     def audit_query():
         try:
-            return jsonify(query_records(request.args))
+            return jsonify(query_records(request.args, business=True))
         except ValueError:
             return jsonify(code='INVALID_QUERY'), 400
 
@@ -210,10 +211,11 @@ def test_audit_captures_source_tab_changes_and_export(security_app):
     result = admin.post('/permission/update', json=dict(username='alice',enabled=False), headers={
         'X-CSRF-Token':credentials['csrf_token'],'X-Tab-Id':'test-tab','X-Real-IP':'192.0.2.5'})
     assert result.status_code == 200
-    records = admin.get('/api/history/getOperationlog',query_string=query_range()).json['operationLogList']
-    record = next(row for row in records if row['operation_target']=='/permission/update')
+    records = admin.get('/api/history/getSecurityAudit',query_string=query_range()).json['operationLogList']
+    record = next(row for row in records if row['operation_type']=='account.disable' and row['operation_target']=='alice')
     assert record['source_ip']=='192.0.2.5' and record['tab_id']=='test-tab'
     assert record['operator']=='admin' and record['before_summary'] and record['after_summary']
+    assert 'POST /permission/update' in record['remark'] and 'HTTP 200' in record['remark']
     assert not {'password','salt'} & json.loads(record['before_summary']).keys()
     export = admin.get('/api/history/export',query_string=query_range())
     assert export.status_code == 200 and export.headers['X-Audit-Id']
@@ -392,7 +394,105 @@ def test_legacy_audit_records_remain_readable(security_app):
     result=client.get('/api/history/getOperationlog',query_string=query_range())
     assert result.status_code==200
     old=next(row for row in result.json['operationLogList'] if row['operator']=='legacy')
-    assert old['remark']=='historical record' and old['source_ip'] is None
+    assert old['remark']=='historical record' and 'source_ip' not in old
+
+
+@pytest.mark.parametrize('level', [1, 2, 3, 4])
+def test_audit_is_level_four_only_and_business_queries_remain_separate(security_app, level):
+    app, engine, _ = security_app
+    with engine.begin() as conn:
+        conn.execute(text("UPDATE users SET permission=:level WHERE username='alice'"), {'level':level})
+    client = app.test_client()
+    login(client)
+    for path in ('/api/history/getSecurityAudit', '/api/history/export', '/api/history/status'):
+        response = client.get(path, query_string=query_range())
+        assert response.status_code == (200 if level == 4 else 403)
+    response = client.get('/api/history/getOperationlog', query_string=query_range())
+    assert response.status_code == (200 if level in (3, 4) else 403)
+    if level in (3, 4):
+        # This test has no business table; security events must not leak into it.
+        assert response.json['total'] == 0
+    if level == 4:
+        records = client.get('/api/history/getSecurityAudit', query_string=query_range()).json['operationLogList']
+        assert any(row['operation_type']=='authentication.login' for row in records)
+
+
+def test_business_and_audit_table_contents_do_not_mix_and_filters_are_semantic(security_app):
+    from utils import security_audit as audit
+    app, engine, _ = security_app
+    client = app.test_client()
+    credentials = login(client, 'admin').json
+    with engine.begin() as conn:
+        conn.execute(text('CREATE TABLE operation_log (log_id INTEGER, operation_time DATETIME, '
+            'operator TEXT, operation_type TEXT, operation_target TEXT, sort INTEGER, result INTEGER, remark TEXT)'))
+        conn.execute(text("INSERT INTO operation_log VALUES (1,'2026-11-03 10:00:00','business-only',"
+            "'system.control','LC',1,1,'business-marker')"))
+        conn.execute(audit.EVENTS.insert().values(log_id='legacy-path-record', operation_time=datetime(2026,11,3),
+            operator='old-audit',operation_type='menu.parameterSetting',operation_target='/old/route',
+            sort=1,result=1,remark='untouched-history'))
+    response = post(client, '/permission/update', credentials,
+        dict(username='alice',enabled=False,operatorName='fake-admin'))
+    assert response.status_code == 200
+    business = client.get('/api/history/getOperationlog', query_string=query_range()).json
+    assert business['total'] == 1 and business['operationLogList'][0]['operator'] == 'business-only'
+    args = dict(query_range(), operationType='account.disable', operationTarget='alice')
+    records = client.get('/api/history/getSecurityAudit', query_string=args).json
+    assert records['total'] == 1
+    row = records['operationLogList'][0]
+    assert row['operator']=='admin' and row['operation_target']=='alice'
+    assert row['operation_type']=='account.disable' and '/permission/update' in row['remark']
+    assert 'fake-admin' not in json.dumps(row)
+    all_rows = client.get('/api/history/getSecurityAudit', query_string=query_range()).json['operationLogList']
+    assert not any(row['operator']=='business-only' for row in all_rows)
+    old = next(row for row in all_rows if row['log_id']=='legacy-path-record')
+    assert old['operation_target']=='/old/route' and old['remark']=='untouched-history'
+    export = client.get('/api/history/export', query_string=dict(query_range(), extraSecret='must-not-log'))
+    assert export.status_code == 200 and b'business-marker' not in export.data
+    with engine.connect() as conn:
+        events = conn.execute(select(audit.EVENTS)).mappings().all()
+    exported = next(item for item in events if item['operation_type']=='audit.export')
+    assert exported['operation_target']=='安全审计记录'
+    assert 'GET /api/history/export' in exported['remark'] and 'must-not-log' not in exported['remark']
+
+
+def test_failed_audit_objects_are_not_taken_from_unverified_request_fields(security_app):
+    client = security_app[0].test_client()
+    credentials = login(client).json
+    assert post(client,'/permission/update',credentials,
+        dict(username='admin',operatorName='forged',password='DO-NOT-LOG')).status_code==403
+    admin = security_app[0].test_client()
+    login(admin, 'admin')
+    records = admin.get('/api/history/getSecurityAudit', query_string=query_range()).json['operationLogList']
+    record = next(row for row in records if row['operation_type']=='account.update')
+    assert record['operator']=='alice'
+    assert record['operation_target']=='未确认的目标账号'
+    assert 'HTTP 403' in record['remark'] and 'FORBIDDEN' in record['remark']
+    assert 'DO-NOT-LOG' not in json.dumps(record) and 'forged' not in json.dumps(record)
+
+
+def test_reset_records_verified_target_and_never_records_password(security_app):
+    client = security_app[0].test_client()
+    credentials = login(client, 'admin').json
+    response = post(client,'/permission/reset-password',credentials,
+        dict(username='alice',confirm='RESET_PASSWORD'))
+    assert response.status_code==200
+    records = client.get('/api/history/getSecurityAudit', query_string=query_range()).json['operationLogList']
+    record = next(row for row in records if row['operation_type']=='account.password.reset')
+    assert record['operation_target']=='alice'
+    assert 'POST /permission/reset-password' in record['remark']
+    assert 'temporary_password' not in json.dumps(record)
+
+
+def test_denied_backup_query_is_not_classified_as_backup_creation(security_app):
+    client = security_app[0].test_client()
+    login(client)
+    assert client.get('/api/security/backups').status_code == 403
+    admin = security_app[0].test_client()
+    login(admin, 'admin')
+    records = admin.get('/api/history/getSecurityAudit', query_string=query_range()).json['operationLogList']
+    event = next(row for row in records if row['operation_type']=='backup.query')
+    assert event['result']==0 and event['operation_target']=='应用安全备份'
+    assert 'GET /api/security/backups' in event['remark']
 
 
 def test_restore_commit_failure_rolls_back_database_and_configuration(security_app):

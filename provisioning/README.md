@@ -264,3 +264,9 @@ sudo ./LC400_Device_Agent --backend file generate \
 可执行包不包含私钥或运行数据。根 CA 指纹仍须独立核对；发行文件 SHA256SUMS 只用于完整性核查，不能替代企业可信分发与代码签名流程。
 
 证书管理脚本统一放在 `exec/app/script/`，设备路径为 `/home/zlg/app/script/modbus_certs.py`。更新时整体复制 app 目录；PC SSH 工具也需使用匹配的新版本。`app/bin/modbus_tee_identity` 仍需放入对应设备架构的新版本二进制，整体复制 app 时保留该文件及设备运行配置、密钥。
+
+## PC Modbus 调试身份（单角色，2026-11-06）
+
+CA GUI/CLI 的 inspect/sign 同时支持原三身份 lc400-csr 和新增 lc400-role-csr 请求包。使用 tools/modbus_gui 的企业CA页面生成请求，CA选择其 request/ 子目录，审查后签发。返回 lc400-role-certificates，使用原签发台账、角色复用/泄露吊销保护和根体系；有效期仍为1–825天且不能超过中间CA。单角色包仅给PC调试工具导入，不作为设备三身份部署包。
+
+CLI沿用：`python3 ca_manager.py --ca-dir /path/to/ca inspect /path/to/pc-identity/request`；`python3 ca_manager.py --ca-dir /path/to/ca sign /path/to/pc-identity/request /path/to/new-output`（口令交互输入）。不接受裸CSR拖入签发；请求清单确保角色和PC编号一起审查。PC私钥不交给CA。

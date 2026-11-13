@@ -2,8 +2,9 @@
 from flask import g, request
 
 ABILITIES = {
-    'account:manage': [4], 'role:read': [4], 'audit:read': [3, 4],
-    'audit:export': [3, 4], 'param:write': [2, 3, 4],
+    'account:manage': [4], 'role:read': [4], 'audit:read': [4],
+    'audit:export': [4], 'business-log:read': [3, 4],
+    'business-log:export': [3, 4], 'param:write': [2, 3, 4],
     'device:control': [2, 3, 4], 'device:upgrade': [3, 4],
     'cert:manage': [4], 'backup:manage': [4], 'decommission': [4],
     'maintenance:enter': [4], 'security:read': [3, 4],
@@ -37,10 +38,14 @@ def request_ability():
         return 'role:read'
     if path == '/api/security/maintenance' and request.method == 'POST':
         return 'maintenance:enter'
-    if path.startswith('/api/history/'):
-        return 'audit:export' if path.endswith('/export') else 'audit:read'
-    if path == '/export_csv_stream':
+    if path == '/api/history/export':
         return 'audit:export'
+    if path in ('/api/history/getSecurityAudit', '/api/history/status'):
+        return 'audit:read'
+    if path.startswith('/api/history/'):
+        return 'business-log:read'
+    if path == '/export_csv_stream':
+        return 'business-log:export'
     if path in ('/ini/update', '/network/set_ip', '/ini/system_counts') and request.method == 'POST':
         return 'param:write'
     if path == '/api/paraConfig/modifyParams':

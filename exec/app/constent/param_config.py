@@ -222,7 +222,7 @@ RUNPARASETTING_PCSSETTING = [
       "text": [
         {
           "address": PCS_REACTIVE_POWER_MODE_ADDR,
-          "name": "device.pcs.activePowerSetpoint",
+          "name": "device.pcs.ReactivePowerMode",
           "sort": "1",
           "maxValue": "14",
           "minValue": "0",

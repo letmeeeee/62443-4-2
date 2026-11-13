@@ -72,7 +72,7 @@ CSR 生成不会修改已部署证书。续签重复生成 CSR 时复用原私�
 
 ## 查询页显示
 
-`GET /api/security/certificates` 提供结构化公开清单。身份包括 master、slave、https，另列 ca-root；一份 fullchain 只计一个身份，中间证书不冒充设备身份。chainVerified 为公开链校验结果，privateKeyVerified:null 表示列表未执行持钥自检，显式 check 才校验私钥。
+`GET /api/security/certificates` 提供结构化公开清单。身份包括 master、slave、https，另列 ca-root；一份 fullchain 只计一个身份，中间证书不冒充设备身份。chainVerified 为公开链校验结果。每次 GET `/api/security/certificates`、`/api/security/status` 或 `/api/security/config-summary` 均重新执行 master、slave、https 的持钥自检，privateKeyVerified 为 true（通过）、false（检查失败）或 null（未能完成/不适用），privateKeyCheckReason 提供原因；ca-root 不持有设备私钥，返回 null / NOT_APPLICABLE。检查只使用已有密钥，不生成、轮换或导出 TEE 私钥。Modbus 复用既有 file/tee 后端的 check 命令（单角色超时 15 秒），HTTPS 使用文件私钥签名随机挑战并用证书公钥验签；工具缺失、超时不会使整份列表失败。此结果独立于有效期和证书链结果，不改变原 errorCount 的证书状态统计。请求耗时会增加，前端应避免重叠轮询。
 
 有效期见 validityStatus；链失败时 status 为 invalid。revocationStatus:unavailable 表示尚未接入 CRL/OCSP，不能展示为“未吊销”。`/api/security/certificates/import` 保留为 Modbus identity/import 的别名；不再支持 POST 创建或 DELETE 钉扎叶证书。
 

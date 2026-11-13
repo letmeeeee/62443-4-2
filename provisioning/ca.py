@@ -198,10 +198,14 @@ class CertificateAuthority:
         return x509.load_pem_x509_certificate(read_file(self.directory / 'roots.pem')).fingerprint(hashes.SHA256()).hex().upper()
 
     def inspect_request(self, directory):
-        manifest = public_package(directory, 'lc400-csr')
+        header = json.loads(read_file(Path(directory)/'manifest.json'))
+        kind = header.get('kind') if isinstance(header,dict) else None
+        if kind not in ('lc400-csr','lc400-role-csr'):
+            raise ValueError('请选择三身份或单角色 CSR 交接目录')
+        manifest = public_package(directory, kind)
         result = []
         keys = set()
-        for role in ROLES:
+        for role in ((manifest['role'],) if kind == 'lc400-role-csr' else ROLES):
             data = read_file(Path(directory) / (role + '.csr'))
             csr, sans = validate_csr(data, role)
             kid = digest(public(csr.public_key()))
@@ -229,7 +233,8 @@ class CertificateAuthority:
             files = {'roots.pem': read_file(self.directory / 'roots.pem'),
                      'intermediates.pem': read_file(self.directory / 'intermediates.pem')}
             rows = []
-            for role in ROLES:
+            for identity in review['identities']:
+                role = identity['role']
                 data = read_file(Path(request_directory) / (role + '.csr'))
                 if digest(data) != next(r['csr_sha256'] for r in review['identities'] if r['role'] == role):
                     raise ValueError('CSR 在签发期间发生变化')
@@ -248,8 +253,10 @@ class CertificateAuthority:
                 rows.append((format(cert.serial_number, 'x'), review['device_id'], role,
                              csr.subject.rfc4514_string(), digest(data), digest(public(csr.public_key())),
                              now().isoformat(), cert.not_valid_after_utc.isoformat(), encoded))
-            manifest = dict(version=1, kind='lc400-certificates', device_id=review['device_id'],
+            single = len(review['identities']) == 1
+            manifest = dict(version=1, kind='lc400-role-certificates' if single else 'lc400-certificates', device_id=review['device_id'],
                             root_fingerprints=[self.fingerprint()], files={n:digest(d) for n,d in files.items()})
+            if single: manifest['role'] = review['identities'][0]['role']
             for filename, data in files.items():
                 atomic_write(stage / filename, data, 0o644)
             atomic_write(stage / 'manifest.json', json_bytes(manifest), 0o644)

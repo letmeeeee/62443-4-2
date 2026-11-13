@@ -914,6 +914,33 @@ lib/modbus_identity.c.s:
 	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_identity.c.s
 .PHONY : lib/modbus_identity.c.s
 
+lib/modbus_peers.o: lib/modbus_peers.c.o
+
+.PHONY : lib/modbus_peers.o
+
+# target to build an object file
+lib/modbus_peers.c.o:
+	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_peers.c.o
+.PHONY : lib/modbus_peers.c.o
+
+lib/modbus_peers.i: lib/modbus_peers.c.i
+
+.PHONY : lib/modbus_peers.i
+
+# target to preprocess a source file
+lib/modbus_peers.c.i:
+	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_peers.c.i
+.PHONY : lib/modbus_peers.c.i
+
+lib/modbus_peers.s: lib/modbus_peers.c.s
+
+.PHONY : lib/modbus_peers.s
+
+# target to generate assembly for a file
+lib/modbus_peers.c.s:
+	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_peers.c.s
+.PHONY : lib/modbus_peers.c.s
+
 lib/modbus_protocol.o: lib/modbus_protocol.c.o
 
 .PHONY : lib/modbus_protocol.o
@@ -3199,6 +3226,9 @@ help:
 	@echo "... lib/modbus_identity.o"
 	@echo "... lib/modbus_identity.i"
 	@echo "... lib/modbus_identity.s"
+	@echo "... lib/modbus_peers.o"
+	@echo "... lib/modbus_peers.i"
+	@echo "... lib/modbus_peers.s"
 	@echo "... lib/modbus_protocol.o"
 	@echo "... lib/modbus_protocol.i"
 	@echo "... lib/modbus_protocol.s"

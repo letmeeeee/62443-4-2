@@ -471,6 +471,10 @@ def GetData():
             DPrint(f"[{now_str()}] [POST /api] Quantity 越界: {quantity}")
             return jsonify(err), 400
 
+        g.audit_event_type = 'register.write' if 6 in functioncode else 'register.read'
+        g.audit_target = "Modbus代理寄存器 / address:" + ",".join(map(str, address[:8]))
+        if len(address) > 8:
+            g.audit_target += f" / batch:{len(address)}"
         data_packet_arr = []
         for i in range(len(deviceid)):
             if functioncode[i] == 6:

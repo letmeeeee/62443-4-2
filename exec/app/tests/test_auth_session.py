@@ -37,6 +37,8 @@ def auth_app(tmp_path, monkeypatch):
     utility.DPrint = Mock()
     utility.now_str = lambda: "now"
     monkeypatch.setitem(sys.modules, "utils.utils", utility)
+    from utils import security_audit
+    monkeypatch.setattr(security_audit, 'DPrint', utility.DPrint)
     method = types.ModuleType("utils.method")
     method._ensure_perm_table_in_request = lambda: None
     method._perm_table_exists = lambda connection: True
@@ -499,7 +501,7 @@ def test_main_guards_all_registered_routes_and_socket_connect(auth_app, monkeypa
     sys.modules["config"].HTTPS_ENABLE = False
     sys.modules["utils.method"].ensure_remote_connected = lambda reason: True
     for module_name, attributes in {
-        "utils.utils": {"DPrint": lambda *args: None, "now_str": lambda: "now"},
+        "utils.utils": {"DPrint": lambda *args, **kwargs: None, "now_str": lambda: "now"},
         "utils.ini": {"ini_param": None},
     }.items():
         module = types.ModuleType(module_name)
@@ -720,3 +722,34 @@ def test_disabled_policy_checked_by_user_loader(auth_app):
     with app.app_context():
         assert load_user("admin")["disabled"] is True
     assert client.get("/g2").status_code == 401
+
+
+@pytest.mark.parametrize('username,send_csrf,status,reason', [
+    (None, False, 401, 'SESSION_INVALID'),
+    ('admin', False, 403, 'CSRF_VALIDATION_FAILED'),
+    ('alice', True, 403, 'PERMISSION_DENIED'),
+    ('admin', True, 200, None),
+])
+def test_certificate_rejection_logged_before_route(auth_app, username, send_csrf, status, reason):
+    app = auth_app[0]
+    handler = Mock(side_effect=lambda: jsonify(ok=True))
+    app.add_url_rule('/api/cert/ca/import', 'cert_import', lambda: handler(), methods=['POST'])
+    client = app.test_client()
+    credentials = login(client, username).json if username else {}
+    printer = sys.modules['utils.utils'].DPrint
+    printer.reset_mock()
+    headers = {'X-CSRF-Token': credentials['csrf_token']} if send_csrf else {}
+
+    response = client.post('/api/cert/ca/import', headers=headers)
+
+    assert response.status_code == status
+    assert handler.call_count == (1 if status == 200 else 0)
+    output = '\n'.join(str(call.args[0]) for call in printer.call_args_list)
+    if reason:
+        assert '[PKI] 全局认证拦截' in output and reason in output
+        assert "path='/api/cert/ca/import'" in output
+    else:
+        assert '[PKI] 全局认证拦截' not in output
+    for field in ('session_token', 'csrf_token'):
+        if field in credentials:
+            assert credentials[field] not in output

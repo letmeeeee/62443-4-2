@@ -1,0 +1,22 @@
+[
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "sha256_before": "ebfce12b7201d4a20257f5e169bb957fe75638069df5ca90cdd7f126f42244e4",
+    "sha256_after": "b6b93d550175db7d61cdd1d759bdeb4425a2141267b80bef5383adbd2cbf91cb",
+    "changed_parts": [
+      "xl/worksheets/sheet1.xml"
+    ],
+    "namespace_aware_cell_text_check": {
+      "passed": true,
+      "cells": 18
+    }
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "sha256_before": "563d68414973c6a99eac22bfb2f3198b534794ac65b8acb36b1f2e6a35f03faf",
+    "sha256_after": "e7f0abf6415d9fec5686f0997845eb8f75b5d8d4ff38d99233125882f106925f",
+    "changed_parts": [
+      "word/document.xml"
+    ]
+  }
+]

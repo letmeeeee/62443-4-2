@@ -1,0 +1,13 @@
+{
+  "修改单元格": 13,
+  "条目数量及评分公式": "保持",
+  "其他工作表": "保持",
+  "校验": "ZIP、XML、样式、公式及逐格回读通过",
+  "sha256": "7be4f5b410faaa92abf745c4ebe24fc458c6a224fec2c40293a40937bfcbcb76",
+  "后端回归验证": {
+    "完整相关测试集": "145 passed（security_center/auth_session/ca_provisioning/input_validation/ssh_api）",
+    "最终审计模块回归": "41 passed，包含新增的GET查询分类测试",
+    "测试范围": "SQLite、模拟设备和服务，不连接生产数据库或设备",
+    "语法及空白检查": "8个修改Python文件AST解析通过，指定文件git diff --check通过"
+  }
+}

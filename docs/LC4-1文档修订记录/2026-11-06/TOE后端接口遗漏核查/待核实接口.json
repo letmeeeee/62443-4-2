@@ -1,0 +1,23 @@
+[
+  {
+    "id": "V01",
+    "name": "手动版本回退角色约束未确认",
+    "interface": "POST /api/upgrade/startRollback",
+    "detail": "有有效会话和通用写请求检查，但request_ability没有对应device:upgrade映射，handler也未见_require_upgrade_permission调用。不能写成所有升级/回退接口仅等级3/4。",
+    "source": "exec/app/routes/route_g3.py:2202-2257；exec/app/utils/access.py:17-57"
+  },
+  {
+    "id": "V02",
+    "name": "测试模式缺少细化角色检查",
+    "interface": "POST /api/data/testMode",
+    "detail": "当前handler使用真实认证账号并记录操作，但未见细化角色限制。不能将关闭开发账号理解为该测试模式接口已默认禁用。",
+    "source": "exec/app/routes/route_g3.py:311-363；exec/app/utils/access.py:17-57"
+  },
+  {
+    "id": "V03",
+    "name": "对端实时认证状态是预留信息",
+    "interface": "GET /api/security/peer-status",
+    "detail": "liveAuthenticationTelemetryAvailable为false，当前按trusted-master角色筛选证书，而证书清单生成角色是master/slave/https/ca-root。不能作为实时已认证对端清单功能补入TOE。",
+    "source": "exec/app/routes/route_security.py:122-172,229-235"
+  }
+]

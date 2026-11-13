@@ -24,7 +24,7 @@ def main():
                '--console' if args.console else '--windowed', '--name', 'ModbusTLS',
                '--paths', str(root), '--distpath', str(output), '--workpath', str(package / 'build-windows'),
                '--specpath', str(package / 'build-windows'), '--noupx',
-               '--hidden-import', 'tools.modbus_gui.certificate_crypto', str(package / 'windows_entry.py')]
+               '--hidden-import', 'tools.modbus_gui.ca_identity', '--hidden-import', 'tools.modbus_gui.certificate_crypto', str(package / 'windows_entry.py')]
     subprocess.run(command, cwd=root, check=True)
     shutil.copyfile(package / 'WINDOWS.md', output / 'WINDOWS.md')
     shutil.copyfile(package / 'README.md', output / 'README.md')

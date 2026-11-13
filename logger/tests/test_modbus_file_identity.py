@@ -1,5 +1,7 @@
 """Real file identities and production Modbus TLS transport, without libteec."""
 import os
+import json
+import time
 import sys
 from pathlib import Path
 import subprocess
@@ -93,7 +95,8 @@ def main():
         ca=make_ca(directory/'offline-ca')
         config=directory/'device.ini'
         config.write_text('[TLS]\nca_file='+str(certdir/'ca-roots.crt')+'\n')
-        env=dict(os.environ,MODBUS_TEE_IDENTITY=str(executable),LC_INI_PATH=str(config))
+        env=dict(os.environ,MODBUS_TEE_IDENTITY=str(executable),LC_INI_PATH=str(config),
+                 MODBUS_PEER_STATE_DIR=str(directory/'peers'))
         env.pop('MODBUS_KEY_BACKEND',None)
         base=['python3',ROOT/'exec/app/script/modbus_certs.py','--config',config,'--dir',certdir]
         run(*base,'ca-import','--cert',ca['root'],env=env)
@@ -116,7 +119,26 @@ def main():
         run(executable,'--dir',certdir,'check','slave',master,env=env,success=False)
         run(*base,'generate','--role','master','--name','forbidden',env=env,success=False)
         run(executable,'--dir',certdir,'cert','master','forbidden','365','',env=env,success=False)
-        (directory/'transport.c').write_text(TRANSPORT_TEST)
+        peer_test = TRANSPORT_TEST.replace('#include <assert.h>', '#include <assert.h>\n#include <stdlib.h>')
+        peer_test = peer_test.replace('static int expected_failure;',
+            'static int expected_failure, release_server;\n'
+            'static pthread_mutex_t gate = PTHREAD_MUTEX_INITIALIZER;\n'
+            'static pthread_cond_t release_gate = PTHREAD_COND_INITIALIZER;')
+        peer_test = peer_test.replace('    Modbus_Close(fd);',
+            '    if (getenv("PEER_TEST_HOLD")) {\n'
+            '        pthread_mutex_lock(&gate);\n'
+            '        while (!release_server) pthread_cond_wait(&release_gate, &gate);\n'
+            '        pthread_mutex_unlock(&gate);\n'
+            '    }\n    Modbus_Close(fd);')
+        peer_test = peer_test.replace('    Modbus_Close(pair[1]); pthread_join(thread, NULL);',
+            '    if (getenv("PEER_TEST_HOLD")) { puts("CONNECTED"); fflush(stdout); getchar(); }\n'
+            '    Modbus_Close(pair[1]);\n'
+            '    if (getenv("PEER_TEST_HOLD")) { puts("CLIENT_CLOSED"); fflush(stdout); getchar(); }\n'
+            '    pthread_mutex_lock(&gate); release_server = 1;\n'
+            '    pthread_cond_signal(&release_gate); pthread_mutex_unlock(&gate);\n'
+            '    pthread_join(thread, NULL);\n'
+            '    if (getenv("PEER_TEST_HOLD")) { puts("CLOSED"); fflush(stdout); getchar(); }')
+        (directory/'transport.c').write_text(peer_test)
         (directory/'config.h').write_text('#define _GNU_SOURCE\n#include <errno.h>\n#define APPCONF_H_\n'
             'typedef unsigned char INT8U;\ntypedef struct { INT8U modbus_tls_enabled; } sysPara;\n'
             'sysPara *SysConf_GetInfo(void);\n')
@@ -125,8 +147,81 @@ def main():
                  (('MODBUS_TLS_SERVER_CERT','slave.crt'),('MODBUS_TLS_CLIENT_CERT','master.crt'))]
         run(*compile_base,*defines,'-include',directory/'config.h',directory/'transport.c',
             ROOT/'logger/lib/modbus_transport.c',ROOT/'logger/lib/modbus_identity.c',
+            ROOT/'logger/lib/modbus_peers.c',ROOT/'logger/cJSON/cJSON.c',
             '-lssl','-lcrypto','-lpthread','-o',transport)
         run(transport,env=env)
+        state_directory = directory/'peers'
+        state_directory.mkdir(exist_ok=True)
+        (state_directory/'peer-obsolete.pem').write_text('old')
+        hold_env = dict(env, PEER_TEST_HOLD='1')
+        process = subprocess.Popen([str(transport)], env=hold_env, stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        def wait_state(expected):
+            deadline = time.monotonic()+8
+            while time.monotonic() < deadline:
+                try:
+                    state=json.loads((state_directory/'status.json').read_text())
+                    files=list(state_directory.glob('peer-*.pem'))
+                    if state['complete'] and len(state['peers']) == expected and len(files) == expected:
+                        return state
+                except (OSError, ValueError):
+                    pass
+                time.sleep(0.05)
+            raise AssertionError('peer state did not converge: '+str(expected))
+        try:
+            assert process.stdout.readline().strip() == 'CONNECTED'
+            state = wait_state(2)
+            assert not (state_directory/'peer-obsolete.pem').exists()
+            assert {entry['localRole'] for entry in state['peers']} == {'master','slave'}
+            assert len({entry['connectionId'] for entry in state['peers']}) == 2
+            for entry in state['peers']:
+                assert entry['authenticationStatus'] == 'verified'
+                pem=(state_directory/entry['certificateFile']).read_bytes()
+                assert b'BEGIN CERTIFICATE' in pem and b'PRIVATE KEY' not in pem
+            # Query the production Flask-side reader against the real C snapshot and PEMs.
+            from flask import Flask
+            sys.path.insert(0,str(ROOT/'exec/app'))
+            from utils.modbus_peers import peer_status
+            app=Flask(__name__)
+            app.config['MODBUS_PEER_STATE_DIR']=str(state_directory)
+            with app.app_context():
+                result=peer_status()
+                assert result['liveAuthenticationTelemetryAvailable'] and len(result['data']) == 2
+            process.stdin.write('\n'); process.stdin.flush()
+            assert process.stdout.readline().strip() == 'CLIENT_CLOSED'
+            wait_state(1)
+            process.stdin.write('\n'); process.stdin.flush()
+            assert process.stdout.readline().strip() == 'CLOSED'
+            wait_state(0)
+            with app.app_context():
+                assert peer_status()['liveAuthenticationTelemetryAvailable']
+                assert peer_status()['data'] == []
+            process.stdin.write('\n'); process.stdin.flush()
+            assert process.wait(timeout=8) == 0
+            assert not list(state_directory.glob('peer-*.pem'))
+            assert not (state_directory/'status.json').exists()
+        finally:
+            if process.poll() is None:
+                process.kill(); process.wait(timeout=5)
+        # Abrupt termination must not turn leftover PEMs into connected peers.
+        process = subprocess.Popen([str(transport)], env=hold_env, stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            assert process.stdout.readline().strip() == 'CONNECTED'
+            wait_state(2)
+            process.kill(); process.wait(timeout=8)
+            with app.app_context():
+                result=peer_status()
+                assert not result['liveAuthenticationTelemetryAvailable'] and not result['data']
+            # Next producer clears stale certificates left by a killed process.
+            run(transport, env=env)
+            assert not list(state_directory.glob('peer-*.pem'))
+        finally:
+            if process.poll() is None:
+                process.kill(); process.wait(timeout=5)
+        # Publication failures must not break real TLS traffic.
+        (directory/'not-a-directory').write_text('blocked')
+        run(transport,env=dict(env,MODBUS_PEER_STATE_DIR=str(directory/'not-a-directory'/'peers')))
         issue('slave',['192.0.2.99'])
         run(transport,'reject',env=env)
         issue('slave',['127.0.0.1'])
@@ -159,7 +254,8 @@ def main():
         key.write_bytes(original_key)
         run(*base,'check','--role','master',env=env)
         print('PASS: file CSR/CA-chain import, independent persisted keys, mutual TLS Modbus exchange, '
-              'peer IP SAN rejection, no self-signing/fallback, missing/mismatched/insecure keys rejected')
+              'peer IP SAN rejection, no self-signing/fallback, missing/mismatched/insecure keys rejected; '
+              'live peer snapshot/Flask read, disconnect cleanup, crash recovery and I/O failure isolation')
 
 
 if __name__=='__main__':

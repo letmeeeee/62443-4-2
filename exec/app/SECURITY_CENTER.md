@@ -1,6 +1,6 @@
 # LC400 应用安全接口部署与验证
 
-本轮增加非固件维护类的应用安全接口，沿用 MySQL 和 Bearer 会话。接口交付说明见 `LC400-前端接口对接反馈-2026-11-03.md`。本文件面向后端部署和设备维护，不作为标准符合性结论。
+本轮增加非固件维护类的应用安全接口，沿用 MySQL 和 Bearer 会话。接口交付说明见 `LC400-前端接口对接反馈-2026-11-06.md`。本文件面向后端部署和设备维护，不作为标准符合性结论。
 
 ## 1. 数据与启动兼容
 
@@ -10,9 +10,9 @@
 - security_session_activity、security_session_locks：会话活动和服务端锁屏。
 - security_auth_attempts、security_rate_limits：跨工作进程共享的失败锁定和 HTTP 来源限速。
 - security_settings：Banner 和限时维护模式。
-- security_audit：结构化请求审计，与原 operation_log 联合查询。
+- security_audit：结构化安全审计，独立查询，与原 operation_log 分开。
 
-原 login_sessions、login_capacity_lock 继续使用。运行账号须能建表并读写上述表；审计容量查询使用 information_schema.TABLES。部署前先保全现有数据库与 INI，并确认存在未被开发账号禁用策略禁止的个人管理员。
+原 login_sessions、login_capacity_lock 继续使用。运行账号须能建表并读写上述表；审计容量查询读取配置路径所在文件系统的空间。部署前先保全现有数据库与 INI，并确认存在未被开发账号禁用策略禁止的个人管理员。
 
 新会话支持默认 900 秒空闲失效。没有活动记录的旧会话需要重新登录；正常请求和后台轮询会更新活动时间。新会话保持原来的绝对有效期配置。
 
@@ -43,7 +43,7 @@
 
 HTTP 限速按来源 IP 的分钟窗口计数；Nginx 从 loopback 转发且覆盖 X-Real-IP 时可恢复真实来源。仅信任 loopback，不信任任意 X-Forwarded-For；非该代理部署应关闭 TRUST_LOOPBACK_PROXY 或核对代理拓扑。默认 3000 次/分钟需结合实际前端轮询和设备压测调整，不代表已完成协议通信负荷压测。
 
-新安全接口采用默认权限矩阵：账号、证书、备份、退役、维护入口为角色 4；审计读/导出、安全汇总为角色 3/4；参数修改为角色 2/3/4。矩阵见 utils/access.py，前端通过 `/api/security/roles` 对齐。
+新安全接口采用默认权限矩阵：账号、证书、备份、退役、维护入口为角色 4；安全审计读/导出为角色4；业务日志读取及安全汇总为角色3/4；参数修改为角色 2/3/4。矩阵见 utils/access.py，前端通过 `/api/security/roles` 对齐。
 
 停用旧 GET `/api?sql=...` 任意 SQL 入口。通用 CSV 导出仅保留白名单业务历史表。生产部署必须同步更新依赖旧入口的客户端。
 
@@ -63,11 +63,13 @@ python3 /home/zlg/app/script/collect_credential.py DELIVERY_ID --directory /home
 
 新审计保留 180 天，在写入时清理过期新审计记录；历史 operation_log 不自动删除。容量改为统计 SECURITY_DISK_PATH 所在文件系统的实际总空间和已用空间（包括其他文件占用），不再按日志表大小或固定 256 MiB 计算。应将该路径配置到 MySQL 数据目录所在文件系统；默认仍为 `/`，远程数据库须在数据库主机侧提供监测，不能用后端本机空间代替。旧 AUDIT_CAPACITY_BYTES 配置保留兼容读取，但不再参与容量计算。业务历史数据清理仍由原磁盘清理策略负责。
 
-对外接口路径、权限及 JSON 字段保持不变：`GET /api/history/status` 的 totalBytes、usedBytes、usagePercent 改为上述文件系统统计；capacityExceeded 仍表示已用空间达到总空间（100%），不代表95%严重告警。`GET /api/security/status` 的 alerts 在使用率达到80%且不足95%时返回 `AUDIT_CAPACITY_HIGH`，提示清理、导出日志或扩容；达到95%时改为返回 `AUDIT_CAPACITY_CRITICAL`，提示尽快处理。两级容量告警不同时返回；`AUDIT_WRITE_FAILED` 独立报告，可与容量告警同时出现。告警对象仍使用 code/source 字段，未增加字段；前端需识别新增的 CRITICAL 告警码并映射提示文案。这些状态在查询时返回，不主动推送、不自动清理或扩容。空间采集失败不得报告为0%正常，安全汇总标记审计状态不可用，已存在的写入故障仍报告。
+容量状态 JSON 字段保持原结构：`GET /api/history/status` 的 totalBytes、usedBytes、usagePercent 改为上述文件系统统计；capacityExceeded 仍表示已用空间达到总空间（100%），不代表95%严重告警。`GET /api/security/status` 的 alerts 在使用率达到80%且不足95%时返回 `AUDIT_CAPACITY_HIGH`，提示清理、导出日志或扩容；达到95%时改为返回 `AUDIT_CAPACITY_CRITICAL`，提示尽快处理。两级容量告警不同时返回；`AUDIT_WRITE_FAILED` 独立报告，可与容量告警同时出现。告警对象仍使用 code/source 字段，未增加字段；前端需识别新增的 CRITICAL 告警码并映射提示文案。这些状态在查询时返回，不主动推送、不自动清理或扩容。空间采集失败不得报告为0%正常，安全汇总标记审计状态不可用，已存在的写入故障仍报告。
 
 旧审计队列满/写失败与新审计写失败会触发 writeFailed。可写本地存储时写入 health/audit-write-failed，跨工作进程和重启保留；磁盘也不可写时至少保留本进程告警。排障并确认数据库、队列和磁盘恢复后，由管理员清除该文件并重启进程，重置告警。不能因单次查询成功自动解除。
 
-新请求审计与旧业务操作日志可同时存在。旧记录的新增字段为 null，不补造来源和变更摘要；统一读取不意味着历史数据已经具备全部新增证据。
+安全审计与业务操作日志独立查询。GET /api/history/getSecurityAudit 只读 security_audit，GET /api/history/getOperationlog 只读 operation_log，均保持 total/pageNum/pageSize/operationLogList 分页结构。安全审计查询、GET /api/history/export 导出、GET /api/history/status 状态均仅等级4；业务操作日志查询仍允许等级3或4。历史数据不迁移、不改写；旧安全审计记录仍可能保留原接口路径和粗粒度类型。
+
+新安全审计记录使用实际事件类型，如 authentication.login、account.disable、account.password.reset、backup.restore；operation_target 写入后端确认的账号、设备、证书角色或备份编号，无法确认时明确标记为未确认对象。接口方法和路径、HTTP状态及错误码放入 remark，不记录原始请求体、完整查询串或明文密码/令牌。恢复、出厂恢复及身份清除执行前的授权记录使用 *.authorize 类型，避免与执行完成混淆。审计类型筛选支持事件类型字符串，审计目标按文本精确匹配；业务日志仍使用原数字类型及设备编号筛选。接口完整说明见《审计日志与业务日志接口说明_2026-11-06.md》。
 
 ## 5. 备份与恢复的保守范围
 
@@ -113,3 +115,85 @@ python3 /home/zlg/app/script/collect_credential.py DELIVERY_ID --directory /home
 另通过 file 私钥的生产 Modbus TCP 双向 TLS 回环与 IP SAN/过期/叶证书冒充 CA 拒绝测试，以及 TEE 软件替身 CSR/CA 身份测试和 OpenSSL TLS1.2/1.3 双向握手测试。TEE 测试不是实机 TA 持久化验证。
 
 检查同时通过变更 Python 文件语法和 CRLF 感知的 git diff --check。测试不等于真实 MySQL、设备硬件或浏览器联调；本次没有在生产设备运行恢复、清除或部署操作。
+
+## firewalld 规则只读查询
+
+`GET /api/security/network-rules`（权限 3/4）读取 `firewall-cmd --list-all-zones`，不再返回整个 nftables ruleset，不调用 `/usr/local/bin/fw-port.sh` 或写入/重载防火墙。运行账号须有查询 firewalld 的权限，且 firewalld 服务正在运行。
+
+网卡、路由仍由 iproute2 采集。`rules` 成功时为 `{scope:"runtime-zones",zones:[...]}`，区域包含 `name`、`active`、`target`、`interfaces`、`sources`、`ports`、`services`、`richRules` 和 `details`。例如 public 的 `ports` 为 `[{"port":"8000","protocol":"tcp"},{"port":"6000-6010","protocol":"udp"}]`；服务隐含端口不展开，复杂规则原样保留。非活动区域也返回，由 active 区分。该结果是区域运行时配置，不是永久配置、系统监听端口或完整访问判定；不包含独立 policy 对象和 direct 等其他规则入口。
+
+查询工具缺失、权限不足、服务未启动或超时，返回 `rules:null`、`rulesAvailable:false`、`rulesUnavailableReason:"FIREWALLD_QUERY_FAILED"`；输出解析失败则原因是 `FIREWALLD_RESPONSE_INVALID`。正常采集但无显式端口时 ports 是空数组，仍为采集成功。新增 DPrint 仅打印区域数量或失败原因，保留现有业务日志和审计通道。配置摘要中的 networkRules 同步使用该结果。
+
+## Modbus TLS 活动对端遥测
+
+`GET /api/security/peer-status`（现有权限 3/4）读取 logger 发布的活动 TLS 对端快照。身份在真实 TLS 握手及验证成功后登记，终止性收发错误或 `Modbus_Close` 时移除。握手失败的连接不发布证书，现有 TLS 错误日志保留。此功能不是新的认证机制，不修改 CA 信任、TLS 策略、寄存器共享内存或业务/审计日志通道。
+
+### 文件与发布周期
+
+默认运行时目录为 `/run/lc400/modbus-peers/`：
+
+- `status.json`：schemaVersion=1，包含当前进程、启动标识、单调时钟心跳和活动连接引用。
+- `peer-<进程实例>-<连接序号>.pem`：每连接独立保存对端公开叶证书，不保存私钥、会话密钥，也不加入信任库。
+- `.lock`、`.publish.tmp`：单发布者锁及原子发布临时文件。
+
+通信线程只在内存登记/移除，独立线程执行 PEM 和 JSON 文件操作。连接变化唤醒发布线程，同时约每秒发布心跳；正常断开后的文件清理通常在下一次发布、约 1 秒内完成，并非通信线程同步删除。同一证书可对应多条连接，每条连接拥有独立文件，关闭一个连接不会删除其他活动连接所需的证书。
+
+正常进程退出清理快照和证书；启动时清理旧 PEM 和快照。SIGKILL、掉电等不能保证立即执行删除：Flask 会通过 PID/启动标识和最多 5 秒的心跳有效期拒绝旧快照，残留文件由下次启动清理，`/run` 也属于临时运行数据。连接状态基于进程实际检测到的断开/错误；未被通信层检测到的半开连接不会仅因业务空闲被强制删除。
+
+最多记录 256 个连接；达到上限或登记信息不完整时返回采集不完整，避免将部分数据误当成全量。采集目录或文件不可用时仅记录诊断，不中断原有 Modbus 通信。当前仅支持一个 logger 发布者占用该目录，多实例应分别配置目录。
+
+### Flask 返回结构
+
+```json
+{
+  "ok": true,
+  "liveAuthenticationTelemetryAvailable": true,
+  "scope": "modbus-tls-active-connections",
+  "sampledAt": "2026-11-11T10:00:00Z",
+  "data": [
+    {
+      "connectionId": "1234-1794362400-123456789-1",
+      "localRole": "master",
+      "peerIp": "192.0.2.10",
+      "peerPort": 502,
+      "transport": "tls",
+      "connectionStatus": "connected",
+      "authenticationStatus": "verified",
+      "connectedAt": "2026-11-11T09:59:00Z",
+      "peerCertificate": {
+        "sha256": "证书SHA-256指纹",
+        "subject": "CN=device-slave",
+        "issuer": "CN=Enterprise-CA",
+        "notBefore": "2026-01-01T00:00:00+00:00",
+        "notAfter": "2027-01-01T00:00:00+00:00"
+      }
+    }
+  ]
+}
+```
+
+以上为结构示例。`localRole` 是本机角色：master 表示本机主动连接从机，slave 表示本机接受主机连接；服务端看到的 peerPort 可能是主机的临时源端口。`authenticationStatus:verified` 表示连接建立时已通过 TLS 验证，不代表持续 CRL/OCSP 查询。API 不返回服务器文件路径、PEM 原文或私钥。没有新增证书下载接口。
+
+`liveAuthenticationTelemetryAvailable:true,data:[]` 表示有效快照中没有活动已认证 TLS 连接；不能扩大解释为所有 Modbus 设备离线。单设备可能有多条读写连接，不能直接将数组长度当作设备数量。明文 Modbus TCP 和 RTU 不在本清单中；本次不提供最近收发时间字段。
+
+遥测不可用时仍返回 HTTP 200、`ok:true`、空 data、`liveAuthenticationTelemetryAvailable:false` 和 `reason`：
+
+| reason | 含义 |
+| --- | --- |
+| PEER_STATE_UNAVAILABLE | 状态文件或某个证书不存在，或断开清理与读取发生竞争 |
+| PEER_STATE_STALE | 心跳超时或时间无效 |
+| PEER_PRODUCER_UNAVAILABLE | 生产进程不存在、已退出或 PID 启动标识不匹配 |
+| TLS_DISABLED | logger 未开启 TLS，不能提供已认证 TLS 对端 |
+| PEER_COLLECTION_INCOMPLETE | 连接超过上限或采集信息不完整 |
+| PEER_STATE_INVALID | 格式、权限、符号链接、大小或证书读取异常 |
+| PEER_CERTIFICATE_READER_UNAVAILABLE | Flask 缺少证书解析依赖 |
+
+Flask 只读、不启动或探测 Modbus 连接，也不清理 logger 文件；状态切换/原子发布期间可能短暂返回不可用，下次轮询重试即可。
+
+### 部署与权限
+
+需要重新配置并构建 logger，将新增 `logger/lib/modbus_peers.c` 纳入现有 CMake 的 lib 源文件集合，部署新 logger 二进制及 Flask 修改后分别重启。只更新 Python 文件不能启用真实遥测。未部署新 logger 时 Flask 会保持遥测不可用。
+
+logger 和 Flask 默认共用 `/run/lc400/modbus-peers`；如设置 `MODBUS_PEER_STATE_DIR` 环境变量，两个服务必须指向同一实际目录，且能访问同一进程命名空间。Flask 还可通过同名 app.config 配置覆盖，避免只修改单方路径。
+
+目录必须由 logger 运行用户拥有，不允许组/其他用户写入；发布文件为 0640。若 Flask 使用不同用户，部署时预建 logger 所有、Flask 可读的共享组目录（例如目录 2750 并设置共享组继承），确保所有父目录可遍历、Flask 可读取文件；不要用 0777 或组可写目录解决权限问题。logger 和 Flask 使用同一用户时默认目录权限即可。`/run` 的目录重启后需要由部署的运行目录机制重新创建。本次不修改 systemd 单元或自动部署。

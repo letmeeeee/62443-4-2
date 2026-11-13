@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 #include "modbus_transport.h"
+#include "modbus_peers.h"
 #include "app_config.h"
 #include <errno.h>
 #include <sys/socket.h>
@@ -202,6 +203,7 @@ static void client_init(void) { client_ctx = make_context(0); }
 int Modbus_Server_Init(void)
 {
     int enabled = tls_enabled();
+    if (enabled >= 0) Modbus_Peers_Start(enabled);
     if (enabled <= 0) return enabled;
     pthread_once(&server_once, server_init);
     if (!server_ctx) { errno = EPROTO; return -1; }
@@ -228,6 +230,7 @@ static int wait_io(int fd, int error, int64_t deadline)
 static int attach(int fd, int server)
 {
     int enabled = tls_enabled();
+    if (enabled >= 0) Modbus_Peers_Start(enabled);
     if (enabled <= 0) return enabled;
     SSL_CTX *ctx;
     if (server) {
@@ -270,6 +273,7 @@ static int attach(int fd, int server)
     pthread_mutex_lock(&registry);
     c->next = connections;
     connections = c;
+    Modbus_Peers_Add(fd, server, c->ssl);
     pthread_mutex_unlock(&registry);
     return 0;
 fail:
@@ -296,6 +300,7 @@ static Connection *acquire(int fd)
 static void release(Connection *c)
 {
     int saved = errno;
+    if (c->failed) Modbus_Peers_Remove(c->fd);
     pthread_mutex_unlock(&c->io);
     pthread_mutex_lock(&registry);
     --c->refs;
@@ -413,6 +418,7 @@ int Modbus_Close(int fd)
     }
     pthread_mutex_unlock(&registry);
     if (c) {
+        Modbus_Peers_Remove(fd);
         /* Nonblocking, best-effort close_notify; never wait on a dead peer. */
         if (!c->failed) SSL_shutdown(c->ssl);
         SSL_free(c->ssl);

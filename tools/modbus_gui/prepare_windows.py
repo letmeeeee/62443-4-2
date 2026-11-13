@@ -4,8 +4,8 @@ import zipfile
 
 
 FILES = (
-    '__init__.py', '__main__.py', 'gui.py', 'core.py', 'certificates.py', 'certificate_crypto.py',
-    'windows_entry.py', 'build_windows.py', 'build_windows.bat', 'requirements-windows.txt',
+    '__init__.py', '__main__.py', 'gui.py', 'core.py', 'certificates.py', 'certificate_crypto.py', 'ca_identity.py', 'requirements.txt',
+    'windows_entry.py', 'build_windows.py', 'build_windows.bat', 'build_installer.bat', 'ModbusTLS.iss', 'requirements-windows.txt',
     'WINDOWS.md', 'README.md', '.gitignore',
 )
 
@@ -23,7 +23,8 @@ def main():
             else:
                 archive.write(package / name, 'tools/modbus_gui/' + name)
         archive.writestr('START-HERE.txt', 'On Windows: install Python 3.12 x64, then double-click\r\n'
-                          'tools\\modbus_gui\\build_windows.bat\r\n'
+                          'tools\\modbus_gui\\build_windows.bat (portable EXE), or install Inno Setup 6 and run\r\n'
+                          'tools\\modbus_gui\\build_installer.bat (Setup installer).\r\n'
                           'Output: tools\\modbus_gui\\dist\\ModbusTLS.exe\r\n'
                           'See tools\\modbus_gui\\WINDOWS.md for instructions.\r\n')
     print(target)

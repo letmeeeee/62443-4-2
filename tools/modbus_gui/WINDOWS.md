@@ -18,7 +18,7 @@ build_windows.bat "C:\Users\你的用户名\AppData\Local\Programs\Python\Python
 
 也可设置环境变量 `MODBUS_PYTHON_EXE` 指向解释器。需 Python 3.10+ 且包含 Tcl/Tk、venv、pip；推荐安装 Python 3.12 x64。如果仅看到安装 Python 的提示，意味着构建尚未开始，按任意键只会关闭旧脚本，不会安装 Python 或生成 EXE。依赖安装日志保存在 `build-windows-pip.log`，只有构建命令成功且确认 EXE 存在才显示 Success。
 
-此 EXE 内含 Python、Tkinter、TLS 和证书生成依赖，运行电脑无需另装 Python 或 OpenSSL。同一个 EXE 包含客户端和服务端，可直接双击运行。保留自签/CA 证书生成、证书导入/导出、TLS 验证开关、完整 TX/RX 日志、复制和循环发送功能。
+此 EXE 内含 Python、Tkinter、TLS 和证书生成依赖，运行电脑无需另装 Python 或 OpenSSL。同一个 EXE 包含客户端和服务端，可直接双击运行。支持单角色CSR交接、企业CA签发包导入及隔离测试证书生成、证书导入/导出、TLS 验证开关、完整 TX/RX 日志、复制和循环发送功能。
 
 [PyInstaller 官方说明](https://github.com/pyinstaller/pyinstaller/blob/develop/README.rst)要求在目标操作系统上运行，因此 Linux 上的 Python 不能直接生成此 Windows EXE。当前提供的是构建源码包；最终 EXE 必须在 Windows 完成构建和验证。
 
@@ -41,4 +41,18 @@ build_windows.bat "C:\Users\你的用户名\AppData\Local\Programs\Python\Python
 
 ## 构建后检查
 
-在 Windows 上运行 EXE，生成证书，用同一窗口启动本机服务端并从客户端读写，检查循环停止、TX/RX 日志和复制；再在没有安装 Python/OpenSSL 的目标电脑运行同一个 EXE。设备自签证书兼容性与 TLS 功能已有 Linux 回环测试，Windows EXE 需通过这些检查后再分发。
+在 Windows 上运行 EXE，生成证书，用同一窗口启动本机服务端并从客户端读写，检查循环停止、TX/RX 日志和复制；再在没有安装 Python/OpenSSL 的目标电脑运行同一个 EXE。企业CA单角色签发与双向 TLS 功能已有 Linux 回环测试，Windows EXE 需通过这些检查后再分发。
+
+## 安装包构建（2026-11-06）
+
+安装包构建包含当前企业CA单角色CSR/导入、循环TLS长连接和正常关闭修正。在Windows上安装Python 3.12 x64（含Tcl/Tk、pip）和Inno Setup 6，然后双击 `build_installer.bat`。首次需要网络安装Python依赖；脚本先生成便携EXE，再编译 `ModbusTLS.iss`。成功输出：
+
+```text
+tools\modbus_gui\dist\ModbusTLS-Setup-2026.11.06.exe
+```
+
+可以将 `ISCC_EXE` 设置为Inno Setup编译器完整路径，Python路径仍可作为脚本第一个参数传入。只需便携程序时继续使用build_windows.bat。
+
+安装程序按当前用户安装到 `%LOCALAPPDATA%\Programs\ModbusTLS`，无需管理员权限，创建开始菜单快捷方式，可选桌面快捷方式。程序包仅含EXE和公开说明，不携带用户私钥、证书或CA数据；用户生成的身份目录应放在自己的数据目录，不放在安装目录。卸载不自动擦除外部身份数据。
+
+当前构建机是Linux，尚未在Windows执行此安装脚本或验证最终安装程序。Windows交付前请检查安装/启动/卸载、单角色CSR及CA导入、双向TLS、循环连接复用、停止清理和防火墙入站提示；不要将构建源码ZIP当作已生成的安装EXE。

@@ -22,6 +22,7 @@ def tee_module(monkeypatch, tmp_path):
     monkeypatch.setitem(sys.modules, "routes.route_g3", route_g3)
     sys.modules.pop("routes.route_tee", None)
     module = importlib.import_module("routes.route_tee")
+    monkeypatch.setattr(module, 'DPrint', Mock())
     client = tmp_path / "crypto_ta_client"
     client.write_bytes(b"test")
     module.TEE_CLIENT = client
@@ -152,3 +153,19 @@ def test_public_key_preserves_returned_lengths(app, tee_module, monkeypatch):
     data = response.get_json()["data"]
     assert base64.b64decode(data["modulus"]) == modulus
     assert base64.b64decode(data["exponent"]) == exponent
+
+
+def test_missing_tee_client_has_explicit_unavailable_contract(app, tee_module, monkeypatch):
+    tee_module.TEE_CLIENT.unlink()
+    run = Mock()
+    monkeypatch.setattr(tee_module.subprocess, 'run', run)
+    response = app.test_client().get('/api/cert/tee/public-key')
+    assert response.status_code == 200
+    assert response.json == {'status': 3, 'message': 'TEE_UNAVAILABLE', 'data': None}
+    run.assert_not_called()
+
+
+def test_installed_but_failed_tee_client_is_not_success(app, tee_module, monkeypatch):
+    monkeypatch.setattr(tee_module, '_run', Mock(side_effect=tee_module.TeeClientError('failed')))
+    response = app.test_client().get('/api/cert/tee/public-key')
+    assert response.status_code == 503 and response.json['code'] == 'TEE_UNAVAILABLE'

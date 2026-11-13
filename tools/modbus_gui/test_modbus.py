@@ -6,11 +6,12 @@ import ssl
 import struct
 import tempfile
 import time
+import threading
 import unittest
 from unittest.mock import patch
 
 from .certificates import export_certificate, generate_demo, generate_device, inspect
-from .core import RegisterBank, Server, exchange, format_frame, receive, request_pdu, send, tls_context
+from .core import RegisterBank, Server, TLSClient, exchange, format_frame, receive, request_pdu, send, tls_context
 
 
 class ProtocolTests(unittest.TestCase):
@@ -113,6 +114,101 @@ class TLSTests(unittest.TestCase):
         return exchange(ctx or self.context(), '127.0.0.1', self.server.port, 1,
                         function, address, count, values, timeout=2, **kwargs)
 
+    def test_packaged_runtime_persistent_connection(self):
+        import os
+        import subprocess
+        executable = os.environ.get('LC400_MODBUS_TEST_EXECUTABLE')
+        if not executable:self.skipTest('set LC400_MODBUS_TEST_EXECUTABLE')
+        base = Path(executable).resolve().parent
+        site = next((base/'runtime/lib').glob('python*/site-packages'))
+        env = dict(os.environ, PYTHONHOME=str(base/'runtime'),
+            PYTHONPATH=str(base/'app')+os.pathsep+str(site), LD_LIBRARY_PATH=str(base/'runtime/lib'),
+            PYTHONNOUSERSITE='1', PYTHONDONTWRITEBYTECODE='1')
+        script = ("import sys;from tools.modbus_gui.core import TLSClient,tls_context;"
+            "c=TLSClient(tls_context(False,sys.argv[1],sys.argv[2],sys.argv[3]),'127.0.0.1',int(sys.argv[4]));"
+            "assert c.request(1,3,0)==[0];assert c.request(1,4,0)==[0];"
+            "assert c.transaction==2;c.close()")
+        result = subprocess.run([str(base/'runtime/bin/python3'), '-c', script,
+            str(self.folder/'client.crt'), str(self.folder/'client.key'), str(self.folder/'ca.crt'),
+            str(self.server.port)], cwd=self.temp.name, env=env, capture_output=True, text=True, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(sum('已连接' in line for line in self.logs), 1)
+
+    def test_persistent_requests_use_one_tls_handshake(self):
+        client = TLSClient(self.context(), '127.0.0.1', self.server.port, timeout=2)
+        try:
+            self.assertEqual(client.request(1, 6, 0, values=[321]), [321])
+            self.assertEqual(client.request(1, 3, 0), [321])
+            self.assertEqual(client.request(1, 4, 0), [0])
+            self.assertEqual(client.transaction, 3)
+        finally:
+            client.close()
+        self.assertEqual(sum('已连接' in line for line in self.logs), 1)
+        self.assertTrue(any('事务号=3 ' in line for line in self.logs))
+
+    def test_close_notify_and_bounded_missing_peer_reply(self):
+        for reply_close in (True, False):
+            with self.subTest(reply_close=reply_close):
+                listener = socket.socket()
+                listener.bind(('127.0.0.1', 0)); listener.listen(1); listener.settimeout(3)
+                port = listener.getsockname()[1]
+                release = threading.Event(); errors = []; clean_eof = []
+                def peer():
+                    try:
+                        raw, _ = listener.accept()
+                        with self.context(True).wrap_socket(raw, server_side=True, suppress_ragged_eofs=False) as conn:
+                            tid, unit, pdu = receive(conn)
+                            send(conn, tid, unit, bytes.fromhex('03 02 00 2A'))
+                            # A bare TCP close raises SSLEOFError with suppression disabled.
+                            clean_eof.append(conn.recv(1) == b'')
+                            if reply_close:
+                                conn.unwrap().close()
+                            else:
+                                release.wait(3)
+                    except BaseException as exc:
+                        errors.append(exc)
+                worker = threading.Thread(target=peer); worker.start()
+                try:
+                    begin = time.monotonic()
+                    self.assertEqual(exchange(self.context(), '127.0.0.1', port, 1, 3, 0, timeout=.5), [42])
+                    self.assertLess(time.monotonic()-begin, 2)
+                finally:
+                    release.set(); worker.join(4); listener.close()
+                self.assertFalse(worker.is_alive())
+                self.assertEqual(errors, [])
+                self.assertEqual(clean_eof, [True])
+
+    def test_failed_write_is_not_replayed_and_next_request_reconnects(self):
+        listener = socket.socket()
+        listener.bind(('127.0.0.1', 0)); listener.listen(2); listener.settimeout(3)
+        port = listener.getsockname()[1]
+        requests = []; errors = []
+        def peer():
+            try:
+                for index in range(2):
+                    raw, _ = listener.accept()
+                    with self.context(True).wrap_socket(raw, server_side=True) as conn:
+                        tid, unit, pdu = receive(conn); requests.append(pdu)
+                        if index == 0:
+                            continue  # Write may have executed, but its response is lost.
+                        send(conn, tid, unit, pdu)
+                        if conn.recv(1) == b'':conn.unwrap().close()
+            except BaseException as exc:
+                errors.append(exc)
+        worker = threading.Thread(target=peer); worker.start()
+        client = TLSClient(self.context(), '127.0.0.1', port, timeout=.5)
+        try:
+            with self.assertRaises((OSError, EOFError)):
+                client.request(1, 6, 0, values=[123])
+            self.assertEqual(len(requests), 1)
+            self.assertIsNone(client.conn)
+            self.assertEqual(client.request(1, 6, 0, values=[456]), [456])
+        finally:
+            client.close(); worker.join(4); listener.close()
+        self.assertFalse(worker.is_alive())
+        self.assertEqual(errors, [])
+        self.assertEqual(len(requests), 2)
+
     def test_mutual_tls_read_write_and_input_register(self):
         self.assertEqual(self.call(16, 5, values=[123, 456]), [123, 456])
         self.assertEqual(self.call(3, 5, 2), [123, 456])
@@ -209,7 +305,7 @@ class TLSTests(unittest.TestCase):
         with self.assertRaises(ssl.SSLError):
             tls_context(False, str(self.folder / 'client.crt'), str(self.foreign / 'client.key'), str(destination))
 
-    def test_device_self_signed_identity_is_accepted_by_existing_manager(self):
+    def test_legacy_self_signed_trust_add_is_rejected_by_current_manager(self):
         import subprocess
         import sys
         folder = generate_device(self.temp.name)
@@ -218,14 +314,8 @@ class TLSTests(unittest.TestCase):
         result = subprocess.run([sys.executable, str(manager), '--dir', str(trust_dir),
                                  'trust-add', '--cert', str(folder / 'client.crt')],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
-        self.assertEqual(result.returncode, 0, result.stderr.decode())
-        self.assertIn((folder / 'client.crt').read_bytes().strip(), (trust_dir / 'master-ca.crt').read_bytes())
-        self.server.stop()
-        self.server = Server(tls_context(True, str(folder / 'server.crt'), str(folder / 'server.key'),
-                                         str(trust_dir / 'master-ca.crt')), '127.0.0.1', 0)
-        self.server.start()
-        ctx = tls_context(False, str(folder / 'client.crt'), str(folder / 'client.key'), str(folder / 'server.crt'))
-        self.assertEqual(self.call(ctx=ctx), [0])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('invalid choice', result.stderr.decode())
 
     def test_windows_certificate_backend_without_openssl_executable(self):
         import subprocess
@@ -242,7 +332,7 @@ class TLSTests(unittest.TestCase):
                     result = subprocess.run([sys.executable, str(manager), '--dir', str(folder / 'trust'),
                                              'trust-add', '--cert', str(folder / 'client.crt')],
                                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
-                    self.assertEqual(result.returncode, 0, result.stderr.decode())
+                    self.assertNotEqual(result.returncode, 0)
                 server_trust = folder / ('client.crt' if device else 'ca.crt')
                 client_trust = folder / ('server.crt' if device else 'ca.crt')
                 server = Server(tls_context(True, str(folder / 'server.crt'), str(folder / 'server.key'), str(server_trust)),

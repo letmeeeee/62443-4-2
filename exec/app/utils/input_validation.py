@@ -17,7 +17,7 @@ def validate_ini_payload(payload):
     if not isinstance(payload,dict):
         raise ValueError('INVALID_JSON')
     fields={'mainSystem','subSystem','pcsCount','bmsCount','pointToPointEnabled',
-            'pcsList','bmsList','testCtlList','bmsBrand','pcsBrand','operatorName'}
+            'pcsList','bmsList','testCtlList','bmsBrand','pcsBrand','operatorName', 'pcsReactiveLimit'}
     if set(payload)-fields:
         raise ValueError('UNKNOWN_CONFIGURATION_FIELD')
     result=dict(payload)
@@ -28,6 +28,11 @@ def validate_ini_payload(payload):
             result[key]=_integer(result[key],minimum,maximum)
     if 'pointToPointEnabled' in result and type(result['pointToPointEnabled']) is not bool:
         raise ValueError('INVALID_BOOLEAN')
+    allowed_fields = {
+        'pcsList': {'id', 'ip', 'port', 'role'},
+        'bmsList': {'id', 'ip', 'port', 'belongsRole'},
+        'testCtlList': {'id', 'ip', 'port'}
+    }
     for key,maximum in (('pcsList',4),('bmsList',10),('testCtlList',10)):
         if key not in result:
             continue
@@ -37,7 +42,7 @@ def validate_ini_payload(payload):
         normalized=[]
         identifiers=set()
         for value in values:
-            if not isinstance(value,dict) or set(value)-{'id','ip','port'}:
+            if not isinstance(value,dict) or set(value)-allowed_fields[key]:
                 raise ValueError('INVALID_DEVICE_ENTRY')
             identifier=_integer(value.get('id'),1,maximum)
             if identifier in identifiers:
@@ -51,7 +56,17 @@ def validate_ini_payload(payload):
                 raise ValueError('INVALID_IP_ADDRESS') from None
             if address.is_multicast or address.is_unspecified or address.is_loopback or str(address)=='255.255.255.255':
                 raise ValueError('INVALID_IP_ADDRESS')
-            normalized.append(dict(id=identifier,ip=str(address),port=_integer(value.get('port'),1,65535)))
+            entry = dict(
+                id=identifier,
+                ip=str(address),
+                port=_integer(value.get('port'), 1, 65535)
+            )
+            
+            for extra in allowed_fields[key] - {'id', 'ip', 'port'}:
+                if extra in value:
+                    entry[extra] = value[extra]
+            
+            normalized.append(entry)
         result[key]=normalized
     return result
 

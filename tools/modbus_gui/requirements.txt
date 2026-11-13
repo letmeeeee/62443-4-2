@@ -1,0 +1,2 @@
+# CA CSR creation/import (Linux / macOS / Windows source runtime).
+cryptography>=42,<51

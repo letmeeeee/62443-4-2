@@ -1,0 +1,394 @@
+[
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!B8",
+    "before": "依据：GI-0002-05（B 版，2026-10-23）、GI-0002-02、GI-0002-06、GI-0007-03、GI-0008-01。“待核验”需以目标型号、版本和部署实测确认；C 列按模板脚注留空。",
+    "after": "依据：截至 2026-11-12 的工作区源码及项目资料；最新实现优先于 2026-10-23 旧稿。源码核对不等于目标设备或前端验收。详细依据见本次修订记录；C 列按模板脚注留空。",
+    "evidence": "exec/app/routes、utils；logger/lib/modbus_transport.c"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!I11",
+    "before": "EM1000 从机验证 EMS 主机的客户端证书；主机目前不验证从机证书。",
+    "after": "已接入 TLS 链路采用双向 CA 证书认证：LC400 从机验证 EMS 客户端证书；主机端也须验证 LC400 服务端证书及目标 IP SAN。外部 EMS 的实际配置需联调确认。",
+    "evidence": "logger/lib/modbus_transport.c:make_context/TLS handshake"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!M11",
+    "before": "限制控制网来源和允许点表；按 R-TLS-01、R-TLS-02 验证对端鉴别、独立入口及寄存器权限。",
+    "after": "限制控制网来源和允许点表；核验双向信任、IP SAN、异常证书拒绝、独立入口及寄存器权限。证书认证不替代寄存器授权。",
+    "evidence": "logger/lib/modbus_transport.c；utils/access.py"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!I12",
+    "before": "用户登录后使用 Bearer／MySQL 可撤销会话；Socket.IO 握手鉴别。",
+    "after": "显式 Bearer／MySQL 可撤销会话；固定及空闲失效、服务端锁屏、失败锁定；Socket.IO 握手鉴别。",
+    "evidence": "exec/app/utils/auth.py；routes/route_permission.py"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!K12",
+    "before": "实时监控、配置、历史查询、日志导出及管理员证书／信任管理。",
+    "after": "监控、参数配置、历史及业务日志；分权的账号管理、安全审计、证书管理、加密备份与恢复、安全状态及网络规则查询。",
+    "evidence": "routes/route_security.py；utils/access.py"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!L12",
+    "before": "登录凭据、会话令牌、设备配置、历史数据、日志、公开证书。",
+    "after": "登录凭据、会话令牌、设备配置、历史及审计日志、公开证书、加密应用备份和安全状态；不导出 TEE 私钥。",
+    "evidence": "routes/route_security.py；utils/security_backup.py"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!N12",
+    "before": "设计外部入口 443，8000／9000 为内部服务；固定有效期不是空闲超时。",
+    "after": "HTTPS_ENABLE=true 时，8000／9000 仅监听回环并由 Nginx 提供外部入口；关闭时可监听全部地址。默认会话绝对有效期 1800 秒、空闲期限 900 秒；后台请求也更新活动。实机监听及前端待核。",
+    "evidence": "main.py；upgrade/upgrade.py；utils/auth.py"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!I13",
+    "before": "EM1000 主机出示客户端证书；已接入从机验证主机，主机目前不验证从机。",
+    "after": "LC400 主机与已接入从机双向验证外部 CA 证书；主机额外核对连接目标 IP 与从机证书 IP SAN。",
+    "evidence": "logger/lib/modbus_transport.c"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!M13",
+    "before": "隔离现场控制网，限制对端地址、功能码和点表；按 R-TLS-01 核验从机身份风险。",
+    "after": "隔离现场控制网，限制对端、功能码和点表；核验信任链、目标 IP SAN、不受信／过期证书拒绝及寄存器授权。",
+    "evidence": "logger/lib/modbus_transport.c"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!I14",
+    "before": "TLS 角色按实际部署核验；当前主机未校验从机证书。",
+    "after": "已接入 Modbus TLS 的主从双向校验证书；LC400 为主机时校验从机证书及目标 IP SAN。其他协议独立核验。",
+    "evidence": "logger/lib/modbus_transport.c"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!M14",
+    "before": "按 R-TLS-01 核验对端身份；隔离控制网、约束指令和点表，验证通信异常处理。",
+    "after": "核验双向信任与异常证书拒绝；隔离控制网、约束指令和点表，验证通信异常处理。",
+    "evidence": "logger/lib/modbus_transport.c"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!I15",
+    "before": "接入 TLS 时按主从角色核验证书鉴别；其余协议待核验。",
+    "after": "已接入 Modbus TLS 链路使用双向 CA 证书认证；主机校验从机证书 IP SAN；其他项目协议待核。",
+    "evidence": "logger/lib/modbus_transport.c"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!K17",
+    "before": "写入和查询历史数据、日志及应用所需记录。",
+    "after": "存取业务历史、操作日志、账号／角色、会话活动与锁屏、失败锁定、安全设置和独立安全审计。",
+    "evidence": "utils/security_store.py；utils/security_audit.py；utils/auth.py"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!I25",
+    "before": "管理员／获授权用户及 Bearer 会话；上传与查询权限分别核验。",
+    "after": "上传／启动按升级类型和角色校验并要求有效 Bearer 会话；独立 9000 查询服务共享 MySQL 会话认证，不依赖 8000 进程存活。",
+    "evidence": "routes/route_g3.py；upgrade/upgrade.py:create_app"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!N25",
+    "before": "内部 9000 为升级查询；应用包验签不代表平台安全启动或反回滚已通过。",
+    "after": "9000 是独立且需认证的升级查询服务；HTTPS 模式仅监听回环。应用包验签不证明平台安全启动或反回滚；各类设备固件的验签与恢复另行核验。",
+    "evidence": "upgrade/upgrade.py；routes/route_g3.py"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!K26",
+    "before": "设备证书查询、生成、续期、信任导入／删除及签名调用。",
+    "after": "设备内生成密钥和 CSR、导出 CSR、导入外部 CA 签发的身份链和信任包、查询／导出公开证书及持钥自检；续签沿用 CSR／CA 导入流程。",
+    "evidence": "routes/route_cert.py；routes/route_security.py"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!M26",
+    "before": "按 R-KEY-01 核验证书与密钥匹配、权限、过期和更换信任后的重启生效。",
+    "after": "核验证书公钥、用途、CA 链及私钥匹配；查询每次执行持钥自检并保留失败／不可用原因。信任更新生效和 TEE 能力需实机确认；链验证不代表吊销检查。",
+    "evidence": "routes/route_cert.py；routes/route_security.py"
+  },
+  {
+    "file": "Product Interfaces Description_LC400.xlsx",
+    "location": "接口说明!N26",
+    "before": "Modbus 主从密钥槽、HTTPS 私钥和升级验签公钥分开管理；样机 TA 依赖待核验。",
+    "after": "Modbus 主／从独立密钥槽、HTTPS 文件私钥、应用包验签公钥分别管理。旧 generate／renew／trust-* 接口返回 410；不再由设备自签发身份。",
+    "evidence": "routes/route_cert.py:retired_certificate_operation"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P1",
+    "before": "评审范围：LC400／MV LOGGER（EM1000 平台）。填写依据为项目资料及 2026 年 10 月 23 日可核实的 4-1 修订。所列实现、设计要求与待验证事项分别标明，供风险评审和证据收集使用。",
+    "after": "评审范围：LC400／MV LOGGER（EM1000 平台）。本轮按截至 2026 年 11 月 12 日的工作区源码核对功能，参考既有 4-1 资料。代码已实现、目标机部署和前端验收分别说明；本问卷不构成认证结论。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P12",
+    "before": "图 2  LC400 主要数据流与资产（EV01、EV02）",
+    "after": "图 2  LC400 主要数据流与资产（EV01、EV02）。图中证书“生成、续期”指设备生成密钥／CSR、由外部 CA 签发后导入，不是设备自行签发身份。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P19",
+    "before": "风险编号来自项目风险分析和 4-1 草案。正式风险等级、责任人与接受结论由项目评审确定。",
+    "after": "风险编号沿用项目草案；R-TLS-01 本轮改为双向证书信任与 IP SAN 配置验证。正式风险等级、责任人与接受结论由项目评审确定。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P30",
+    "before": "LC400（MV LOGGER／logger-ts），本次按 EM1000 单机及内置软件评估。参考平台固件 V2.3.0；log_control、lc_data、Web 前端和后端参考 V01R01C01SPC140。正式销售型号、BOM、Build ID、镜像哈希及 EM1000G 等变体另核（EV01、EV04）。",
+    "after": "LC400（MV LOGGER／logger-ts），按 EM1000 单机及内置软件评估。旧资料参考平台 V2.3.0、应用 V01R01C01SPC140，不作为最新交付版本结论。当前有系统／PCS 版本查询接口；正式型号、BOM、Build ID、镜像哈希及变体须与实际发布件绑定（EV01、EV04）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P49",
+    "before": "站端运维、授权安装调试人员、系统管理员、只读审计／监视人员及 EMS 集成方。按批准的岗位授权，管理、控制、查询和审计权限分别核验（EV05、EV10）。",
+    "after": "站端运维、授权安装调试人员、系统管理员及 EMS 集成方。应用按权限等级区分能力，未实现独立的专职审计角色：安全审计仅等级4，业务日志为等级3/4；岗位与账号映射按交付核验（EV05、EV10）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P52",
+    "before": "现场数据采集、功率／启停控制和联锁、北向通信、Web 监控及参数配置、历史查询和日志、应用升级、证书与信任管理。项目专用功能以交付配置为准（EV01、EV02、EV05）。",
+    "after": "现场采集、功率／启停控制及联锁、北向通信、Web 监控／配置、历史与业务日志、应用升级。新增账号启停／强制下线、锁屏与登录提示、独立安全审计、安全状态／网络规则／活动 TLS 对端查询、外部 CA 证书流程、加密应用备份／校验／受控恢复及应用身份清除；项目配置和前端交付另核（EV01、EV02、EV05）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P71",
+    "before": "EV02 的 IF01–IF17：北向、Web、PCS／BMS／测控／UPS、现场总线及 I/O、本机数据与控制、物理维护、旧 Modbus、应用更新与 TEE；FTP／SSH 仅按实际启用核实。",
+    "after": "EV02 的 IF01–IF17 覆盖北向、Web、现场设备／总线及 I/O、本机数据与控制、物理维护、旧 Modbus、更新、证书与 TEE、可选 FTP／SSH。备份、安全状态及审计通过 IF02；活动 Modbus TLS 对端证书查询只读连接快照，不增加通信入口。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P80",
+    "before": "LC400 提供站内 Web 管理，使用 HTTPS／WSS 及 Bearer 会话。EMS／SCADA 是站控网通信对端；现场接口、传输和访问边界见 EV02。",
+    "after": "站内 Web 使用 HTTPS／WSS 与显式 Bearer 会话，MySQL 存储会话状态；支持角色授权、空闲失效、锁屏和撤销。HTTPS 开启时主服务8000／查询服务9000仅监听回环，关闭时可监听全部地址，须核对实机配置；前端联调不由后端实现推定（EV02、EV05）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P108",
+    "before": "历史和会话相关记录在本机 MySQL，日志／INI／CSV、备份及可选介质另行核对。资料记载容量阈值清理，不能当成保留期限或安全擦除。各数据类型保留、复制、删除及退役验证待定（EV03、EV10、EV11）。",
+    "after": "MySQL 保存历史、账号、会话、安全设置和独立审计；另有 INI／CSV／日志及加密应用备份。新安全审计默认写入时清理超过180天记录，业务日志不套用此期限。容量监测按配置文件系统计算，80%／95%返回分级告警；容量清理不等于安全擦除，其他数据留存仍须明确（EV03、EV05、EV10、EV11）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P123",
+    "before": "已定义安全配置目标：批准的网络、账号和端口，未用服务关闭。量产、首装及复位后基线、默认凭据和首登强制改密待实机核验（EV05、EV07、EV09）。",
+    "after": "应用已有角色限制、开发账号配置禁用、首登／过期改密约束和强口令策略；恢复／身份清除默认禁止实际执行。最小开放及普通账号启停已实现，但不能据此认定所有量产服务默认关闭；出厂、首装和复位基线须实机核验（EV05、EV07、EV09）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P127",
+    "before": "Web 角色、本机账号／数据库权限、旧 Modbus 四级角色分别管理。目标版逐 API、寄存器、账号权限与撤权审计待验证（EV02、EV05、EV07）。",
+    "after": "Web 能力按等级授权：账号／证书／备份／维护／退役及安全审计为4；业务日志和安全汇总为3/4；参数修改与设备控制为2/3/4。旧 Modbus 与本机账号／数据库权限另管。任意 SQL 读取旧入口已停用；逐 API 和寄存器负向验证仍需绑定目标版本（EV02、EV05、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P131",
+    "before": "资料记录 Bearer／MySQL 可撤销会话，默认固定 1800 秒、最多 20 个有效会话；Socket.IO 握手鉴别。固定期限非空闲超时；失败锁定、密码策略与长连接失效待验证（EV05、EV07）。",
+    "after": "显式 Bearer／MySQL 会话，默认绝对期限1800秒、空闲期限900秒、全局最多20个有效会话，允许同账号多会话；后台轮询也刷新活动。支持服务端锁屏、管理员撤销、改密／禁用后撤销，登录失败5次锁定300秒。Socket.IO 握手认证及主进程已知连接主动断开已实现，跨进程／9000长连接与持续失效需专项验证（EV05、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P135",
+    "before": "Web HTTPS／WSS；已接入 Modbus TCP 使用 TLS 1.2 及以上，从机验证主机客户端证书，主机目前不验证从机。旧入口、内部 TCP、RTU／CAN、FTP 独立评估；目标证书信任与端口待核（EV02、EV03、EV05）。",
+    "after": "HTTPS／WSS；已接入 Modbus TLS 1.2+ 使用外部 CA 双向证书认证，主机校验服务端目标 IP SAN。旧入口、内部 TCP、RTU／CAN、FTP不自动获得此保护。证书链通过不代表持续吊销检查，第三方设备兼容性、实际端口与信任部署需实测（EV02、EV03、EV05）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P139",
+    "before": "资料记录 TEE 内 Modbus 独立密钥槽及管理员证书、信任维护。Web 身份、Modbus、应用包验签各自管理；库、日志、备份的加密和权限、换发及吊销策略待核（EV03、EV05）。",
+    "after": "Modbus 主／从身份采用独立密钥槽，支持 TEE 持钥；HTTPS 使用独立文件私钥。设备生成 CSR、导入外部 CA 身份与信任，旧自签生成／续期接口停用。证书查询执行实际持钥自检，失败或不可用须分别展示。应用备份使用 AES-GCM，不包含私钥或可重放会话令牌；TEE持久化、权限和轮换需目标机验证（EV03、EV05）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P143",
+    "before": "资料记录应用包 RSA-PSS／SHA-256 验签。生产签名包、错误包拒绝、版本控制、反回滚、断电恢复及平台启动链待实机举证；独立升级查询不是上传入口（EV06、EV07）。",
+    "after": "应用包执行 RSA-PSS／SHA-256 验签，上传、启动与独立9000查询均需有效会话并按接口授权；9000认证不依赖8000存活。设备固件更新与应用更新分开取证；反回滚、断电恢复和平台启动链仍待实机验证（EV06、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P147",
+    "before": "有操作、运行、故障及容量／配置变化日志资料。待验证登录失败、授权及更新记录覆盖、统一时间、导出权限、留存、脱敏和抗篡改；INI 摘要变化记录不等同日志完整性（EV03、EV05、EV07）。",
+    "after": "新增独立 security_audit，记录认证、账号／权限、证书、更新和备份／恢复等安全事件，与业务 operation_log 分开。记录经验证身份、来源、对象、结果及接口状态，避免原始请求体、密码和令牌；审计查看／导出仅等级4，业务日志3/4。默认审计留存180天，容量和写失败告警已实现；不宣称日志防篡改或集中留存（EV03、EV05、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P151",
+    "before": "以工业遥测、必要账号、配置和日志为范围。待建立每类数据保留期限及账号、主库、日志、缓存、备份和可选介质的删除与可恢复性检查（EV03、EV10、EV11）。",
+    "after": "支持账号删除、会话撤销及 application-identities 范围清除；后者保留业务数据库、INI、证书、TEE密钥及日志，不等于整机擦除。实际执行默认关闭并受维护模式、二次认证和确认约束；各类个人数据副本、保留期限和不可恢复删除仍需验证（EV03、EV10、EV11）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P155",
+    "before": "设计包含通信超时、降级／停机、看门狗和备份恢复；验证过载、断电、断网及恢复后账号、信任、配置和日志仍处于批准的安全状态（EV01、EV06、EV07）。",
+    "after": "已实现 AES-GCM 同设备应用备份及校验、受控恢复、预置基线出厂恢复；范围为账号／角色、安全设置、INI及公开证书引用，不含业务历史库、私钥或平台镜像。执行默认关闭，需维护模式、二次认证和明确确认；恢复前检查点及异常 pending 标记防止不确定状态启动。通信超时、看门狗及断电／过载恢复须另做实机验证（EV01、EV06、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P159",
+    "before": "已记录 Modbus TLS 1.2+、应用包 RSA-PSS／SHA-256。资料仍记录加盐 MD5 口令存储；增强派生、TLS 套件、证书换发与弱算法退出待评审和验证（EV03、EV05、EV07）。",
+    "after": "Modbus TLS 1.2+、应用包 RSA-PSS／SHA-256、备份 AES-GCM；新建／改密采用随机盐 PBKDF2-HMAC-SHA256（600000次），旧加盐MD5仅兼容验证并在成功登录后迁移，未迁移存量仍需排查。口令12–128字符并要求大小写、数字、特殊字符和最近5次历史限制。证书换发、算法退出及平台能力需持续验证（EV03、EV05、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P163",
+    "before": "已编制接口台账及最小开放要求，区分旧 Modbus、内部 TCP、FTP／SSH、维护口与扩展。目标量产镜像的监听、调试口、工程模式和测试账号须核验（EV02、EV07、EV09）。",
+    "after": "接口台账区分旧 Modbus、内部TCP、FTP／SSH和维护口。已停用任意SQL和旧证书生成接口；新增 firewalld 所有区域运行时规则只读查询，不修改规则，也不代表完整内核有效策略。监听范围、调试口、测试账号和出厂开放仍以目标镜像核查（EV02、EV07、EV09）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P174",
+    "before": "已有 项目静态分析及初步组件清单、4-1 SVV 计划和报告模板。正式评估须绑定目标 Build，补齐 SCA、端口／权限、TLS、升级、接口负向、模糊／渗透及恢复测试的执行记录（EV04、EV07）。",
+    "after": "仓库已有认证／权限、口令迁移、锁屏／空闲、审计、备份篡改拒绝、证书及网络规则等本地回归和软件密钥双向TLS回环记录；数据库／设备命令部分使用替身。2026-11-11已反馈设备firewalld解析正常；TEE实机持钥、前端展示／导出、目标Build的SCA、渗透及恢复测试仍待证据（EV04、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P202",
+    "before": "说明单向 Modbus 证书鉴别、旧入口范围、条件启用服务、用户配置责任和剩余风险；安全公告／PCN 的审批、送达和版本记录待实际发布验证（EV03、EV08、EV10）。",
+    "after": "向用户说明双向 Modbus CA 信任和 IP SAN 配置、旧入口隔离、条件启用服务、备份恢复范围及日志留存责任。证书链验证不等于吊销检查；安全公告／PCN审批、送达和版本记录待实际发布验证（EV03、EV08、EV10）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P205",
+    "before": "受控退役：隔离设备，撤销账户、证书和信任，按清单处理配置、数据库、日志、介质和备份；维修时仅传必要脱敏材料。重置不能代替擦除；验证清除范围、复装后的安全基线及销毁记录（EV10、EV11）。",
+    "after": "应用身份清除仅覆盖应用账号／会话／安全设置和本地备份／临时凭据，保留业务数据库、INI、证书、TEE密钥和日志，需另按退役清单处理；不提供物理介质覆盖擦除。默认仅预览，实际执行受维护模式、配置开关、二次认证和确认限制；维修材料脱敏、完整清除及复装基线须另验证（EV10、EV11）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P214",
+    "before": "EV02｜《Product Interfaces Description LC400 EM1000》IF01–IF17；参照 4-1 GI-0002-05 B。待目标版本端口及配置核验。",
+    "after": "EV02｜本轮《Product Interfaces Description_LC400.xlsx》IF01–IF17；截至2026-11-12源码与既有4-1资料核对。目标机监听、实际启用及第三方对端配置另核；本轮逐项修改与依据见同日修订记录。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P236",
+    "before": "状态说明：“部分已有”表示资料记录了部分措施；“流程已定义／设计待验证”不代表已执行；“待验证”表示关键证据待补。",
+    "after": "状态说明：“部分已有”表示已有相关实现或流程但不代表目标机验收完成；“流程已定义／设计待验证”不代表已执行。功能事实以截至2026-11-12源码为准，目标版本、前端和实机证据分别核验。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P270",
+    "before": "开发账号可按配置禁用；量产凭据唯一性、首次强制改密及工厂账号清理待核（EV05、EV09）。",
+    "after": "开发账号按配置禁用；普通账号可启停。新建／重置账号及口令过期触发改密约束，临时口令由受控本机渠道领取；量产凭据唯一性和工厂账号清理仍须出厂证据（EV05、EV09）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P338",
+    "before": "有日志查询及操作记录；核验查看、导出、文件权限及审计（EV05、EV07）。",
+    "after": "安全审计独立查询／导出仅等级4，业务日志查询／导出为3/4；日志脱敏、文件权限和目标机负向访问仍需验证（EV05、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P351",
+    "before": "会话有固定期限和撤销；空闲超时、长连接撤销及异常登录检测待核（EV03、EV05）。",
+    "after": "已有绝对／空闲失效、锁屏、撤销、失败锁定，改密／停用使账号会话失效；主动断开覆盖主进程登记连接。跨进程、9000及已建立长连接的持续失效仍需专项验证；失败锁定不等于完整异常登录检测（EV03、EV05）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P371",
+    "before": "Modbus TLS 1.2+；口令仍记录加盐 MD5，套件、增强派生和退弱待核（EV05、EV07）。",
+    "after": "口令已采用PBKDF2-HMAC-SHA256（600000次），旧MD5成功登录后迁移；Modbus TLS最低1.2，TLS1.2配置ECDHE-RSA/AES-GCM。存量弱摘要清理、实际TLS协商与算法退出仍需验证（EV05、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P384",
+    "before": "从机验证主机客户端证书，主机不验证从机；Web 信任与负向验证待补（EV02、EV03）。",
+    "after": "已接入Modbus TLS双向校验证书，主机另校验从机目标IP SAN；外部CA链和私钥匹配均校验。Web浏览器信任、第三方对端及目标机负向验证仍需举证，不宣称持续吊销检查（EV02、EV03）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P403",
+    "before": "有退役清理要求；主库、日志、备份、介质的同步清除和不可恢复性待核（EV11）。",
+    "after": "应用身份清除不覆盖业务库、INI、证书、TEE密钥及日志；账号删除／会话撤销不等于介质擦除，主库及副本不可恢复性另验（EV11）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P409",
+    "before": "有账号管理、退出与会话撤销；与账号和历史数据安全擦除分开验证（EV05、EV11）。",
+    "after": "已有账号管理／删除、退出／撤销及受控应用身份清除；清除范围有限，不宣称历史数据或整个设备已安全擦除（EV05、EV11）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P436",
+    "before": "有会话上限和资源监控；总连接、队列限额及抗资源耗尽测试待补（EV05、EV07）。",
+    "after": "已有全局20会话上限、来源IP HTTP限速、失败锁定及资源监测；限速不覆盖所有工业协议，总连接／队列及目标设备抗资源耗尽仍需压测（EV05、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P442",
+    "before": "有故障降级及备份恢复方案；重启后认证、信任、日志与配置恢复待验证（EV06、EV07）。",
+    "after": "已有加密应用备份／校验／受控恢复、恢复前检查点和异常pending启动阻断；不覆盖平台镜像和业务历史库。断电及重启后的账号、信任、INI基线和日志一致性仍需实测（EV06、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P475",
+    "before": "已有操作、故障及配置变化日志；鉴别失败、权限变更与更新事件覆盖待测（EV05、EV07）。",
+    "after": "独立安全审计已覆盖认证、账号／权限、证书、更新、备份／恢复等事件，与业务操作／故障日志分开；拒绝路径和实际事件完整性需目标版本采样确认（EV05、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P481",
+    "before": "已有操作身份记录；统一时钟、来源、对象、结果字段及关联验证待补（EV03、EV07）。",
+    "after": "安全审计使用已认证操作人、来源IP、后端确认对象、事件类型和结果；接口／HTTP状态写入备注。设备标识、统一时钟、跨服务关联及脱敏仍须验证（EV03、EV07）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "word/document.xml P489",
+    "before": "本地日志和容量清理不证明防篡改；集中留存、删除审批及完整性待证（EV03、EV10）。",
+    "after": "本地安全审计具备留存、容量和写失败告警，但不具备由这些机制证明的防篡改能力；INI采用独立SHA-256可信基线核对，不能替代日志完整性。集中留存和删除审批仍待证（EV03、EV10）。",
+    "evidence": "对应源码与说明见核查说明.md"
+  },
+  {
+    "file": "CRA_风险分析调查问卷_LC400.docx",
+    "location": "图3",
+    "before": "位图：从机证书尚未被主机校验",
+    "after": "可编辑风险重点表：双向CA证书信任、目标IP SAN及异常证书拒绝",
+    "evidence": "logger/lib/modbus_transport.c"
+  }
+]

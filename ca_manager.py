@@ -16,7 +16,7 @@ def gui():
     w = Window('LC400 企业内部 CA — 离线签发管理')
     w.field('ca', 'CA 数据目录（含加密私钥）', str(Path.home() / 'lc400-ca'), True)
     w.field('organization', '企业/CA 名称', 'LC400 Enterprise')
-    w.field('request', '设备 CSR 交接目录', '', True)
+    w.field('request', 'CSR 交接目录（三身份 / 单角色）', '', True)
     w.field('output', '证书包输出目录（必须不存在）', '')
     w.field('days', '设备证书有效期（天，1–825）', '365')
     w.field('serial', '待吊销的证书序列号（十六进制）', '')
@@ -57,7 +57,7 @@ def gui():
                 ca.revoke(v['serial'], password); return '已记录吊销；请导出并分发最新 CRL。设备当前尚不自动检查 CRL。'
             ca.export_crl(destination, password); return 'CRL 已导出：' + destination
         w.task(execute)
-    for label, kind in [('初始化 CA','init'),('预览 CSR','inspect'),('签发三证书包','sign'),('签发记录','list'),('导出根 CA','roots'),('吊销证书','revoke'),('导出 CRL','crl')]:
+    for label, kind in [('初始化 CA','init'),('预览 CSR','inspect'),('签发证书包','sign'),('签发记录','list'),('导出根 CA','roots'),('吊销证书','revoke'),('导出 CRL','crl')]:
         w.button(label, lambda k=kind: action(k))
     w.run()
 

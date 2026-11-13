@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, threading, shutil, subprocess
+import json, threading, shutil, subprocess, hashlib
 from flask import request, jsonify, g
 from werkzeug.utils import secure_filename
 import traceback
@@ -25,6 +25,7 @@ from constent.bms_fault import BMS_CHECK_ADDR_LIST, BMS_FAULT_ADDR_LIST, BMS_WAR
 from constent.pcs_fault import PCS_CHECK_ADDR_LIST, PCS_FAULT_ADDR_LIST, PCS_WARNING_ADDR_LIST
 from constent.mv_fault import MV_FAULT_ADDR_LIST
 from constent.device_info import SYSTEM_CONSISTENCY_CHECK_LIST
+from utils.upgrade_index import UpgradePackageIndex
 import constent.fault_all as fault_all
 import constent.common as common
 import utils.systemctl as systemctl
@@ -214,6 +215,7 @@ def GetList():
 
         # 3. PCS：数量从 pcsNum 获取
         # sort 在 PCS 类型内部计数
+        DPrint(PCS_BRAND)
         for i in range(1, pcs_num + 1):
             brand = _ini_get_int(
                 ini_data,
@@ -221,7 +223,7 @@ def GetList():
                 f"pcs{i}_brand",
                 PCS_BRAND["G3_SELF"]
             )
-            DPrint(brand)
+            DPrint(f"pcs{i}_brand: {brand}")
 
             _group_type, pcs_type = _get_pcs_device_type_by_brand(brand)
             add_device(pcs_type, i)
@@ -254,6 +256,380 @@ def GetList():
             "deviceList": [],
             "error": f"服务器异常: {e}"
         }), 500
+
+# ============ PCS 具名查询与系统时间设置 ============
+# PCS/系统组编号均从 1 开始，每个块偏移 300；保持旧 POST /api 兼容接口不变。
+SYSTEM_TIME_WRITE_LOCK = threading.Lock()
+
+
+class NamedDeviceError(Exception):
+    """具名设备接口的可预期错误，携带对外错误码及 HTTP 状态。"""
+    def __init__(self, code, message, status=400):
+        super().__init__(message)
+        self.code = code
+        self.status = status
+
+
+def _named_device_permission(permissions, write=False):
+    """使用会话身份检查权限；时间写入额外校验 CSRF，包括同源请求。"""
+    user = getattr(g, 'current_user', None)
+    if not isinstance(user, dict):
+        raise NamedDeviceError('SESSION_INVALID', 'Authentication required', 401)
+    if user.get('permission') not in permissions:
+        raise NamedDeviceError('FORBIDDEN', 'Permission denied', 403)
+    if write:
+        import hmac
+        supplied = request.headers.get('X-CSRF-Token', '')
+        expected = getattr(g, 'csrf_token', '')
+        if not supplied or not expected or not hmac.compare_digest(
+            supplied.encode('utf-8'), expected.encode('utf-8')
+        ):
+            raise NamedDeviceError('CSRF_INVALID', 'CSRF token is invalid', 403)
+
+
+def _named_device_counts():
+    """读取配置容量，避免请求越过实际设备数量或协议支持的范围。"""
+    ini_data = read_ini_all()
+    pcs_num = _ini_get_int(ini_data, 'SYSTEM', 'pcsNum', -1)
+    sys_num = _ini_get_int(ini_data, 'SYSTEM', 'sysNum', -1)
+    if not 0 <= pcs_num <= 4 or not 0 <= sys_num <= 2:
+        raise NamedDeviceError('DEVICE_UNAVAILABLE', 'Invalid device count configuration', 503)
+    return pcs_num, sys_num
+
+
+def _named_device_indices(name, configured, maximum):
+    """解析逗号分隔序号；空字符串表示空列表，缺参、重复、越界返回 400。"""
+    import re
+    values = request.args.getlist(name)
+    if len(values) != 1:
+        raise NamedDeviceError('INVALID_DEVICE_INDEX', f'{name} is required exactly once')
+    if values[0] == '':
+        return []
+    parts = values[0].split(',')
+    if len(parts) > maximum or any(not re.fullmatch(r'[0-9]{1,2}', part) for part in parts):
+        raise NamedDeviceError('INVALID_DEVICE_INDEX', f'Invalid {name} indices')
+    indices = [int(part) for part in parts]
+    if len(indices) != len(set(indices)) or any(
+        index < 1 or index > min(configured, maximum) for index in indices
+    ):
+        raise NamedDeviceError('INVALID_DEVICE_INDEX', f'{name} indices are duplicate or out of range')
+    return indices
+
+
+def _named_device_read(address, quantity, functioncode=READ_INPUT_REGISTER):
+    """用现有共享内存读取，不将缺失、短读或非法值填充成 0。"""
+    from operator import index
+    try:
+        model = method.registers_model
+        size = model.HOLD_SIZE if functioncode == READ_HOLD_REGISTER else model.INPUT_SIZE
+        if address < 0 or address + quantity > size:
+            raise NamedDeviceError('DEVICE_UNAVAILABLE', 'Register range is unavailable', 503)
+        values = query_register_data(
+            deviceid=FIXED_DEVICE_ID,
+            functioncode=functioncode,
+            address=address,
+            quantity=quantity,
+        )
+        if values is None or len(values) != quantity:
+            raise NamedDeviceError('DEVICE_UNAVAILABLE', 'Register data is incomplete', 503)
+        words = []
+        for value in values:
+            if isinstance(value, bool):
+                raise ValueError('Invalid boolean register value')
+            word = index(value)  # 同时支持普通整数与共享内存返回的 numpy.uint16。
+            if not 0 <= word <= 65535:
+                raise ValueError('Register value is out of range')
+            words.append(word)
+        return words
+    except NamedDeviceError:
+        raise
+    except TimeoutError:
+        raise NamedDeviceError('MODBUS_TIMEOUT', 'Register read timed out', 503) from None
+    except Exception:
+        DPrint(f'[DEVICE] register read failed: fc={functioncode}, address={address}, '
+               f'quantity={quantity}\n{traceback.format_exc()}', level='ERROR')
+        raise NamedDeviceError('DEVICE_UNAVAILABLE', 'Register data is unavailable', 503) from None
+
+
+def _named_device_success(data, started):
+    """读取成功返回统一结构，采样时间带设备本地时区。"""
+    sampled_at = datetime.now().astimezone().isoformat()
+    DPrint(f'[DEVICE] {request.path} elapsed_ms={(time.monotonic() - started) * 1000:.1f}', level='DEBUG')
+    return jsonify(ok=True, sampledAt=sampled_at, data=data), 200
+
+
+def _named_device_failure(exc):
+    """可预期错误返回业务码，未预期错误仅在服务端记录完整堆栈。"""
+    if isinstance(exc, NamedDeviceError):
+        if exc.status >= 500:
+            DPrint(f'[DEVICE] {request.path} {exc.code}: {exc}', level='ERROR')
+        return _query_error(exc.code, str(exc), exc.status)
+    DPrint(f'[DEVICE] {request.path} failed\n{traceback.format_exc()}', level='ERROR')
+    if isinstance(exc, (OSError, RuntimeError)):
+        return _query_error('DEVICE_UNAVAILABLE', 'Device operation is unavailable', 503)
+    return _query_error('INTERNAL_ERROR', 'Device operation failed', 500)
+
+
+# PCS 安规码、关键配置与主从角色查询
+@g3_bp.route('/api/device/pcs/verify', methods=['GET'])
+def get_pcs_verify():
+    """查询 PCS 校验信息。
+
+    示例：GET /api/device/pcs/verify?pcs=1,2,3,4&groups=1,2
+    pcs/groups 必填，序号不重复且不超过配置容量；空字符串表示空列表。
+    返回：{ok, sampledAt, data: {standards, groups, masterSlave}}。
+
+    安规码：FC3，12100 + (n-1)*700。
+    组状态：FC3，12000 + (n-1)*700 + 0~4。
+    主从机：FC3，12009 + (n-1)*700。
+    每组两台 PCS，+60 bit9 对应组内第一台，+62 bit14 对应第二台。
+    任一读取失败时整体失败，不返回部分成功数据。
+    """
+    started = time.monotonic()
+    try:
+        _named_device_permission(PERMISSION_TABLE.get('data', []))
+        pcs_num, sys_num = _named_device_counts()
+        pcs = _named_device_indices('pcs', pcs_num, 4)
+        groups = _named_device_indices('groups', sys_num, 2)
+        standards = []
+        master_slave = []
+        group_data = []
+
+        # 0. 检查 PCS 与组数量是否匹配，避免后续读取越界。
+        if not pcs and not groups:
+            return _named_device_success({'standards': [], 'groups': [], 'masterSlave': []}, started)
+        if sys_num <= 0 or pcs_num % sys_num != 0:
+            DPrint(f"[DEVICE] Invalid PCS to group ratio: pcs_num={pcs_num}, sys_num={sys_num}", level='ERROR')
+            raise NamedDeviceError(
+                'DEVICE_UNAVAILABLE', 'Invalid PCS to group ratio', 503
+            )
+        # 1. 按选定 PCS 读取安规码和主从机角色。
+        for number in pcs:
+            code = _named_device_read(
+                common.PCS_VERIFY_STANDARD_ADDR + (number - 1) * common.PCS_VERIFY_PARAM_STEP,
+                1, READ_HOLD_REGISTER,
+            )[0]
+            role = _named_device_read(
+                common.PCS_VERIFY_ROLE_ADDR + (number - 1) * common.PCS_VERIFY_PARAM_STEP,
+                1, READ_HOLD_REGISTER,
+            )[0]
+            standards.append({
+                'pcs': number,
+                'code': code,
+                'name': (common.PCS_VERIFY_STANDARD_NAMES[code]
+                         if code < len(common.PCS_VERIFY_STANDARD_NAMES) else None),
+            })
+            master_slave.append({
+                'pcs': number,
+                'role': common.PCS_VERIFY_ROLE_NAMES.get(role, common.PCS_VERIFY_UNKNOWN_ROLE),
+            })
+
+        # 2. 合并读取每组状态区，在后端解析位域。
+        if (pcs_num//sys_num) == 2:
+            pcs_hold_step = common.PCS_GROUP_HOLD_STEP
+        elif (pcs_num//sys_num) == 1:
+            pcs_hold_step = common.PCS_HOLD_STEP
+        else:
+            DPrint(f"[DEVICE] Invalid PCS to group ratio: pcs_num={pcs_num}, sys_num={sys_num}", level='ERROR')
+            raise NamedDeviceError('DEVICE_UNAVAILABLE', 'Invalid PCS to group ratio', 503)
+        for group in groups:
+            parallelMode = _named_device_read(common.PCS_BASE_HOLD_ADDRESS + (group - 1) * pcs_hold_step, 1, READ_HOLD_REGISTER)
+            gridMode = _named_device_read(common.PCS_BASE_HOLD_ADDRESS + (group - 1) * pcs_hold_step + 2, 1, READ_HOLD_REGISTER)
+            runMode = _named_device_read(common.PCS_BASE_HOLD_ADDRESS + (group - 1) * pcs_hold_step + 3, 1, READ_HOLD_REGISTER)
+            parallel = []
+            for position in range(pcs_num//sys_num):
+                number = position + 1 + (group - 1) * (pcs_num//sys_num)
+                if number > pcs_num:
+                    DPrint(f"[DEVICE] PCS group {group} has no PCS at position {position + 1}", level='WARNING')
+                    break
+                parallel.append({
+                    'pcs': number,
+                    'mode': common.PCS_VERIFY_PARALLEL_MODE_NAMES.get(parallelMode[0],None),
+                })
+            group_data.append({
+                'group': group,
+                'parallelMode': parallel,
+                'gridMode': common.PCS_VERIFY_GRID_MODE_NAMES.get(gridMode[0],None),
+                'runMode': common.PCS_VERIFY_RUN_MODE_NAMES.get(runMode[0],None),
+            })
+        return _named_device_success({
+            'standards': standards, 'groups': group_data, 'masterSlave': master_slave,
+        }, started)
+    except Exception as exc:
+        return _named_device_failure(exc)
+
+
+def _format_pcs_firmware_version(word):
+    """按 PCS 单字位域格式化为 V主版本-子版本-功能标识。"""
+    main_version = word & common.PCS_FIRMWARE_MAIN_VERSION_MASK
+    sub_version = (
+        word >> common.PCS_FIRMWARE_SUB_VERSION_SHIFT
+    ) & common.PCS_FIRMWARE_FIELD_MASK
+    function_code = (
+        word >> common.PCS_FIRMWARE_FUNCTION_SHIFT
+    ) & common.PCS_FIRMWARE_FIELD_MASK
+    function_name = common.PCS_FIRMWARE_FUNCTION_NAMES.get(
+        function_code, f'RESERVED_{function_code}'
+    )
+    return (f'V{main_version // 100}.{main_version % 100:02d}'
+            f'-{sub_version}-{function_name}')
+
+
+# PCS 固件完整版本查询
+@g3_bp.route('/api/device/pcs/versions', methods=['GET'])
+def get_pcs_firmware_versions():
+    """读取 PCS 各固件组件版本；仅角色 3、4 可访问。
+
+    示例：GET /api/device/pcs/versions?pcs=1,2,3,4
+    返回：{ok, sampledAt, data: [{pcs, components: [{name, version}]}]}。
+    FC4 从 2600 + (n-1)*300 + 4 连续读取 8 字，每个组件一个 16 位字。
+    bit0～9：主版本值 /100；bit10～12：子版本；bit13～15：功能码。
+    例如 100 返回 V1.00-0-M；功能码 0/1/2 为 M/P/V，3～7 显示 RESERVED_n。
+    """
+    started = time.monotonic()
+    try:
+        _named_device_permission((3, 4))
+        pcs_num, _ = _named_device_counts()
+        pcs = _named_device_indices('pcs', pcs_num, 4)
+        data = []
+        for number in pcs:
+            words = _named_device_read(
+                common.PCS_BASE_ADDRESS + (number - 1) * common.PCS_FAULT_STEP
+                + common.PCS_FIRMWARE_VERSION_OFFSET,
+                len(common.PCS_FIRMWARE_COMPONENT_NAMES),
+            )
+            components = []
+            for name, word in zip(common.PCS_FIRMWARE_COMPONENT_NAMES, words):
+                components.append({
+                    'name': name,
+                    'version': _format_pcs_firmware_version(word),
+                })
+            data.append({'pcs': number, 'components': components})
+        return _named_device_success(data, started)
+    except Exception as exc:
+        return _named_device_failure(exc)
+
+
+# LC 与 PCS 短版本查询
+@g3_bp.route('/api/system/versions', methods=['GET'])
+def get_system_versions():
+    """查询系统版本，无入参，所有已登录角色可访问。
+    PCS控制程序版本号返回的是MS CDSP 板版本号
+
+    返回 data：{protocolVersion, softwareVersion, patchNumber, pcs: [{pcs, version}]}。
+    FC4 的 1～5 为 LC 版本；每台 PCS 输入区 +5 为单字版本。
+    PCS 版本沿用固件接口位域格式（如 V1.00-0-M），零值仍返回 null。
+    """
+    started = time.monotonic()
+    try:
+        _named_device_permission(PERMISSION_TABLE.get('data', []))
+        pcs_num, _ = _named_device_counts()
+        words = _named_device_read(1, 5)
+        pcs = []
+        for number in range(1, pcs_num + 1):
+            version = _named_device_read(
+                common.PCS_BASE_ADDRESS + (number - 1) * common.PCS_FAULT_STEP
+                + common.PCS_FIRMWARE_VERSION_OFFSET,
+                1,
+            )
+            pcs.append({
+                'pcs': number,
+                'version': _format_pcs_firmware_version(version[0]) if version[0] != 0 else None,
+            })
+        return _named_device_success({
+            'protocolVersion': f'V{words[0] >> 8}.{words[0] & 0xff}',
+            'softwareVersion': f'V{words[1]:02}R{words[2]:02}C{words[3]:02}',
+            'patchNumber': f'SPC{words[4]:03}',
+            'pcs': pcs,
+        }, started)
+    except Exception as exc:
+        return _named_device_failure(exc)
+
+
+# 重启前的系统组充放电状态查询
+@g3_bp.route('/api/device/pcs/charge-state', methods=['GET'])
+def get_pcs_charge_state():
+    """查询各组充放电状态。
+
+    示例：GET /api/device/pcs/charge-state?groups=1,2
+    返回 data：{chargeDischarging, groups: [{group, state}]}。
+    FC4，17000 + (g-1)*300 + 32～33：1 放电、2 充电，其它 idle。
+    同组同时出现充电和放电时 state=unknown，但 chargeDischarging 仍为 true。
+    """
+    started = time.monotonic()
+    try:
+        _named_device_permission(PERMISSION_TABLE.get('data', []))
+        _, sys_num = _named_device_counts()
+        groups = _named_device_indices('groups', sys_num, 2)
+        data = []
+        active = False
+        for group in groups:
+            words = _named_device_read(17000 + (group - 1) * 300 + 32, 2)
+            states = {word for word in words if word in (1, 2)}
+            active = active or bool(states)
+            state = 'unknown' if len(states) > 1 else 'discharge' if 1 in states else 'charge' if 2 in states else 'idle'
+            data.append({'group': group, 'state': state})
+        return _named_device_success({'chargeDischarging': active, 'groups': data}, started)
+    except Exception as exc:
+        return _named_device_failure(exc)
+
+
+# 设置系统时间
+@g3_bp.route('/api/system/time', methods=['POST'])
+def set_system_time():
+    """通过现有 FC6 写入流程设置系统时间，不直接调用 date 或重启命令。
+
+    请求示例：POST /api/system/time
+      {"datetime": "2026-11-10 12:34:56", "confirm": "SET_SYSTEM_TIME"}
+    设备本地时间格式固定为 YYYY-MM-DD HH:mm:ss，年份范围 2000～2099。
+    沿用参数写权限（角色 2/3/4），需会话 CSRF Token；维护模式下拒绝写入。
+    成功返回 {ok: true, applied: true, reboot_scheduled_in: null}。
+    1500～1505 按年/月/日/时/分/秒逐字下发；中途失败立即停止，并保留部分写入审计。
+    """
+    try:
+        from utils import security_audit as audit
+        from utils import security_store as store
+        import re
+
+        g.audit_event_type = 'system.time.set'
+        g.audit_target = 'system'
+        _named_device_permission(PERMISSION_TABLE.get('param', []), write=True)
+        body = request.get_json(silent=True)
+        if not isinstance(body, dict):
+            raise NamedDeviceError('INVALID_QUERY', 'JSON object is required')
+        if body.get('confirm') != 'SET_SYSTEM_TIME':
+            raise NamedDeviceError('SET_TIME_CONFIRMATION_REQUIRED', 'confirm must be SET_SYSTEM_TIME')
+        value = body.get('datetime')
+        if not isinstance(value, str) or not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}', value):
+            raise NamedDeviceError('SYSTEM_TIME_INVALID', 'datetime must use YYYY-MM-DD HH:mm:ss')
+        try:
+            target = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            raise NamedDeviceError('SYSTEM_TIME_INVALID', 'Invalid local datetime') from None
+        if not 2000 <= target.year <= 2099:
+            raise NamedDeviceError('SYSTEM_TIME_INVALID', 'Year must be between 2000 and 2099')
+
+        # 1. 公共认证钩子也会检查维护模式；此处保留接口自身的写入前检查。
+        with audit.engine().connect() as conn:
+            if store.maintenance_state(conn)['active']:
+                raise NamedDeviceError('MAINTENANCE_IN_PROGRESS', 'Maintenance mode is active', 409)
+
+        # 2. 串行执行本接口的六次写入。审计由公共 after_request 按会话身份落库。
+        with SYSTEM_TIME_WRITE_LOCK:
+            g.audit_before = {'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+            g.audit_after = {'datetime': value, 'applied': False, 'writtenRegisters': []}
+            values = (target.year, target.month, target.day, target.hour, target.minute, target.second)
+            for address, word in enumerate(values, start=1500):
+                result, _ = write_register_with_retry(address, word, slave=FIXED_DEVICE_ID)
+                if result is None or result.isError():
+                    raise NamedDeviceError('DEVICE_UNAVAILABLE', 'System time register write failed', 503)
+                g.audit_after['writtenRegisters'].append(address)
+            g.audit_after['applied'] = True
+        DPrint(f'[TIME] operator={g.current_user["username"]} system time set to {value}')
+        return jsonify(ok=True, applied=True, reboot_scheduled_in=None), 200
+    except Exception as exc:
+        return _named_device_failure(exc)
+
 
 # 数据参数查询
 @g3_bp.route('/api/data/getParams', methods=['GET'])
@@ -700,6 +1076,52 @@ def GetPcsAlarm():
             "error": f"服务器异常: {e}",
         }), 500
 
+def _query_error(code, message, status=400):
+    """为本轮修复的历史和录波接口提供可追踪的错误响应。"""
+    from uuid import uuid4
+
+    trace = getattr(g, 'trace_id', None) or str(uuid4())
+    g.trace_id = trace
+    response = jsonify(ok=False, code=code, message=message, trace_id=trace)
+    response.headers['X-Trace-Id'] = trace
+    return response, status
+
+
+def _query_positive_integer(name, default=None):
+    """校验查询中的正整数，避免缺参时泄露 int(None) 等内部异常。"""
+    value = request.args.get(name, default)
+    if value is None or value == '':
+        raise ValueError(f'{name} is required')
+    if not str(value).isascii() or not str(value).isdigit() or int(value) < 1:
+        raise ValueError(f'{name} must be a positive integer')
+    return int(value)
+
+
+def _query_time_range(allow_date=False):
+    """校验设备本地时间；历史数据用 T 分隔，录波额外允许仅日期。"""
+    import re
+
+    values = []
+    parsed = []
+    for name in ('beginDt', 'endDt'):
+        value = request.args.get(name, '')
+        fmt = '%Y-%m-%dT%H:%M:%S'
+        pattern = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}'
+        if allow_date and re.fullmatch(r'\d{4}-\d{2}-\d{2}', value):
+            fmt = '%Y-%m-%d'
+            pattern = r'\d{4}-\d{2}-\d{2}'
+        if not re.fullmatch(pattern, value):
+            raise ValueError(f'{name} must use YYYY-MM-DDTHH:mm:ss (local time)')
+        try:
+            parsed.append(datetime.strptime(value, fmt))
+        except ValueError:
+            raise ValueError(f'{name} is not a valid local datetime') from None
+        values.append(value)
+    if parsed[0] > parsed[1]:
+        raise ValueError('beginDt must not be after endDt')
+    return values
+
+
 # 故障日志查询
 @g3_bp.route('/api/history/getFault', methods=['GET'])
 def GetFault():
@@ -746,10 +1168,13 @@ def GetFault():
     最后,把这整个回复返回给前端
     """
     try:
-        begin_dt = str(request.args.get("beginDt", "")).strip()
-        end_dt = str(request.args.get("endDt", "")).strip()
-        page_num = int(request.args.get("pageNum", 1))
-        page_size = int(request.args.get("pageSize", 10))
+        # 参数错误在访问配置及数据库前返回 400。
+        try:
+            begin_dt, end_dt = _query_time_range()
+            page_num = _query_positive_integer('pageNum', 1)
+            page_size = _query_positive_integer('pageSize', 10)
+        except ValueError as exc:
+            return _query_error('INVALID_QUERY', str(exc))
 
         ini_data = read_ini_all()
         pcs_num = _ini_get_int(ini_data, "SYSTEM", "pcsNum", 0)
@@ -844,16 +1269,16 @@ def GetFault():
 
     except Exception as e:
         DPrint(f"[{now_str()}] [/api/history/getFault] 服务器异常: {e}")
-        return jsonify({"error": f"服务器异常: {e}"}), 500
+        return _query_error('INTERNAL_ERROR', 'Fault history query failed', 500)
 
 # 操作日志查询
 @g3_bp.route('/api/history/getOperationlog', methods=['GET'])
 def GetOperationlog():
     from utils.security_audit import query_records
     try:
-        return jsonify(query_records(request.args))
+        return jsonify(query_records(request.args, business=True))
     except (ValueError, TypeError):
-        return jsonify(ok=False, code='INVALID_QUERY', message='Invalid audit query'), 400
+        return jsonify(ok=False, code='INVALID_QUERY', message='Invalid business log query'), 400
 
 
 @g3_bp.route('/api/history/getDeviceData', methods=['GET'])
@@ -892,11 +1317,13 @@ def GetDeviceData():
         # ----------------------------------
         # 1. 获取 GET 参数
         # ----------------------------------
-        device_id = int(request.args.get("id"))
-        begin_dt = request.args.get("beginDt", "")
-        end_dt = request.args.get("endDt", "")
-        page_num = int(request.args.get("pageNum", 1))
-        page_size = int(request.args.get("pageSize", 10))
+        try:
+            device_id = _query_positive_integer('id')
+            begin_dt, end_dt = _query_time_range()
+            page_num = _query_positive_integer('pageNum', 1)
+            page_size = _query_positive_integer('pageSize', 10)
+        except ValueError as exc:
+            return _query_error('INVALID_QUERY', str(exc))
 
         ini_data = read_ini_all()
         pcs_num = _ini_get_int(ini_data, "SYSTEM", "pcsNum", 0)
@@ -920,10 +1347,7 @@ def GetDeviceData():
         # 2. 查设备信息
         # ----------------------------------
         if not device_info:
-            return jsonify({
-                "code": 1,
-                "msg": f"设备不存在: id={device_id}"
-            })
+            return _query_error('DEVICE_NOT_FOUND', 'Device does not exist', 404)
 
         device_type = device_info.get("deviceType")
         sort = device_info.get("sort")
@@ -934,10 +1358,7 @@ def GetDeviceData():
         date_str = begin_dt.split('T')[0].replace('-', '')
         table_prefix = TABLE_PREFIX_MAP.get(device_type)
         if not table_prefix:
-            return jsonify({
-                "code": 1,
-                "msg": f"未知设备或不支持设备类型: {device_type}"
-            })
+            return _query_error('DEVICE_TYPE_UNSUPPORTED', 'Device type is not supported')
         if device_type == DEVICE_TYPE.get("G3_PCS"):
             device_num = pcs_num
         if device_type == DEVICE_TYPE.get("MV"):
@@ -945,10 +1366,7 @@ def GetDeviceData():
         if device_type == DEVICE_TYPE.get("BMS_BANK"):
             device_num = bms_num
         if (sort > device_num) or (sort < 1):
-            return jsonify({
-                "code": 1,
-                "msg": f"当前无该设备信息: {table_prefix} {sort}"
-            })
+            return _query_error('DEVICE_NOT_FOUND', 'Device index is not configured', 404)
         table_name = f"{table_prefix}{date_str}"
         # ----------------------------------
         # 4. 查表MySQL
@@ -956,10 +1374,7 @@ def GetDeviceData():
         rows = query_device_mysqldata(table_name, begin_dt, end_dt, offset, page_size, sort - 1)
         # DPrint(f"rows:{rows}")
         if not rows and (common.TEST_MODE is False):
-            return jsonify({
-                "code": 1,
-                "msg": f"查询日期无该设备信息: {begin_dt} ~ {end_dt} {table_prefix} {sort}"
-            })
+            return jsonify(total=0, pageNum=page_num, pageSize=page_size, dataList=[]), 200
         # ----------------------------------
         # 5. 解析 rows
         # ----------------------------------
@@ -1019,10 +1434,7 @@ def GetDeviceData():
 
     except Exception as e:
         DPrint(f"[/api/history/getDeviceData] 服务器异常: {e}")
-        return jsonify({
-            "code": 1,
-            "msg": str(e)
-        })
+        return _query_error('INTERNAL_ERROR', 'Device history query failed', 500)
 
 # 录波查询
 @g3_bp.route('/api/faultRecord/getRecordList', methods=['GET'])
@@ -1051,15 +1463,11 @@ def GetRecordList():
     # 1. 获取 GET 参数
     # ----------------------------------
     try:
-        pcsid = int(request.args.get("pcsId"))
-        begin_dt = request.args.get("beginDt", "")
-        end_dt = request.args.get("endDt", "")
-
-        if not pcsid:
-            return jsonify({"error": "Missing pcsid"}), 400
-
-        if not begin_dt or not end_dt:
-            return jsonify({"error": "Missing beginDt or endDt"}), 400
+        try:
+            pcsid = _query_positive_integer('pcsId')
+            begin_dt, end_dt = _query_time_range(allow_date=True)
+        except ValueError as exc:
+            return _query_error('INVALID_QUERY', str(exc))
 
         begin_dt = begin_dt.replace("T"," ")
         end_dt = end_dt.replace("T"," ")
@@ -1069,52 +1477,36 @@ def GetRecordList():
         # 2. 查设备信息
         # ----------------------------------
         if not device_info:
-            return jsonify({
-                "code": 1,
-                "msg": f"设备不存在: pcsid={pcsid}"
-            })
+            return _query_error('DEVICE_NOT_FOUND', 'Device does not exist', 404)
         pcs_sort = int(device_info.get("sort"))
         # 执行下载
-        if pcs_sort < 1:
-            return jsonify({
-                "code": 1,
-                "msg": f"设备不存在: pcsid={pcsid}"
-            })
-        if not check_network(REMOTE_IPS[pcs_sort - 1], REMOTE_PORTS[pcs_sort - 1]):
-            return jsonify({
-                "code": 1,
-                "msg": f"连接设备网络异常: pcsid={pcsid}"
-            })
+        if pcs_sort < 1 or pcs_sort > min(len(REMOTE_IPS), len(REMOTE_PORTS)):
+            return _query_error('DEVICE_NOT_FOUND', 'Device does not exist', 404)
+        if not check_network(REMOTE_IPS[pcs_sort - 1], 22):
+            return _query_error('DEVICE_UNREACHABLE', 'Device network is unreachable', 503)
         DPrint(f"scp:{REMOTE_IPS[pcs_sort - 1]}")
         # scp拉取远端PCS录波到本地,覆盖旧文件
-        scp_download(
-            remote_ip=REMOTE_IPS[pcs_sort - 1], # PCS ip
-            user=REMOTE_USERNAME,               # user name
-            password = REMOTE_PASSWORD,         # user password
-            remote_path=REMOTE_DB_FILE,         # PCS db file path
-            local_path=LOCAL_SAVE_PATH,         # local db file path
-            port = REMOTE_PORTS[pcs_sort - 1]   # PCS port
-        )
+        try:
+            scp_download(
+                remote_ip=REMOTE_IPS[pcs_sort - 1], # PCS ip
+                user=REMOTE_USERNAME,               # user name
+                password = REMOTE_PASSWORD,         # user password
+                remote_path=REMOTE_DB_FILE,         # PCS db file path
+                local_path=LOCAL_SAVE_PATH,         # local db file path
+                port = 22   # PCS port
+            )
+        except (OSError, RuntimeError, subprocess.SubprocessError):
+            return _query_error('DEVICE_UNREACHABLE', 'Device recording download failed', 503)
         rows = query_device_sqlitedata(LOCAL_SAVE_PATH, SQL_TABLE_NAME, begin_dt, end_dt)
         recordList = []
         for row in rows:
             record = f"{row['faultCodeOccurDate']}_{row['id']}"
             recordList.append(record)
-        if not recordList:
-            return jsonify({
-                "code": 1,
-                "msg": f"未找到符合条件的录波: pcsid={pcsid}"
-            })
-        return jsonify({
-         "recordList": recordList
-        }), 200
+        return jsonify(ok=True, recordList=recordList, list=recordList, total=len(recordList)), 200
 
     except Exception as e:
         DPrint(f"[/api/faultRecord/getRecordList] 服务器异常: {e}")
-        return jsonify({
-            "code": 1,
-            "msg": str(e)
-        })
+        return _query_error('INTERNAL_ERROR', 'Fault recording query failed', 500)
 
 @g3_bp.route('/api/faultRecord/getRecordDetails', methods=['GET'])
 def GetRecordDetails():
@@ -1149,11 +1541,14 @@ def GetRecordDetails():
         # ----------------------------------
         # 1. 获取 GET 参数
         # ----------------------------------
-        recordId = int(request.args.get("recordId"))
-        if not recordId:
-            return jsonify({"error": "Missing recordId"}), 400
+        try:
+            recordId = _query_positive_integer('recordId')
+        except ValueError as exc:
+            return _query_error('INVALID_QUERY', str(exc))
 
         rows = query_device_sqlitedata(LOCAL_SAVE_PATH, SQL_TABLE_NAME, record_id=recordId)
+        if not rows:
+            return _query_error('RECORD_NOT_FOUND', 'Fault recording does not exist', 404)
         # 解析封装录波
         fault_code_list = []
         data_list = []
@@ -1170,14 +1565,11 @@ def GetRecordDetails():
 
     except Exception as e:
         DPrint(f"[/api/faultRecord/getRecordDetails] 服务器异常: {e}")
-        return jsonify({
-            "code": 1,
-            "msg": str(e)
-        })
+        return _query_error('INTERNAL_ERROR', 'Fault recording detail query failed', 500)
 
 # ============ 升级包存储、查询与执行 ============
 def _upgrade_error(message, status_code=400):
-    return jsonify({'status': STATE_ERROR, 'error': message}), status_code
+    return jsonify({'status': STATE_ERROR, 'error': message, 'msg': message}), status_code
 
 def _require_upgrade_permission(operator_name):
     if not operator_name:
@@ -1219,9 +1611,9 @@ def _read_saved_package(firmware, version):
 
 @g3_bp.route('/api/upgrade/file', methods=['POST'])
 def upload_upgrade_file():
-    """上传、验签并归档升级包；兼容新旧表单字段，此接口不会直接触发升级。"""
+    """上传、验签、归档并入MySQL；upgradeEnable=1时复用统一启动流程。"""
     payload = request.get_json(silent=True) or request.form
-    operator_name = g.current_user["username"]
+    operator_name = (payload.get('operatorName') or '').strip()
     task_name = (payload.get('taskName') or '').strip()
     # raw_target = (payload.get('firmwareCategory') or '').strip()
     startup = (payload.get('upgradeEnable') or '').strip()
@@ -1308,6 +1700,16 @@ def upload_upgrade_file():
     incoming_dir.mkdir(parents=True, exist_ok=False)
     incoming_path = incoming_dir / safe_name
     try:
+        invalid_device_ips = []
+        parsed_device_ids = []
+        # 必须在后台任务启动前解析，才能将无效 IP 返回给调用方。
+        if startup_flag == 1 and device_ip_values:
+            parsed_device_ids = method.parse_device_ids_from_ips(
+                device_ip_values, invalid_ips=invalid_device_ips,
+            )
+            if not parsed_device_ids:
+                raise ValueError(f"未找到对应 PCS 或 LC 设备: {', '.join(invalid_device_ips)}")
+            parsed_device_ids = sorted(set(parsed_device_ids))
         firmware_file.save(incoming_path)
         DPrint(f"[UPLOAD] 临时文件已保存，开始验签: {incoming_path}")
         inner_tar_name = verify_upgrade_package(incoming_path, PUBLIC_KEY_PATH)
@@ -1322,209 +1724,35 @@ def upload_upgrade_file():
         package_dir = UPGRADE_PACKAGE_DIR / firmware / version
         package_dir.mkdir(parents=True, exist_ok=True)
         saved_path = package_dir / safe_name
-        existing_packages = [
-            path for path in package_dir.glob('*.tar.gz')
-            if path.is_file() and path != saved_path
-        ]
-        if existing_packages:
-            raise RuntimeError(
-                f"firmware={firmware}, version={version} 已存在升级包: "
-                f"{existing_packages[0].name}"
-            )
+        # existing_packages = [
+        #     path for path in package_dir.glob('*.tar.gz')
+        #     if path.is_file() and path != saved_path
+        # ]
+        # if existing_packages:
+        #     raise RuntimeError(
+        #         f"firmware={firmware}, version={version} 已存在升级包: "
+        #         f"{existing_packages[0].name}"
+        #     )
         if saved_path.exists():
             saved_path.unlink()
         shutil.move(str(incoming_path), str(saved_path))
         DPrint(f"[UPLOAD] 已验签并保存升级包: {saved_path}")
 
-        def _bg_process(info):
-            try:
-                incoming_dir = UPGRADE_PACKAGE_DIR / f".incoming_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
-                incoming_dir.mkdir(parents=True, exist_ok=False)
-            except Exception as e:
-                DPrint(f"[UPLOAD]({task_name}) 创建临时目录失败: {e}")
-                _write_status(task_name, STATE_ERROR, 0, '创建临时目录失败')
-                _record_upgrade_operation(
-                    operator_name, operation_target, operationLog.OperationResult.FAIL, '创建临时目录失败'
-                )
-                return
-            try:
-                # target_name = method.parse_targets(raw_target) if raw_target else ''
-                # if not target_name:
-                #     target_name = 'lc' if firmware.upper().startswith('LC') else (
-                #         'pcs' if firmware.upper().startswith('PCS') else None
-                #     )
-                target_name = ''
-                effective_device_ids = []
-                if device_ip_values:
-                    effective_device_ids = method.parse_device_ids_from_ips(device_ip_values)
-                    if 0 in effective_device_ids:
-                        target_name = 'lc'
-                    elif effective_device_ids:
-                        target_name = 'pcs'
-                elif device_id_values:
-                    try:
-                        effective_device_ids = [int(value) for value in device_id_values]
-                    except ValueError:
-                        raise RuntimeError('deviceId must be integer')
-                    if 0 in effective_device_ids:
-                        target_name = 'lc'
-                    elif effective_device_ids:
-                        target_name = 'pcs'
-                if target_name in ('pcs-g2', 'pcs-g3', 'pcs'):
-                    DPrint(f"[UPLOAD]({task_name}) 处理PCS升级包")
-                    pcs_inner = method.extract_inner_tar_by_prefix(saved_path, 'pcs', incoming_dir)
-                    if not pcs_inner:
-                        DPrint(f"[UPLOAD]({task_name}) 未找到有效的 PCS 升级包内容")
-                        # _write_status(task_name, STATE_ERROR, 0, '未找到有效的 PCS 升级包内容')
-                        _record_upgrade_operation(
-                            operator_name, operation_target, operationLog.OperationResult.FAIL, '未找到有效的 PCS 升级包内容'
-                        )
-                        return
-                    else:
-                        DPrint(f"[UPLOAD]({task_name}) PCS 升级包内容已提取: {pcs_inner}")
-                    pcs_ip_mapping_list = parse_pcs_ip_mapping_from_ini()
-                    if not pcs_ip_mapping_list:
-                        # _write_status(task_name, STATE_ERROR, 0, 'Please check the IP of PCS')
-                        _record_upgrade_operation(
-                            operator_name, operation_target, operationLog.OperationResult.FAIL, 'Please check the IP of PCS'
-                        )
-                        return
-                    fault_host = []
-                    for idx, _ in enumerate(pcs_ip_mapping_list, start=1):
-                        host = pcs_ip_mapping_list.get(f'PCS{idx}')
-                        if idx not in effective_device_ids:
-                            DPrint(f"[UPLOAD]({task_name}) 跳过非目标设备: PCS {idx}, IP: {host}")
-                            continue
-                        ret0 = query_pcs_upgrade_status(idx)
-                        if ret0 == STATE_IN_PROGRESS:
-                            # _write_status(task_name, STATE_ERROR, 0, f"[UPLOAD]({task_name}) PCS {idx} 升级状态异常: {ret0}")
-                            _record_upgrade_operation(
-                                operator_name, operation_target, operationLog.OperationResult.FAIL, f"PCS {idx} 升级状态异常: {ret0}"
-                            )
-                            fault_host.append(host)
-                            break
-                        ret1 = clear_remote_upgrade_folder(REMOTE_USERNAME, host, PCS_REMOTE_DEST, REMOTE_PASSWORD_TEST)
-                        if ret1 is not True:
-                            # _write_status(task_name, STATE_ERROR, 0, f"[UPLOAD]({task_name}) 清理远程升级目录失败: {host}")
-                            _record_upgrade_operation(
-                                operator_name, operation_target, operationLog.OperationResult.FAIL, f"清理远程升级目录失败: {host}"
-                            )
-                            fault_host.append(host)
-                            break
-                    if fault_host:
-                        DPrint(f"[UPLOAD]({task_name}) 由于清理远程升级目录失败或PCS升级状态异常, hosts: {fault_host},中止所有PCS升级")
-                        return
-                    device_num = len(effective_device_ids)
-                    systemctl.inc_pending(device_num)
-                    for idx, _ in enumerate(pcs_ip_mapping_list, start=1):
-                        host = pcs_ip_mapping_list.get(f'PCS{idx}')
-                        if idx not in effective_device_ids:
-                            continue
-                        DPrint(f"[UPLOAD]({task_name}) 正在分发PCS升级包: PCS{idx}")
-                        scp_send_async(pcs_inner, REMOTE_USERNAME, host, PCS_REMOTE_DEST)
-                        act_idx += 1
-                        # _write_status(task_name, STATE_IN_PROGRESS, 0, f"push pcs upgrade package {idx}/{device_num}")
-                        _record_upgrade_operation(
-                            operator_name, operation_target, operationLog.OperationResult.FAIL, f"push pcs upgrade package {act_idx}/{device_num}"
-                        )
-                        time.sleep(1)
-                        modbus_address = PCS_UPGRADE_SIGNAL_ADDR + (idx - 1) * PCS_CONFIG_PARAM_GAP
-                        old_value = query_register_data(
-                            deviceid=FIXED_DEVICE_ID,
-                            functioncode=READ_HOLD_REGISTER,
-                            address=modbus_address,
-                            quantity=1,
-                        )
-                        if old_value and old_value[0] == STATE_IN_PROGRESS:
-                            # _write_status(task_name, STATE_ERROR, 0, f"PCS {idx} 升级信号寄存器地址 {modbus_address} 当前值为 {old_value[0]}, 需要先清零")
-                            _record_upgrade_operation(
-                                operator_name, operation_target, operationLog.OperationResult.FAIL, f"PCS {idx} 升级信号寄存器地址 {modbus_address} 当前值为 {old_value[0]}, 需要先清零"
-                            )
-                            return
-                        ret, try_count = write_register_with_retry(modbus_address, 65535)
-                        if ret.isError():
-                            # _write_status(task_name, STATE_ERROR, 0, f"PCS {idx} 升级信号寄存器地址 {modbus_address} 当前值为 {old_value[0] if old_value else 'N/A'}, 下发升级信号失败,请检查PCS网络或Modbus通信")
-                            _record_upgrade_operation(
-                                operator_name, operation_target, operationLog.OperationResult.FAIL, f"PCS {idx} 升级信号寄存器地址 {modbus_address} 当前值为 {old_value[0] if old_value else 'N/A'}, 下发升级信号失败,请检查PCS网络或Modbus通信"
-                            )
-                            return
-                        DPrint(f"[UPLOAD]({task_name}) PCS {idx} 升级信号已下发")
-                        # _write_status(task_name, STATE_DONE, 0, f"PCS {idx} 升级信号寄存器地址 {modbus_address} 当前值为 {old_value[0] if old_value else 'N/A'}, 已下发升级信号")
-                        _record_upgrade_operation(
-                            operator_name, operation_target, operationLog.OperationResult.SUCCESS, f"PCS {idx} 升级信号寄存器地址 {modbus_address} 当前值为 {old_value[0] if old_value else 'N/A'}, 已下发升级信号"
-                        )
-                elif target_name == 'lc':
-                    DPrint(f"[UPLOAD]({task_name}) 处理LC升级包")
-                    lc_inner = method.extract_inner_tar_by_prefix(saved_path, 'lc', incoming_dir)
-                    lc_out_path = UPLOAD_DIR / 'LC'
-                    lc_out_path.mkdir(parents=True, exist_ok=True)
-                    if not lc_inner:
-                        DPrint(f"[UPLOAD]({task_name}) 未找到有效的 LC 升级包内容")
-                        _write_status(task_name, STATE_ERROR, 0, '未找到有效的 LC 升级包内容')
-                        _record_upgrade_operation(
-                            operator_name, operation_target, operationLog.OperationResult.FAIL, '未找到有效的 LC 升级包内容'
-                        )
-                        return
-                    _spc_addr = common.SYSTEM_SPC_VERSION_ADDR
-                    # _upgrade_release_dir = lc_out_path / 'info.json'
-                    spc_registers = query_register_data(FIXED_DEVICE_ID, READ_INPUT_REGISTER, _spc_addr, 1)
-                    now_spc_version = int(spc_registers[0]) & 0xFFFF
-                    # note_data = load_release_note(_upgrade_release_dir)
-                    note_data = info
-                    if not note_data:
-                        _write_status(task_name, STATE_ERROR, 0, 'not found release info')
-                        _record_upgrade_operation(
-                            operator_name, operation_target, operationLog.OperationResult.FAIL, 'not found release info'
-                        )
-                        return
-                    # basic = note_data.get('basicInfo', {})
-                    # if not basic:
-                    #     _write_status(task_name, STATE_ERROR, 0, 'invalid release note')
-                    #     return
-                    _release_version = note_data.get('version', 0)
-                    release_version = get_spc_num(_release_version)
-                    DPrint(f"release note: {_release_version}, SPC: {release_version}")
-                    if now_spc_version == release_version:
-                        DPrint(f'current SPC version is already object version: {release_version}')
-                        _write_status(task_name, STATE_DONE, 0, f'current SPC version is already object version: {release_version}')
-                        _record_upgrade_operation(
-                            operator_name, operation_target, operationLog.OperationResult.SUCCESS, f'current SPC version is already object version: {release_version}'
-                        )
-                        return
-                    with tarfile.open(lc_inner, 'r') as tf:
-                        safe_extract_tar(tf, lc_out_path)
-                    run_upgrade_async(task_name, str(now_spc_version), delay_sec=2)
-                else:
-                    DPrint(f"[UPLOAD]({task_name}) 暂不支持该设备升级")
-                    # _write_status(task_name, STATE_ERROR, 0, '暂不支持该设备升级')
-                    raise RuntimeError('暂不支持该设备升级')
-            except Exception as exc:
-                DPrint(f"[UPLOAD]({task_name}) 后台处理异常: {exc}")
-                if target_name == 'lc':
-                    _write_status(task_name, STATE_ERROR, 0, f'error:{exc}')
-                _record_upgrade_operation(
-                    operator_name, operation_target, operationLog.OperationResult.FAIL, f'error:{exc}'
-                )
-            finally:
-                if target_name == 'lc':
-                    shutil.rmtree(incoming_dir, ignore_errors=True)
-                    DPrint(f"[CLEAN]({task_name}) 已清理LC升级临时目录: {incoming_dir}")
-
+        record = _upgrade_package_index().register(saved_path)
         if startup_flag == 1:
-            DPrint(f"[UPLOAD]({task_name}) 启动升级任务 (startup={startup_flag})")
-            threading.Thread(target=_bg_process, args=(info,), daemon=True).start()
-            max_wait_sec = 0.5
-            start_time = time.time()
-            _remark = f"升级包上传并验签成功,并启动升级: version={version}, file={safe_name}, startup={startup_flag}"
-            while 1:
-                # 超时退出
-                if time.time() - start_time >= max_wait_sec:
-                    break
-                time.sleep(0.1)  # 每100ms查一次，不疯狂空转
+            result, http_status = _start_upgrade_payload({
+                'operatorName': operator_name,
+                'taskName': task_name,
+                'sha256': record['package']['sha256'],
+                'deviceId': device_id_values,
+                'deviceIP': device_ip_values,
+            })
+            if http_status != 202:
+                return result, http_status
+            _remark = f"升级包上传并验签成功，已启动升级: version={version}, file={safe_name}"
         else:
-            DPrint(f"[UPLOAD]({task_name}) 升级包已上传，等待前端调用升级接口")
             _write_status(task_name, STATE_DONE, 0, 'upgrade package uploaded, waiting for start command')
-            _remark = f"升级包上传并验签成功,等待前端调用升级接口： version={version}, file={safe_name}, startup={startup_flag}"
+            _remark = f"升级包上传并验签成功，等待升级指令: version={version}, file={safe_name}"
 
         _record_upgrade_operation(
             operator_name,
@@ -1532,10 +1760,18 @@ def upload_upgrade_file():
             operationLog.OperationResult.SUCCESS,
             _remark,
         )
+        message = '升级包校验通过并已保存'
+        if invalid_device_ips:
+            ip_error = f"未找到对应 PCS 或 LC 设备: {', '.join(invalid_device_ips)}"
+            message += f"；{ip_error}，已跳过这些 IP，其余有效目标设备继续升级"
+            _record_upgrade_operation(
+                operator_name, operation_target, operationLog.OperationResult.FAIL, ip_error,
+            )
         return jsonify({
             'status': 0,
-            'msg': '升级包校验通过并已保存',
+            'msg': message,
             'package': info,
+            'sha256': record['package']['sha256'],
             'taskName': task_name,
             'startup': startup_flag,
         }), 200
@@ -1552,28 +1788,173 @@ def upload_upgrade_file():
         shutil.rmtree(incoming_dir, ignore_errors=True)
 
 
+def _catalog_upgrade_package(package_path):
+    """上传或迁移时复验归档包，构建数据库记录。"""
+    before = package_path.stat()
+    inner_tar_name = verify_upgrade_package(package_path, PUBLIC_KEY_PATH)
+    info = read_upgrade_package_info(package_path, inner_tar_name)
+    if (info['firmware'], info['version']) != (
+        package_path.parent.parent.name, package_path.parent.name,
+    ):
+        raise RuntimeError('升级包元数据与归档目录不一致')
+    digest = hashlib.sha256()
+    with package_path.open('rb') as package_file:
+        for chunk in iter(lambda: package_file.read(1024 * 1024), b''):
+            digest.update(chunk)
+    after = package_path.stat()
+    # 上传可能覆盖同名包，避免将不同文件的元数据、大小和摘要拼在一起。
+    if (before.st_ino, before.st_size, before.st_mtime_ns) != (
+        after.st_ino, after.st_size, after.st_mtime_ns,
+    ):
+        raise RuntimeError('升级包在查询期间发生变化，请重试')
+    package = {
+        'firmware': info['firmware'],
+        'version': info['version'],
+        'file_name': package_path.name,
+        'size': f'{after.st_size / (1024 * 1024):.2f}MB',
+        'sha256': digest.hexdigest(),
+        'creator': info['creator'],
+        'created_at': datetime.fromtimestamp(after.st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
+        'description': info['description'],
+    }
+    return {'package': package, 'metadata': info, 'inner_tar_name': inner_tar_name}
+
+
+def _upgrade_package_index():
+    index = UpgradePackageIndex(UPGRADE_PACKAGE_DIR, PUBLIC_KEY_PATH, _catalog_upgrade_package, config.engine)
+    index.ensure_schema()
+    return index
+
+
+def _read_package_by_sha256(sha256):
+    index = _upgrade_package_index()
+    package_path, record = index.find_by_sha256(sha256)
+    before = index.fingerprint(package_path)
+    # 数据库只用于定位；启动时重新验签并核对实际包摘要。
+    inner_tar_name = verify_upgrade_package(package_path, PUBLIC_KEY_PATH)
+    info = read_upgrade_package_info(package_path, inner_tar_name)
+    digest = hashlib.sha256()
+    with package_path.open('rb') as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b''):
+            digest.update(chunk)
+    if digest.hexdigest() != record['package']['sha256']:
+        raise RuntimeError('升级包文件与数据库摘要不一致，请重新上传')
+    if before != index.fingerprint(package_path):
+        raise RuntimeError('升级包在启动期间发生变化，请重试')
+    return package_path, inner_tar_name, info, before
+
+
 @g3_bp.route('/api/upgrade/package-info', methods=['GET'])
 def get_upgrade_package_info():
-    """读取本地已归档升级包的 info.json；查询时会再次验签。"""
+    """仅查询MySQL；支持firmware分类筛选，保留firmware/version单包查询。"""
     firmware = (request.args.get('firmware') or '').strip()
     version = (request.args.get('version') or '').strip()
-    if not firmware or not version:
-        return _upgrade_error('firmware and version are required')
+    if version:
+        if not firmware or not version:
+            return _upgrade_error('firmware and version must be provided together')
+        try:
+            record = _upgrade_package_index().get_by_version(firmware, version)
+            return jsonify({'status': STATE_DONE, 'package': record['metadata']}), 200
+        except LookupError as exc:
+            return _upgrade_error(str(exc), 404)
+        except Exception as exc:
+            return _upgrade_error(str(exc), 500)
     try:
-        _, _, info = _read_saved_package(firmware, version)
-        return jsonify({'status': STATE_DONE, 'package': info}), 200
+        _upgrade_query_device_id(required=False)
+        packages, errors = _upgrade_package_index().list_packages()
+        if firmware:
+            packages = [item for item in packages if item['firmware'].lower() == firmware.lower()]
+        return jsonify({
+            'status': STATE_DONE,
+            'packages': packages,
+            'total': len(packages),
+            'errors': errors,
+        }), 200
+    except ValueError as exc:
+        return _upgrade_error(str(exc))
     except Exception as exc:
+        return _upgrade_error(str(exc), 500)
+
+
+
+@g3_bp.route('/api/upgrade/package', methods=['DELETE'])
+def delete_upgrade_package():
+    """按SHA-256删除已归档升级包及MySQL记录，使用现有升级权限。"""
+    payload = request.get_json(silent=True) or request.form
+    operator_name = (payload.get('operatorName') or '').strip()
+    permission_error = _require_upgrade_permission(operator_name)
+    if permission_error:
+        _record_upgrade_operation(
+            operator_name, 'upgrade package delete', operationLog.OperationResult.FAIL, permission_error,
+        )
+        return _upgrade_error(permission_error, 403)
+    try:
+        digest = UpgradePackageIndex.normalize_sha256(payload.get('sha256'))
+    except ValueError as exc:
+        return _upgrade_error(str(exc))
+    try:
+        result = _upgrade_package_index().delete(digest)
+    except LookupError as exc:
+        _record_upgrade_operation(
+            operator_name, 'upgrade package delete', operationLog.OperationResult.FAIL,
+            f'sha256={digest}, error={exc}',
+        )
         return _upgrade_error(str(exc), 404)
+    except ValueError as exc:
+        _record_upgrade_operation(
+            operator_name, 'upgrade package delete', operationLog.OperationResult.FAIL,
+            f'sha256={digest}, error={exc}',
+        )
+        return _upgrade_error(str(exc))
+    except Exception as exc:
+        _record_upgrade_operation(
+            operator_name, 'upgrade package delete', operationLog.OperationResult.FAIL,
+            f'sha256={digest}, error={exc}',
+        )
+        return _upgrade_error(str(exc), 500)
+    message = '升级包缓存及数据库记录已删除'
+    if result['file_retained']:
+        message = '数据库记录已删除；缓存文件仍被其他升级包记录引用，已保留'
+    elif not result['file_deleted']:
+        message = '数据库记录已删除；本地缓存文件原本不存在'
+    _record_upgrade_operation(
+        operator_name, 'upgrade package delete', operationLog.OperationResult.SUCCESS,
+        f'sha256={digest}, file_deleted={result["file_deleted"]}, '
+        f'file_retained={result["file_retained"]}, was_current={result["was_current"]}',
+    )
+    return jsonify(dict(status=STATE_DONE, msg=message, **result)), 200
+
+
+def _upgrade_query_device_id(required=False):
+    # 当前包只描述本机，兼容旧调用中的 deviceId=0。
+    value = request.args.get('deviceId')
+    if value is not None and str(value) != '0':
+        raise ValueError('current package only describes this device (deviceId=0)')
+    return 0
+
+
+@g3_bp.route('/api/upgrade/current', methods=['GET'])
+def get_current_upgrade_package():
+    try:
+        _upgrade_query_device_id()
+        firmware = (request.args.get('firmware') or 'lc').strip().lower()
+        if firmware not in ('lc', 'config-file'):
+            return _upgrade_error('current package firmware must be lc or config-file')
+        return jsonify(dict(status=STATE_DONE, **_upgrade_package_index().current(firmware))), 200
+    except ValueError as exc:
+        return _upgrade_error(str(exc))
+    except Exception as exc:
+        return _upgrade_error(str(exc), 500)
 
 
 def _payload_device_values(payload, field_name):
     """兼容 JSON 数组、表单重复字段及逗号分隔的设备参数。"""
-    if request.is_json:
+    if isinstance(payload, dict) and not hasattr(payload, 'getlist'):
         raw_values = payload.get(field_name, [])
         if not isinstance(raw_values, (list, tuple)):
             raw_values = [raw_values]
     else:
-        raw_values = request.form.getlist(field_name)
+        raw_values = payload.getlist(field_name)
 
     values = []
     for raw_value in raw_values:
@@ -1581,13 +1962,15 @@ def _payload_device_values(payload, field_name):
     return [value.strip() for value in values if str(value).strip()]
 
 
-def _select_upgrade_devices(payload):
+def _select_upgrade_devices(payload, invalid_ips=None):
     """遵循旧接口策略：deviceIP 优先；包含 LC 时忽略 PCS；否则选择指定 PCS。"""
     device_ips = _payload_device_values(payload, 'deviceIP')
     device_id_values = _payload_device_values(payload, 'deviceId')
 
     if device_ips:
-        device_ids = method.parse_device_ids_from_ips(device_ips)
+        device_ids = method.parse_device_ids_from_ips(device_ips, invalid_ips=invalid_ips)
+        if not device_ids and invalid_ips:
+            raise ValueError(f"未找到对应 PCS 或 LC 设备: {', '.join(invalid_ips)}")
         if any(device_id < 0 for device_id in device_ids):
             raise RuntimeError('deviceIP contains an invalid device')
         # 与旧接口一致：请求中一旦包含 LC IP，优先执行 LC 升级且忽略 PCS。
@@ -1610,78 +1993,80 @@ def _select_upgrade_devices(payload):
     return 'pcs', sorted(set(device_ids))
 
 
-def _dispatch_pcs_upgrade(job_id, inner_tar_path, device_ids):
-    """在后台对指定 PCS 分发包并下发升级寄存器，状态写入同一个任务文件。"""
-    try:
-        pcs_ip_mapping = parse_pcs_ip_mapping_from_ini()
-        missing_ids = [
-            device_id for device_id in device_ids
-            if not pcs_ip_mapping.get(f'PCS{device_id}')
-        ]
-        if missing_ids:
-            raise RuntimeError(f"PCS deviceId not configured: {missing_ids}")
+def _dispatch_pcs_upgrade(job_id, inner_tar_path, device_ids, operator_name, dispatched_device_ids):
+    """同步完成PCS传输及指令下发；异常交调用方返回，临时目录由调用方清理。"""
+    pcs_ip_mapping = parse_pcs_ip_mapping_from_ini()
+    missing_ids = [
+        device_id for device_id in device_ids
+        if not pcs_ip_mapping.get(f'PCS{device_id}')
+    ]
+    if missing_ids:
+        raise RuntimeError(f"PCS deviceId not configured: {missing_ids}")
 
-        for device_id in device_ids:
-            host = pcs_ip_mapping[f'PCS{device_id}']
-            current_state = query_pcs_upgrade_status(device_id)
-            DPrint(f"[UPGRADE]({job_id}) PCS{device_id} 当前升级状态: {current_state}")
-            if current_state == STATE_IN_PROGRESS:
-                raise RuntimeError(f"PCS{device_id} is already upgrading")
-            if not clear_remote_upgrade_folder(
-                REMOTE_USERNAME, host, PCS_REMOTE_DEST, REMOTE_PASSWORD_TEST
-            ):
-                raise RuntimeError(f"failed to clear PCS{device_id} upgrade directory")
+    for device_id in device_ids:
+        host = pcs_ip_mapping[f'PCS{device_id}']
+        current_state = query_pcs_upgrade_status(device_id)
+        DPrint(f"[UPGRADE]({job_id}) PCS{device_id} 当前升级状态: {current_state}")
+        if current_state is None:
+            raise RuntimeError(f"PCS{device_id} upgrade status unavailable")
+        if current_state == STATE_IN_PROGRESS:
+            raise RuntimeError(f"PCS{device_id} is already upgrading")
+        if not clear_remote_upgrade_folder(
+            REMOTE_USERNAME, host, PCS_REMOTE_DEST, REMOTE_PASSWORD
+        ):
+            raise RuntimeError(f"failed to clear PCS{device_id} upgrade directory")
 
-        systemctl.inc_pending(len(device_ids))
-        for index, device_id in enumerate(device_ids, start=1):
-            host = pcs_ip_mapping[f'PCS{device_id}']
-            DPrint(f"[UPGRADE]({job_id}) 分发升级包至 PCS{device_id}: {host}")
-            scp_send_async(inner_tar_path, REMOTE_USERNAME, host, PCS_REMOTE_DEST)
-            # _write_status(
-            #     job_id, STATE_IN_PROGRESS, 0,
-            #     f"push PCS upgrade package {index}/{len(device_ids)}",
-            # )
-            time.sleep(1)
-            modbus_address = PCS_UPGRADE_SIGNAL_ADDR + (device_id - 1) * PCS_CONFIG_PARAM_GAP
-            old_value = query_register_data(
-                deviceid=FIXED_DEVICE_ID,
-                functioncode=READ_HOLD_REGISTER,
-                address=modbus_address,
-                quantity=1,
-            )
-            if not old_value or old_value[0] == STATE_IN_PROGRESS:
-                raise RuntimeError(f"PCS{device_id} upgrade signal register is busy")
-            result, try_count = write_register_with_retry(modbus_address, 65535)
-            if result.isError():
-                raise RuntimeError(
-                    f"PCS{device_id} upgrade signal failed after {try_count} retries"
-                )
-            DPrint(f"[UPGRADE]({job_id}) PCS{device_id} 升级信号已下发")
-            _record_upgrade_operation(
-                '', 'pcs', operationLog.OperationResult.SUCCESS, f'PCS{device_id} upgrade signal sent'
-            )
-
-        # _write_status(job_id, STATE_DONE, 0, 'PCS upgrade instructions sent')
-    except Exception as exc:
-        DPrint(f"[UPGRADE]({job_id}) PCS 下发失败: {exc}")
-        # _write_status(job_id, STATE_ERROR, 0, f'PCS upgrade dispatch failed: {exc}')
-        _record_upgrade_operation(
-            '', 'pcs', operationLog.OperationResult.FAIL, f'PCS upgrade dispatch failed: {exc}'
+    for index, device_id in enumerate(device_ids, start=1):
+        host = pcs_ip_mapping[f'PCS{device_id}']
+        DPrint(f"[UPGRADE]({job_id}) 分发升级包至 PCS{device_id}: {host}")
+        ok, msg = systemctl.scp_send(
+            inner_tar_path, REMOTE_USERNAME, host, PCS_REMOTE_DEST,
+            password=REMOTE_PASSWORD_TEST, timeout_sec=120,
         )
+        if not ok:
+            raise RuntimeError(f"PCS{device_id} upgrade package transfer failed: {msg}")
+        _record_upgrade_operation(
+            operator_name, 'pcs', operationLog.OperationResult.SUCCESS,
+            f'push pcs upgrade package {index}/{len(device_ids)}',
+        )
+        modbus_address = PCS_UPGRADE_SIGNAL_ADDR + (device_id - 1) * PCS_CONFIG_PARAM_GAP
+        old_value = query_register_data(
+            deviceid=FIXED_DEVICE_ID,
+            functioncode=READ_HOLD_REGISTER,
+            address=modbus_address,
+            quantity=1,
+        )
+        if not old_value or old_value[0] == STATE_IN_PROGRESS:
+            raise RuntimeError(f"PCS{device_id} upgrade signal register is busy")
+        result, try_count = write_register_with_retry(modbus_address, 65535)
+        if result is None or result.isError():
+            raise RuntimeError(
+                f"PCS{device_id} upgrade signal failed after {try_count} retries"
+            )
+        dispatched_device_ids.append(device_id)
+        DPrint(f"[UPGRADE]({job_id}) PCS{device_id} 升级信号已下发")
+        _record_upgrade_operation(
+            operator_name, 'pcs', operationLog.OperationResult.SUCCESS, f'PCS{device_id} upgrade signal sent'
+        )
+
+    # 指令下发不代表升级完成；终态仍由 PCS 寄存器提供。
 
 
 @g3_bp.route('/api/upgrade/start', methods=['POST'])
 def start_upgrade():
-    """按 firmware/version 选择已验签归档包，并启动对应的本地升级脚本。"""
-    payload = request.get_json(silent=True) or request.form
-    operator_name = g.current_user["username"]
-    # firmware = (payload.get('firmwareCategory') or '').strip()
-    version = (payload.get('version') or '').strip()
+    """按 sha256 唯一选择已归档包，按 file 接口的 PCS/LC 流程启动升级。"""
+    return _start_upgrade_payload(request.get_json(silent=True) or request.form)
+
+
+def _start_upgrade_payload(payload):
+    operator_name = (payload.get('operatorName') or '').strip()
+    package_sha256 = payload.get('sha256')
+    version = ''
     job_id = (payload.get('taskName') or '').strip()
     operation_target = ''
     DPrint(
         f"[UPGRADE] 收到升级指令: operator={operator_name or 'unknown'}, "
-        f"version={version}, job_id={job_id}"
+        f"sha256={package_sha256}, job_id={job_id}"
     )
     permission_error = _require_upgrade_permission(operator_name)
     if permission_error:
@@ -1690,12 +2075,16 @@ def start_upgrade():
         )
         return _upgrade_error(permission_error, 403)
 
-    if not version or not job_id:
+    if not package_sha256 or not job_id:
         _record_upgrade_operation(
             operator_name, operation_target, operationLog.OperationResult.FAIL,
-            'version and taskName are required',
+            'sha256 and taskName are required',
         )
-        return _upgrade_error('version and taskName are required')
+        return _upgrade_error('sha256 and taskName are required')
+    try:
+        package_sha256 = UpgradePackageIndex.normalize_sha256(package_sha256)
+    except ValueError as exc:
+        return _upgrade_error(str(exc))
     if secure_filename(job_id) != job_id:
         _record_upgrade_operation(
             operator_name, operation_target, operationLog.OperationResult.FAIL,
@@ -1703,8 +2092,10 @@ def start_upgrade():
         )
         return _upgrade_error('taskName contains unsupported characters')
 
+    upgrade_target = ''
+    invalid_device_ips = []
     try:
-        upgrade_target, selected_device_ids = _select_upgrade_devices(payload)
+        upgrade_target, selected_device_ids = _select_upgrade_devices(payload, invalid_device_ips)
         if upgrade_target == 'pcs':
             pcs_ip_mapping = parse_pcs_ip_mapping_from_ini()
             missing_ids = [
@@ -1725,48 +2116,60 @@ def start_upgrade():
         return _upgrade_error(str(exc))
 
     staging_dir = None
+    started = False
+    dispatched_device_ids = []
     try:
-        package_path, inner_tar_name, info = _read_saved_package(upgrade_target, version)
+        package_path, inner_tar_name, info, package_fingerprint = _read_package_by_sha256(package_sha256)
+        version = info['version']
+        if info['firmware'].lower() != upgrade_target:
+            if not (info['firmware'].lower() == 'config-file' and upgrade_target == 'lc'):
+                raise RuntimeError('升级包 firmware 与目标设备类型不匹配')
         DPrint(
             f"[UPGRADE]({job_id}) 已定位并复验升级包: path={package_path}, "
             f"inner_tar={inner_tar_name}"
         )
         staging_dir = UPGRADE_PACKAGE_DIR / f".staging_{job_id}_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
-        # inner_tar_path = extract_inner_tar(package_path, inner_tar_name, staging_dir)
-        extract_dir = staging_dir / 'content'
-        scan_dir = extract_dir / info['scan_path']
         _innerpackage = method.extract_inner_tar_by_prefix(package_path, upgrade_target, staging_dir)
-        with tarfile.open(_innerpackage, 'r') as tf:
-            safe_extract_tar(tf, scan_dir)
-        if not scan_dir.exists() or not scan_dir.is_dir():
-            raise RuntimeError(f"升级包 scan_path 不存在或不是目录: {info['scan_path']}")
-        DPrint(f"[UPGRADE]({job_id}) 内层包已安全解压，scan_path={scan_dir}")
+        if not _innerpackage:
+            raise RuntimeError(f'未找到有效的 {upgrade_target.upper()} 升级包内容')
+        if package_fingerprint != UpgradePackageIndex.fingerprint(package_path):
+            raise RuntimeError('升级包在提取期间发生变化，请刷新升级包列表')
 
         if upgrade_target == 'lc':
+            spc_registers = query_register_data(
+                FIXED_DEVICE_ID, READ_INPUT_REGISTER, common.SYSTEM_SPC_VERSION_ADDR, 1,
+            )
+            if not spc_registers:
+                raise RuntimeError('无法读取当前 LC SPC 版本')
+            now_spc_version = int(spc_registers[0]) & 0xFFFF
+
+            # 与 file 一致，直接使用业务 tar 的目录结构；scan_path 不作为解压根目录。
+            extract_dir = staging_dir / 'content'
+            extract_dir.mkdir(parents=True, exist_ok=True)
+            with tarfile.open(_innerpackage, 'r') as tf:
+                safe_extract_tar(tf, extract_dir)
             lc_upgrade_dir = UPLOAD_DIR / 'LC'
+            lc_upgrade_dir.parent.mkdir(parents=True, exist_ok=True)
             if lc_upgrade_dir.exists():
                 DPrint(f"[UPGRADE]({job_id}) 清理上一份 LC 升级内容: {lc_upgrade_dir}")
                 shutil.rmtree(lc_upgrade_dir)
-            scan_dir.replace(lc_upgrade_dir)
-            shutil.rmtree(staging_dir, ignore_errors=True)
-            staging_dir = None
+            extract_dir.replace(lc_upgrade_dir)
 
             _write_status(job_id, STATE_IN_PROGRESS, 0, f"start {upgrade_target} {version}")
-            run_upgrade_async(job_id, version, delay_sec=2)
+            # 脚本以该参数标记旧版本备份，必须传升级前 SPC，不能传目标版本。
+            started = True
+            run_upgrade_async(job_id, str(now_spc_version), delay_sec=2, package_sha256=package_sha256)
             message = 'LC 升级指令已下发'
             DPrint(f"[UPGRADE]({job_id}) 已启动 {upgrade_target} {version}: {package_path}")
         else:
-            # scp_send_async 在所有指定 PCS 的传输结束后会自动清理 staging_dir。
-            # _write_status(job_id, STATE_IN_PROGRESS, 0, f"start {upgrade_target} {version}")
-            threading.Thread(
-                target=_dispatch_pcs_upgrade,
-                args=(job_id, _innerpackage, selected_device_ids),
-                daemon=True,
-            ).start()
-            staging_dir = None
-            message = f'{upgrade_target} 升级指令已下发，目标设备: {selected_device_ids}'
+            started = True
+            _write_status(job_id, STATE_IN_PROGRESS, 0, f"start {upgrade_target} {version}")
+            _dispatch_pcs_upgrade(
+                job_id, _innerpackage, selected_device_ids, operator_name, dispatched_device_ids,
+            )
+            message = f'PCS 升级指令已下发，目标设备: {dispatched_device_ids}'
             DPrint(
-                f"[UPGRADE]({job_id}) 已调度 {upgrade_target} 升级: firmware={upgrade_target}, "
+                f"[UPGRADE]({job_id}) 已完成 {upgrade_target} 升级指令下发: firmware={upgrade_target}, "
                 f"version={version}, deviceIds={selected_device_ids}"
             )
 
@@ -1774,30 +2177,51 @@ def start_upgrade():
             operator_name,
             upgrade_target,
             operationLog.OperationResult.SUCCESS,
-            f"升级指令已下发: version={version}, taskName={job_id}, target={upgrade_target}, "
+            f"升级任务已启动: sha256={package_sha256}, version={version}, taskName={job_id}, target={upgrade_target}, "
             f"deviceIds={selected_device_ids}",
         )
+        if invalid_device_ips:
+            ip_error = f"未找到对应 PCS 或 LC 设备: {', '.join(invalid_device_ips)}"
+            message += f"；{ip_error}，已跳过这些 IP，其余有效目标设备继续升级"
+            _record_upgrade_operation(
+                operator_name, upgrade_target, operationLog.OperationResult.FAIL, ip_error,
+            )
         return jsonify({
             'taskName': job_id,
+            'sha256': package_sha256,
             'status': STATE_IN_PROGRESS,
             'package': info,
             'target': upgrade_target,
             'deviceId': selected_device_ids,
+            'dispatchedDeviceId': dispatched_device_ids,
             'msg': message,
         }), 202
     except Exception as exc:
-        _write_status(job_id, STATE_ERROR, 0, str(exc))
+        if started:
+            _write_status(job_id, STATE_ERROR, 0, str(exc))
         DPrint(f"[UPGRADE]({job_id}) 启动失败: {exc}")
         _record_upgrade_operation(
             operator_name,
             upgrade_target,
             operationLog.OperationResult.FAIL,
-            f"升级指令下发失败: version={version}, taskName={job_id}, error={exc}",
+            f"升级指令下发失败: sha256={package_sha256}, version={version}, taskName={job_id}, error={exc}",
         )
+        if upgrade_target == 'pcs' and started:
+            return jsonify({
+                'taskName': job_id,
+                'sha256': package_sha256,
+                'status': STATE_ERROR,
+                'target': 'pcs',
+                'deviceId': selected_device_ids,
+                'dispatchedDeviceId': dispatched_device_ids,
+                'undispatchedDeviceId': [i for i in selected_device_ids if i not in dispatched_device_ids],
+                'error': str(exc),
+                'msg': str(exc),
+            }), 400
         return _upgrade_error(str(exc))
-    # finally:
-    #     if staging_dir is not None:
-    #         shutil.rmtree(staging_dir, ignore_errors=True)
+    finally:
+        if staging_dir is not None:
+            shutil.rmtree(staging_dir, ignore_errors=True)
 
 
 # 历史单接口实现保留为未注册函数，避免上传成功后立即执行升级。
@@ -1807,7 +2231,7 @@ def _legacy_upgrade_file():
     try:
         # —— 打印收到的表单键 ——
         f = request.files.get('firmwareFile')
-        operatorName = g.current_user["username"]
+        operatorName = (request.form.get('operatorName') or '').strip()
         job_name = (request.form.get('taskName') or '').strip()
         # releaseVersion = (request.form.get('releaseVersion') or '').strip()
         raw_target = (request.form.get('firmwareCategory') or '').strip()
@@ -2070,13 +2494,6 @@ def _legacy_upgrade_file():
                             global releaseVersion
                             releaseVersion = get_spc_num(_releaseVersion)
                             DPrint(f"release note: {_releaseVersion}, SPC: {releaseVersion}")
-                            if now_spc_version == releaseVersion:
-                                DPrint(f'current SPC version is already object version: {releaseVersion}')
-                                _write_status(job_id, STATE_DONE, 0, f'current SPC version is already object version: {releaseVersion}')
-                                return
-                                # return jsonify({
-                                #     'error': f'current SPC version is already object version: {releaseVersion}'
-                                # }), 400
                         except Exception as e:
                             DPrint(f"地址 {_spc_addr} 读取异常: {e}")
                             # return jsonify({'error': str(e)}), 500
@@ -2206,7 +2623,7 @@ def upgrade_startRollback():
         _result = operationLog.OperationResult.FAIL
         remark = ""
         _rollback = False
-        operatorName = g.current_user["username"]
+        operatorName = (request.form.get('operatorName') or '').strip()
         job_name = (request.form.get('taskName') or '').strip()
         objectSPCVersion = (request.form.get('objectSPCVersion') or '').strip()
         if not operatorName:
@@ -2238,6 +2655,9 @@ def upgrade_startRollback():
             history_spc_dict = get_folder_dict(config.HISTORY_ROLL_PATH)
             DPrint(f"history_spc_dict:{history_spc_dict}")
             if objectSPCVersion in history_spc_dict:
+                if secure_filename(job_name) != job_name:
+                    return _upgrade_error('taskName contains unsupported characters')
+                _write_status(job_name, STATE_IN_PROGRESS, 0, 'rollback starting')
                 start_rollback(job_name, objectSPCVersion)
             else:
                 remark = f'local has no object version backup: {objSPCVersion}'
@@ -2600,6 +3020,7 @@ def modifyConfigDatafromParams():
         device_type = device_info.get("deviceType")
         sort = device_info.get("sort")
         device_name = device_info.get("name")
+        g.audit_target = f"{device_name} {sort} / register:{address}"
         # 系统参数下发,不记录设备名,暂记录为system
         if address > 1505:
             operationTarget = device_name

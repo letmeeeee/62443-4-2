@@ -46,12 +46,21 @@ def build_portable_ca(root, destination, desktop='ca'):
     (runtime/'share').mkdir()
     shutil.copytree(tcl,runtime/'share/tcl')
     shutil.copytree(tk,runtime/'share/tk')
-    package = application/'provisioning'; package.mkdir()
-    modules = ('__init__','common','ca','passwords','password_ui','ui') if desktop=='ca' else ('__init__','common','device','ssh_agent','ssh_device','deployment_record','ui')
-    entry='ca_manager' if desktop=='ca' else 'device_deploy'
-    for name in modules:
-        shutil.copy2(root/'provisioning'/(name+'.py'),package/(name+'.py'))
-    shutil.copy2(root/(entry+'.py'),application/(entry+'.py'))
+    if desktop == 'modbus':
+        (application/'tools').mkdir()
+        # Namespace package: do not copy private material or test/generated directories.
+        package=application/'tools/modbus_gui';package.mkdir()
+        for name in ('__init__','gui','core','certificates','certificate_crypto','ca_identity'):
+            shutil.copy2(root/'tools/modbus_gui'/(name+'.py'),package/(name+'.py'))
+        entry='modbus_gui_entry'
+        (application/(entry+'.py')).write_text('from tools.modbus_gui.gui import main\nmain()\n')
+    else:
+        package = application/'provisioning'; package.mkdir()
+        modules = ('__init__','common','ca','passwords','password_ui','ui') if desktop=='ca' else ('__init__','common','device','ssh_agent','ssh_device','deployment_record','ui')
+        entry='ca_manager' if desktop=='ca' else 'device_deploy'
+        for name in modules:
+            shutil.copy2(root/'provisioning'/(name+'.py'),package/(name+'.py'))
+        shutil.copy2(root/(entry+'.py'),application/(entry+'.py'))
     # Carry non-glibc shared dependencies. Use the host's glibc/loader on compatible targets.
     core = re.compile(r'^(?:ld-linux.*|lib(?:c|m|pthread|dl|rt|util|resolv|anl)\.so(?:\..*)?)$')
     binaries = [python]+list(runtime.rglob('*.so'))+list(runtime.rglob('*.so.*'))
@@ -80,7 +89,7 @@ def build_portable_ca(root, destination, desktop='ca'):
                 if source.is_file(): shutil.copy2(source,notices/(distribution+'-'+item.name))
     for name, path in [('Python','/usr/share/doc/python3.8/copyright'),('Tcl','/usr/share/doc/tcl8.6/copyright'),('Tk','/usr/share/doc/tk8.6/copyright')]:
         if Path(path).is_file(): shutil.copy2(path,notices/(name+'-copyright.txt'))
-    executable = destination/('LC400_CA_Manager' if desktop=='ca' else 'LC400_Device_Deploy')
+    executable = destination/('LC400_CA_Manager' if desktop=='ca' else 'ModbusTLS' if desktop=='modbus' else 'LC400_Device_Deploy')
     subprocess.run(['cc','-std=c99','-O2','-Wall','-Wextra','-Werror','-static',
                     '-DLC_PYTHON_SITE="runtime/lib/'+version+'/site-packages"',
                     '-DLC_APP_SCRIPT="app/'+entry+'.py"',

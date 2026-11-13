@@ -43,7 +43,7 @@ HOME_VIEW_DIAGRAM_PARAMS = [
         "offset": 2,
         "precision": "0.1",
         "unit": "A",
-        "valueType": "uint32",
+        "valueType": "int32",
         "bitMapping": ""
     },
     {

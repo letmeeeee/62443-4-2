@@ -61,8 +61,15 @@ def public_package(directory, kind):
     if not isinstance(manifest, dict) or manifest.get('version') != 1 or manifest.get('kind') != kind:
         raise ValueError('不支持的交接包格式')
     device_name(manifest.get('device_id', ''))
-    expected = {role + ('.csr' if kind == 'lc400-csr' else '-leaf.pem') for role in ROLES}
-    if kind == 'lc400-certificates':
+    if kind not in ('lc400-csr', 'lc400-certificates', 'lc400-role-csr', 'lc400-role-certificates'):
+        raise ValueError('不支持的交接包格式')
+    roles = ROLES
+    if kind.startswith('lc400-role-'):
+        if manifest.get('role') not in ('master', 'slave'):
+            raise ValueError('单角色交接包仅支持 master/slave')
+        roles = (manifest['role'],)
+    expected = {role + ('.csr' if kind.endswith('csr') else '-leaf.pem') for role in roles}
+    if kind.endswith('certificates'):
         expected.update(('roots.pem', 'intermediates.pem'))
     if not isinstance(manifest.get('files'), dict) or set(manifest['files']) != expected:
         raise ValueError('交接包文件清单不完整或含未知文件')

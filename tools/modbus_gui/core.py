@@ -119,31 +119,90 @@ def request_pdu(function, address, count=1, values=()):
     return struct.pack('!BHHB', function, address, len(values), len(values) * 2) + struct.pack('!{}H'.format(len(values)), *values)
 
 
+def close_tls(conn, timeout=1, log=lambda message: None):
+    """Send close_notify and bound the wait for the peer's reciprocal alert.
+
+    Only use after a complete response or clean peer EOF. A shutdown failure must
+    not turn a successfully received Modbus response into a failed transaction.
+    """
+    try:
+        conn.settimeout(min(timeout, 1))
+        raw = conn.unwrap()
+        raw.close()
+    except (OSError, ValueError) as exc:
+        log('TLS 关闭确认未完成（报文收发结果不受影响）：' + str(exc))
+    finally:
+        conn.close()
+
+
+class TLSClient:
+    """Serial persistent connection; failed requests are never replayed automatically."""
+    def __init__(self, ctx, host, port, timeout=5, server_name='', log=lambda message: None):
+        if not host or not 1 <= port <= 65535 or not 0 < timeout <= 120:
+            raise ValueError('检查主机、端口及超时（0～120 秒）')
+        self.ctx, self.host, self.port = ctx, host, port
+        self.timeout, self.server_name, self.log = timeout, server_name, log
+        self.conn = None
+        self.transaction = 0
+
+    def connect(self):
+        if self.conn is not None:
+            return
+        raw = socket.create_connection((self.host, self.port), timeout=self.timeout)
+        try:
+            self.conn = self.ctx.wrap_socket(raw, server_hostname=self.server_name or self.host)
+        except BaseException:
+            raw.close()
+            raise
+        verification = '未验证服务端证书及名称' if self.ctx.verify_mode == ssl.CERT_NONE else '服务端身份验证通过'
+        self.log('{} / {}，{}'.format(self.conn.version(), self.conn.cipher()[0], verification))
+
+    def close(self, graceful=True):
+        conn, self.conn = self.conn, None
+        if conn is not None:
+            if graceful:
+                close_tls(conn, timeout=self.timeout, log=self.log)
+            else:
+                conn.close()
+
+    def request(self, unit, function, address, count=1, values=()):
+        if not 0 <= unit <= 255:
+            raise ValueError('站号范围0～255')
+        pdu = request_pdu(function, address, count, values)
+        frame_received = False
+        try:
+            self.connect()
+            self.transaction = self.transaction % 65535 + 1
+            tid = self.transaction
+            send(self.conn, tid, unit, pdu, trace=lambda frame: self.log(
+                format_frame('TX', frame, '客户端 → {}:{}'.format(self.host, self.port), request=True)))
+            response_tid, response_unit, response = receive(self.conn, trace=lambda frame: self.log(
+                format_frame('RX', frame, '客户端 ← {}:{}'.format(self.host, self.port), request=False)))
+            frame_received = True
+            if response_tid != tid or response_unit != unit:
+                raise ValueError('响应事务号或站号不匹配')
+            if response[0] == function | 0x80 and len(response) == 2:
+                raise ValueError('Modbus 异常码 0x{:02X}'.format(response[1]))
+            if function in (3, 4):
+                if len(response) != 2 + count * 2 or response[:2] != bytes([function, count * 2]):
+                    raise ValueError('响应功能码、字节数或长度错误')
+                return list(struct.unpack('!{}H'.format(count), response[2:]))
+            expected = pdu if function == 6 else pdu[:5]
+            if response != expected:
+                raise ValueError('写入响应与请求不匹配')
+            return list(values)
+        except BaseException:
+            self.close(graceful=frame_received)
+            raise
+
+
 def exchange(ctx, host, port, unit, function, address, count=1, values=(), timeout=5,
              server_name='', log=lambda message: None):
-    if not host or not 1 <= port <= 65535 or not 0 <= unit <= 255 or not 0 < timeout <= 120:
-        raise ValueError('检查主机、端口、站号及超时（0～120 秒）')
-    pdu = request_pdu(function, address, count, values)
-    with socket.create_connection((host, port), timeout=timeout) as raw:
-        with ctx.wrap_socket(raw, server_hostname=server_name or host) as conn:
-            verification = '未验证服务端证书及名称' if ctx.verify_mode == ssl.CERT_NONE else '服务端身份验证通过'
-            log('{} / {}，{}'.format(conn.version(), conn.cipher()[0], verification))
-            peer = '客户端 → {}:{}'.format(host, port)
-            send(conn, 1, unit, pdu, trace=lambda frame: log(format_frame('TX', frame, peer, request=True)))
-            tid, response_unit, response = receive(conn, trace=lambda frame: log(
-                format_frame('RX', frame, '客户端 ← {}:{}'.format(host, port), request=False)))
-    if tid != 1 or response_unit != unit:
-        raise ValueError('响应事务号或站号不匹配')
-    if response[0] == function | 0x80 and len(response) == 2:
-        raise ValueError('Modbus 异常码 0x{:02X}'.format(response[1]))
-    if function in (3, 4):
-        if len(response) != 2 + count * 2 or response[:2] != bytes([function, count * 2]):
-            raise ValueError('响应功能码、字节数或长度错误')
-        return list(struct.unpack('!{}H'.format(count), response[2:]))
-    expected = pdu if function == 6 else pdu[:5]
-    if response != expected:
-        raise ValueError('写入响应与请求不匹配')
-    return list(values)
+    client = TLSClient(ctx, host, port, timeout, server_name, log)
+    try:
+        return client.request(unit, function, address, count, values)
+    finally:
+        client.close()
 
 
 class RegisterBank:
@@ -262,7 +321,11 @@ class Server:
                 response = self.bank.reply(pdu)
                 send(conn, tid, unit, response, trace=lambda frame: self.log(
                     format_frame('TX', frame, '服务端 → {}:{}'.format(*address), request=False)))
-        except (OSError, ValueError, EOFError) as exc:
+        except EOFError:
+            close_tls(conn, log=self.log)
+            if not self.stopped.is_set():
+                self.log('{} 连接结束'.format(address))
+        except (OSError, ValueError) as exc:
             if not self.stopped.is_set():
                 self.log('{} 连接结束/拒绝：{}'.format(address, exc))
         finally:

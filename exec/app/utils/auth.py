@@ -285,6 +285,21 @@ def _same_origin():
     return request.headers.get("Sec-Fetch-Site") == "same-origin"
 
 
+def _log_certificate_rejection(reason, status, **details):
+    """证书路由执行前的拦截也输出诊断，不记录凭据或上传内容。"""
+    if not request.path.startswith('/api/cert/'):
+        return
+    from utils.utils import DPrint
+
+    user = getattr(g, 'current_user', {})
+    context = dict(operator=user.get('username', '-'),
+                   permission=user.get('permission'), method=request.method,
+                   path=request.path, ip=request.remote_addr,
+                   status=status, reason=reason, **details)
+    fields = ' '.join(f'{key}={value!r}' for key, value in context.items())
+    DPrint(f'[PKI] 全局认证拦截: {fields}', level='WARNING')
+
+
 def init_auth(app):
     secret = app.config.get("SECRET_KEY") or os.environ.get("FLASK_SECRET_KEY")
     if not secret or len(secret) < 32:
@@ -344,6 +359,7 @@ def init_auth(app):
             return None
         try:
             if not authenticate_session():
+                _log_certificate_rejection('SESSION_INVALID', 401)
                 return jsonify(ok=False, error="Authentication required", code="SESSION_INVALID"), 401
         except Exception:
             app.logger.exception("Session verification failed")
@@ -351,6 +367,8 @@ def init_auth(app):
         if request.method not in ("GET", "HEAD") and not _same_origin():
             token = request.headers.get("X-CSRF-Token", "")
             if not hmac.compare_digest(token.encode("utf-8"), g.csrf_token.encode("utf-8")):
+                _log_certificate_rejection('CSRF_VALIDATION_FAILED', 403,
+                                           csrf_header_present=bool(token))
                 return jsonify(ok=False, error="CSRF validation failed"), 403
         from utils.access import request_ability, allowed
         if request.path == '/export_csv_stream':
@@ -360,6 +378,7 @@ def init_auth(app):
                 return jsonify(ok=False,code='EXPORT_TABLE_NOT_ALLOWED'),400
         if g.session_locked and request.path not in ('/permission/session','/permission/verify',
                 '/permission/logout','/permission/lock'):
+            _log_certificate_rejection('SESSION_LOCKED', 403)
             return jsonify(ok=False, code='SESSION_LOCKED', message='Unlock session before continuing'), 403
         if request.path == '/api':
             if request.method == 'GET':
@@ -370,6 +389,7 @@ def init_auth(app):
                 return jsonify(ok=False, code=error), 400
         ability = request_ability()
         if ability and not allowed(ability):
+            _log_certificate_rejection('PERMISSION_DENIED', 403, ability=ability)
             from utils import operationLog
             operationLog.enqueue_operation_log(g.current_user['username'],
                 operationLog.OperationType.USER, request.path, 1, False, 'Permission denied')
@@ -385,6 +405,7 @@ def init_auth(app):
         if (g.current_user.get('password_change_required') and request.path not in
                 ('/permission/session', '/permission/logout', '/permission/update',
                  '/permission/verify', '/permission/lock', '/api/security/password-policy')):
+            _log_certificate_rejection('PASSWORD_CHANGE_REQUIRED', 403)
             return jsonify(ok=False, code='PASSWORD_CHANGE_REQUIRED', message='Change password before continuing'), 403
 
     @app.after_request

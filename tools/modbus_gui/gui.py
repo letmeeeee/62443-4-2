@@ -11,7 +11,7 @@ from tkinter import filedialog, messagebox, ttk
 from tkinter.scrolledtext import ScrolledText
 
 from . import certificates
-from .core import RegisterBank, Server, exchange, request_pdu, tls_context
+from .core import RegisterBank, Server, TLSClient, exchange, request_pdu, tls_context
 
 
 def integer(text):
@@ -32,6 +32,7 @@ class Window:
         self.fields = {}
         self.client_busy = False
         self.loop_running = False
+        self.loop_client = None
         self.loop_timer = None
         self.loop_count = self.loop_success = self.loop_failure = 0
         root.title('Modbus TLS 客户端 / 服务端')
@@ -265,11 +266,14 @@ class Window:
         settings = self.snapshot(role)
         self.work(lambda: self.perform_request(role, settings), lambda result: self.fields[role]['result'].set(result))
 
-    def perform_request(self, role, settings):
+    def perform_request(self, role, settings, client=None):
         function = int(settings['function'][:2])
         address = integer(settings['address'])
         if role == 'server':
             data = self.bank.snapshot(function, address, integer(settings['count']))
+        elif client is not None:
+            data = client.request(integer(settings['unit']), function, address,
+                                  integer(settings['count']), values(settings['values']))
         else:
             data = exchange(self.context(role, settings), settings['host'].strip(), integer(settings['port']),
                             integer(settings['unit']), function, address,
@@ -306,8 +310,20 @@ class Window:
                     prefix, self.loop_count, self.loop_success, self.loop_failure))
                 if self.loop_running:
                     self.loop_timer = self.root.after(self.loop_delay, self.loop_tick)
-            self.client_buttons()
-        self.work(lambda: self.perform_request('client', settings), done, on_error=failed, finished=finished)
+            if cycling and not self.loop_running and self.loop_client is not None:
+                self.close_loop_async()
+            else:
+                self.client_buttons()
+        def action():
+            try:
+                if cycling and self.loop_client is None:
+                    self.loop_client = TLSClient(self.context('client', settings), settings['host'].strip(),
+                        integer(settings['port']), float(settings['timeout']), settings['server_name'].strip(), self.log)
+                return self.perform_request('client', settings, self.loop_client if cycling else None)
+            finally:
+                if cycling and not self.loop_running:
+                    self.close_loop_client()
+        self.work(action, done, on_error=failed, finished=finished)
 
     def start_loop(self):
         if self.client_busy or self.loop_running:
@@ -331,13 +347,26 @@ class Window:
         self.loop_count = self.loop_success = self.loop_failure = 0
         self.loop_running = True
         self.loop_status.set('循环中')
-        self.log('开始循环发送：每次请求结束后等待 {} 毫秒；使用启动时的参数'.format(delay))
+        self.log('开始循环发送：复用 TLS 长连接，每次请求结束后等待 {} 毫秒；失败不重发当前请求，下一轮重连；使用启动时的参数'.format(delay))
         self.loop_tick()
 
     def loop_tick(self):
         self.loop_timer = None
         if self.loop_running:
             self.send_client(self.loop_settings, cycling=True)
+
+    def close_loop_client(self):
+        client, self.loop_client = self.loop_client, None
+        if client is not None:
+            client.close()
+
+    def close_loop_async(self):
+        self.client_busy = True
+        self.client_buttons()
+        def finished():
+            self.client_busy = False
+            self.client_buttons()
+        self.work(self.close_loop_client, finished=finished)
 
     def stop_loop(self):
         was_running = self.loop_running
@@ -349,7 +378,10 @@ class Window:
             text = '已停止循环；当前请求完成或超时后结束' if self.client_busy else '已停止循环'
             self.loop_status.set(text)
             self.log(text)
-        self.client_buttons()
+        if not self.client_busy and self.loop_client is not None:
+            self.close_loop_async()
+        else:
+            self.client_buttons()
 
     def edit_bank(self):
         try:
@@ -399,19 +431,145 @@ class Window:
         self.work(server.stop, done)
 
     def build_certificates(self, tab):
-        ttk.Label(tab, text='默认生成适配 EMS 的直接自签身份证书（CA:FALSE，有效期 365 天）。\n客户端 client.crt 可供设备 modbus_certs.py trust-add 导入；两端直接信任对端证书。\n取消下方设备模式，可生成 CA 签发的通用联调证书。\n客户端可分别设置“发送客户端证书”和“验证服务端证书”；服务端可设置“验证客户端证书”。',
+        ttk.Label(tab, text='连接当前设备：在 PC 生成独立私钥和单角色 CSR → 将 request 目录交给企业 CA 签发 → 导入签发包。\n主机客户端使用 clientAuth；模拟从机使用 serverAuth，SAN 填写本机实际 IP。私钥保留本机，不交给 CA。',
                   justify='left', wraplength=930).pack(anchor='w', pady=10)
+        ca_box=ttk.LabelFrame(tab,text='企业 CA 身份（当前设备方案）',padding=5);ca_box.pack(fill='x')
+        self.pc_identity=self.field(ca_box,0,'PC 身份编号','PC-debug-001')
+        self.pc_role=tk.StringVar(value='master')
+        ttk.Label(ca_box,text='角色').grid(row=1,column=0,sticky='w')
+        ttk.Combobox(ca_box,textvariable=self.pc_role,values=('master','slave'),state='readonly').grid(row=1,column=1,sticky='w')
+        self.pc_host=self.field(ca_box,2,'模拟从机实际 IP SAN','')
+        self.pc_host_entry=ca_box.grid_slaves(row=2,column=1)[0]
+        self.pc_folder=self.field(ca_box,3,'本地身份目录（含私钥和 request）','')
+        ttk.Button(ca_box,text='选择身份目录',command=self.choose_pc_identity).grid(row=3,column=2)
+        self.pc_roots=self.field(ca_box,4,'可信根 CA SHA-256（多根逗号分隔）','')
+        ttk.Button(ca_box,text='生成私钥并导出 CSR 请求包',command=self.generate_pc_csr).grid(row=5,column=0,columnspan=2,sticky='w',pady=5)
+        ttk.Button(ca_box,text='导入 CA 签发包并配置角色',command=self.import_pc_identity).grid(row=5,column=2,sticky='w')
+        self.pc_actions=[child for child in ca_box.winfo_children() if isinstance(child,ttk.Button)]
+        self.pc_hint=tk.StringVar()
+        ttk.Label(ca_box,textvariable=self.pc_hint,wraplength=850).grid(row=6,column=0,columnspan=3,sticky='w',pady=5)
+        self.pc_states={role:dict(identity='PC-debug-001',host='',folder='',roots='') for role in ('master','slave')}
+        self.pc_active_role='master'
+        self.pc_busy=False
+        self.pc_role.trace_add('write',self.switch_pc_role)
+        self.refresh_pc_role()
+        ttk.Label(tab,text='以下快速联调使用独立测试身份，与当前企业 CA 无关，不能直接接入生产设备。').pack(anchor='w',pady=5)
         box = ttk.Frame(tab)
         box.pack(fill='x')
         self.san = self.field(box, 0, '服务端证书 SAN（实际连接 IP / DNS）', '127.0.0.1')
-        self.device_certificates = tk.BooleanVar(value=True)
-        ttk.Checkbutton(tab, text='EMS 设备模式：直接自签证书（适用于 trust-add）',
+        self.device_certificates = tk.BooleanVar(value=False)
+        ttk.Checkbutton(tab, text='旧版隔离测试：直接自签叶证书（不兼容当前设备）',
                         variable=self.device_certificates).pack(anchor='w', pady=5)
         button = ttk.Button(tab, text='生成联调证书并配置两端…')
         button.configure(command=lambda: self.generate(button))
         button.pack(anchor='w', pady=12)
-        ttk.Label(tab, text='本地联调：生成证书 → 服务端启动 → 客户端发送请求。\n连接实际设备：把 client.crt 导入设备信任列表，把设备 slave.crt 导入客户端信任栏。\n生成目录包含未加密私钥，请妥善保管。修改证书设置后需重启服务端。\n服务端仅操作内存中的模拟寄存器；关闭程序后寄存器数据不保存。',
+        ttk.Label(tab, text='本地联调：生成证书 → 服务端启动 → 客户端发送请求。\n连接当前设备：使用上方企业 CA 身份流程，保持双向校验。\n生成目录包含未加密私钥，请妥善保管。修改证书设置后需重启服务端。\n服务端仅操作内存中的模拟寄存器；关闭程序后寄存器数据不保存。',
                   justify='left', wraplength=930).pack(anchor='w', pady=10)
+
+    def pc_values(self):
+        return dict(identity=self.pc_identity.get(),host=self.pc_host.get(),folder=self.pc_folder.get(),roots=self.pc_roots.get())
+
+    def refresh_pc_role(self):
+        slave=self.pc_active_role=='slave'
+        self.pc_host_entry.configure(state='normal' if slave else 'disabled')
+        self.pc_hint.set('slave：模拟从机 / serverAuth。SAN 填运行模拟器的 PC 实际 IP，不是 EMS 设备 IP；监听可用 0.0.0.0。' if slave else
+                         'master：主机客户端 / clientAuth，不需要服务端 IP SAN。身份目录与 slave 分开保存（当前窗口内）。')
+
+    def switch_pc_role(self, *_):
+        role=self.pc_role.get()
+        if role not in self.pc_states:return
+        self.pc_states[self.pc_active_role]=self.pc_values()
+        self.pc_active_role=role
+        self.set_pc_values(role,**self.pc_states[role])
+        self.refresh_pc_role()
+
+    def set_pc_values(self, role, **values):
+        self.pc_states[role].update(values)
+        if self.pc_active_role==role:
+            for key,value in values.items():
+                getattr(self,'pc_'+key).set(value)
+
+    def pc_task(self, action, done):
+        self.pc_busy=True
+        for button in self.pc_actions:button.configure(state='disabled')
+        def finished():
+            self.pc_busy=False
+            for button in self.pc_actions:button.configure(state='normal')
+        self.work(action,done,finished=finished)
+
+    def choose_pc_identity(self):
+        if self.pc_busy:return
+        folder=filedialog.askdirectory(title='选择含 request 和角色私钥的本地身份目录（不是 request 子目录）')
+        if not folder:return
+        try:
+            from .ca_identity import inspect_local_identity
+            info=inspect_local_identity(folder)
+            role=info.pop('role')
+            if role!=self.pc_role.get():
+                if not messagebox.askyesno('身份目录角色不同','该目录为 '+role+' 身份，是否切换到该角色？'):return
+                self.pc_role.set(role)
+            self.set_pc_values(role,**info,roots='')
+        except Exception as exc:messagebox.showerror('身份目录无效',str(exc))
+
+    def generate_pc_csr(self):
+        if self.pc_busy:return
+        parent=filedialog.askdirectory(title='选择 PC 身份保存位置（自动新建独立目录）')
+        if not parent:return
+        role,identity,host=self.pc_role.get(),self.pc_identity.get().strip(),self.pc_host.get().strip()
+        def work():
+            from .ca_identity import generate
+            return generate(parent,role,identity,host)
+        def done(folder):
+            self.set_pc_values(role,folder=str(folder),identity=identity,host=host,roots='')
+            self.log('PC 身份已生成；仅交付公开请求目录给 CA：'+str(folder/'request'))
+            messagebox.showinfo('CSR 已生成','交给 CA 的目录：'+str(folder/'request')+'\n私钥保留在其上级目录。CA 工具选择此 request 目录审查并签发。')
+        self.pc_task(work,done)
+
+    def import_pc_identity(self):
+        if self.pc_busy:return
+        selected_role=self.pc_role.get()
+        folder=self.pc_folder.get().strip()
+        try:
+            from .ca_identity import inspect_local_identity
+            info=inspect_local_identity(folder)
+            if info['role']!=selected_role:
+                raise ValueError('当前选择 '+selected_role+'，身份目录属于 '+info['role']+'；请切换角色或重新选择对应目录')
+        except Exception as exc:
+            messagebox.showerror('身份目录与角色不匹配',str(exc));return
+        bundle=filedialog.askdirectory(title='选择 CA 返回的单角色证书包目录')
+        if not bundle:return
+        try:
+            import json
+            from .ca_identity import read
+            manifest=json.loads(read(Path(bundle)/'manifest.json'))
+            if (manifest.get('kind')!='lc400-role-certificates' or manifest.get('role')!=selected_role
+                    or manifest.get('device_id')!=info['identity']):
+                raise ValueError('签发包的角色或 PC 编号与当前身份目录不一致')
+        except Exception as exc:
+            messagebox.showerror('签发包与身份不匹配',str(exc));return
+        pins=self.pc_roots.get().split(',')
+        if not any(v.strip() for v in pins):
+            try:
+                import json
+                from .ca_identity import read
+                manifest=json.loads(read(Path(bundle)/'manifest.json'))
+                pins=manifest.get('root_fingerprints',[])
+                if not pins or not all(isinstance(v,str) for v in pins):raise ValueError('证书包缺少根指纹记录')
+                if not messagebox.askyesno('确认 CA 交付来源','记录中的根 CA SHA-256：\n'+'\n'.join(pins)+'\n请通过可信 CA 管理端独立核对。确认采用这些根指纹？'):return
+            except Exception as exc:
+                messagebox.showerror('无法加载 CA 指纹',str(exc));return
+        def work():
+            from .ca_identity import import_bundle
+            return import_bundle(folder,bundle,pins)
+        def done(result):
+            self.set_pc_values(selected_role,roots=','.join(pins))
+            role='client' if result['role']=='master' else 'server'
+            for key in ('cert','key','ca'):self.fields[role][key].set(result[key])
+            self.fields[role]['password'].set('')
+            self.fields[role]['mutual'].set(True)
+            if role=='client':self.fields[role]['verify_peer'].set(True)
+            self.log('CA 身份校验并配置成功：'+role+'；客户端循环或服务端需停止后重新启动生效。')
+        self.pc_task(work,done)
 
     def generate(self, button):
         parent = filedialog.askdirectory(title='选择证书保存位置（会新建独立子目录）')
@@ -447,6 +605,9 @@ class Window:
 
     def close(self):
         self.stop_loop()
+        if self.client_busy or self.pc_busy:
+            self.root.after(50, self.close)
+            return
         if self.server:
             self.server.stop()
         self.root.destroy()

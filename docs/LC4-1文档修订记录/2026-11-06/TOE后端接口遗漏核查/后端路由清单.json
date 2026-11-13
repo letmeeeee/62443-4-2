@@ -1,0 +1,1185 @@
+[
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 29,
+    "decorator": "g2_bp.route",
+    "path": "/fault_wave/fetch",
+    "methods": [
+      "POST"
+    ],
+    "function": "fetch_wave",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 98,
+    "decorator": "g2_bp.route",
+    "path": "/fault_wave/diag",
+    "methods": [
+      "GET"
+    ],
+    "function": "fault_wave_diag",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 125,
+    "decorator": "g2_bp.route",
+    "path": "/system/reboot",
+    "methods": [
+      "POST"
+    ],
+    "function": "system_reboot",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 137,
+    "decorator": "g2_bp.route",
+    "path": "/sqlite/count_rows",
+    "methods": [
+      "POST"
+    ],
+    "function": "sqlite_count_rows",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 197,
+    "decorator": "g2_bp.route",
+    "path": "/sqlite/query_series",
+    "methods": [
+      "POST"
+    ],
+    "function": "sqlite_query_series",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 282,
+    "decorator": "g2_bp.route",
+    "path": "/zlog/query_series",
+    "methods": [
+      "POST"
+    ],
+    "function": "zlog_query_series",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 373,
+    "decorator": "g2_bp.route",
+    "path": "/export_csv_stream",
+    "methods": [
+      "GET"
+    ],
+    "function": "export_csv_stream",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 426,
+    "decorator": "g2_bp.route",
+    "path": "/api",
+    "methods": [
+      "GET",
+      "POST",
+      "OPTIONS"
+    ],
+    "function": "GetData",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 523,
+    "decorator": "g2_bp.route",
+    "path": "/network/set_ip",
+    "methods": [
+      "POST"
+    ],
+    "function": "network_set_ip",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 803,
+    "decorator": "g2_bp.route",
+    "path": "/ini/update",
+    "methods": [
+      "POST"
+    ],
+    "function": "ini_update",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 874,
+    "decorator": "g2_bp.route",
+    "path": "/status/update",
+    "methods": [
+      "POST"
+    ],
+    "function": "status_update",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 901,
+    "decorator": "g2_bp.route",
+    "path": "/ini/system_counts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "function": "ini_system_counts",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g2.py",
+    "line": 921,
+    "decorator": "g2_bp.route",
+    "path": "/ini/all",
+    "methods": [
+      "GET"
+    ],
+    "function": "ini_all",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 125,
+    "decorator": "permission_bp.route",
+    "path": "/permission/login",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_login",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 178,
+    "decorator": "permission_bp.route",
+    "path": "/permission/verify",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_verify",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 211,
+    "decorator": "permission_bp.route",
+    "path": "/permission/all",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_all",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 220,
+    "decorator": "permission_bp.route",
+    "path": "/permission/add",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_add",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 251,
+    "decorator": "permission_bp.route",
+    "path": "/permission/update",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_update",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 349,
+    "decorator": "permission_bp.route",
+    "path": "/permission/delete",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_delete",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 376,
+    "decorator": "permission_bp.route",
+    "path": "/permission/session",
+    "methods": [
+      "GET"
+    ],
+    "function": "permission_session",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 388,
+    "decorator": "permission_bp.route",
+    "path": "/permission/logout",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_logout",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 417,
+    "decorator": "permission_bp.route",
+    "path": "/permission/sessions",
+    "methods": [
+      "GET"
+    ],
+    "function": "permission_sessions",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 428,
+    "decorator": "permission_bp.route",
+    "path": "/permission/sessions/revoke",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_revoke_session",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 459,
+    "decorator": "permission_bp.route",
+    "path": "/permission/reset-password",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_reset_password",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_permission.py",
+    "line": 504,
+    "decorator": "permission_bp.route",
+    "path": "/permission/lock",
+    "methods": [
+      "POST"
+    ],
+    "function": "permission_lock",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_system.py",
+    "line": 13,
+    "decorator": "system_bp.route",
+    "path": "/api/system/memory-usage",
+    "methods": [
+      "GET"
+    ],
+    "function": "memory_usage",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_system.py",
+    "line": 23,
+    "decorator": "system_bp.route",
+    "path": "/api/system/cpu-usage",
+    "methods": [
+      "GET"
+    ],
+    "function": "cpu_usage",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_system.py",
+    "line": 33,
+    "decorator": "system_bp.route",
+    "path": "/api/system/disk-usage",
+    "methods": [
+      "GET"
+    ],
+    "function": "disk_usage",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 162,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/mode",
+    "methods": [
+      "GET"
+    ],
+    "function": "certificate_mode",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 171,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/csr",
+    "methods": [
+      "POST"
+    ],
+    "function": "create_identity_csr",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 180,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/csr/export",
+    "methods": [
+      "GET"
+    ],
+    "function": "export_identity_csr",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 192,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/identity/import",
+    "methods": [
+      "POST"
+    ],
+    "function": "import_signed_identity",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 206,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/ca",
+    "methods": [
+      "GET"
+    ],
+    "function": "shared_ca_status",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 216,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/ca/import",
+    "methods": [
+      "POST"
+    ],
+    "function": "import_shared_ca",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 232,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/https/csr",
+    "methods": [
+      "POST"
+    ],
+    "function": "create_https_csr",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 240,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/https/csr/export",
+    "methods": [
+      "GET"
+    ],
+    "function": "export_https_csr",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 251,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/https/identity/import",
+    "methods": [
+      "POST"
+    ],
+    "function": "import_https_identity",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 264,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/https/apply",
+    "methods": [
+      "POST"
+    ],
+    "function": "apply_https_identity",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 271,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/https/status",
+    "methods": [
+      "GET"
+    ],
+    "function": "https_identity_status",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 279,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/identity",
+    "methods": [
+      "GET"
+    ],
+    "function": "get_certificate_identity",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 287,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/check",
+    "methods": [
+      "GET"
+    ],
+    "function": "check_certificate",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 296,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/export",
+    "methods": [
+      "GET"
+    ],
+    "function": "export_certificate",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 312,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/generate",
+    "methods": [
+      "POST"
+    ],
+    "function": "retired_certificate_operation",
+    "scope": "返回410的退役接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 312,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/renew",
+    "methods": [
+      "POST"
+    ],
+    "function": "retired_certificate_operation",
+    "scope": "返回410的退役接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 312,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/trust-add",
+    "methods": [
+      "POST"
+    ],
+    "function": "retired_certificate_operation",
+    "scope": "返回410的退役接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 312,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/trust-remove",
+    "methods": [
+      "POST"
+    ],
+    "function": "retired_certificate_operation",
+    "scope": "返回410的退役接口"
+  },
+  {
+    "file": "exec/app/routes/route_cert.py",
+    "line": 312,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/trust-list",
+    "methods": [
+      "GET"
+    ],
+    "function": "retired_certificate_operation",
+    "scope": "返回410的退役接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 86,
+    "decorator": "g3_bp.route",
+    "path": "/api/system/ssh/status",
+    "methods": [
+      "GET"
+    ],
+    "function": "get_ssh_status",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 100,
+    "decorator": "g3_bp.route",
+    "path": "/api/system/ssh",
+    "methods": [
+      "POST"
+    ],
+    "function": "set_ssh_enabled",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 145,
+    "decorator": "g3_bp.route",
+    "path": "/api/device/list",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetList",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 260,
+    "decorator": "g3_bp.route",
+    "path": "/api/data/getParams",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetParams",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 311,
+    "decorator": "g3_bp.route",
+    "path": "/api/data/testMode",
+    "methods": [
+      "POST"
+    ],
+    "function": "set_test_mode",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 372,
+    "decorator": "g3_bp.route",
+    "path": "/api/data/getData",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetDataByParams",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 464,
+    "decorator": "g3_bp.route",
+    "path": "/api/data/muti/getData",
+    "methods": [
+      "GET"
+    ],
+    "function": "MutiGetDataByParams",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 613,
+    "decorator": "g3_bp.route",
+    "path": "/api/data/bms/getAlarm",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetBmsAlarm",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 657,
+    "decorator": "g3_bp.route",
+    "path": "/api/data/pcs/getAlarm",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetPcsAlarm",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 705,
+    "decorator": "g3_bp.route",
+    "path": "/api/history/getFault",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetFault",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 851,
+    "decorator": "g3_bp.route",
+    "path": "/api/history/getOperationlog",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetOperationlog",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 860,
+    "decorator": "g3_bp.route",
+    "path": "/api/history/getDeviceData",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetDeviceData",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 1029,
+    "decorator": "g3_bp.route",
+    "path": "/api/faultRecord/getRecordList",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetRecordList",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 1120,
+    "decorator": "g3_bp.route",
+    "path": "/api/faultRecord/getRecordDetails",
+    "methods": [
+      "GET"
+    ],
+    "function": "GetRecordDetails",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 1221,
+    "decorator": "g3_bp.route",
+    "path": "/api/upgrade/file",
+    "methods": [
+      "POST"
+    ],
+    "function": "upload_upgrade_file",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 1556,
+    "decorator": "g3_bp.route",
+    "path": "/api/upgrade/package-info",
+    "methods": [
+      "GET"
+    ],
+    "function": "get_upgrade_package_info",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 1674,
+    "decorator": "g3_bp.route",
+    "path": "/api/upgrade/start",
+    "methods": [
+      "POST"
+    ],
+    "function": "start_upgrade",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 2155,
+    "decorator": "g3_bp.route",
+    "path": "/api/upgrade/calibration",
+    "methods": [
+      "GET"
+    ],
+    "function": "upgrade_calibration",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 2182,
+    "decorator": "g3_bp.route",
+    "path": "/api/upgrade/getRollbackVersion",
+    "methods": [
+      "GET"
+    ],
+    "function": "upgrade_getRollbackVersion",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 2202,
+    "decorator": "g3_bp.route",
+    "path": "/api/upgrade/startRollback",
+    "methods": [
+      "POST"
+    ],
+    "function": "upgrade_startRollback",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 2277,
+    "decorator": "g3_bp.route",
+    "path": "/api/system/consistencyCheck",
+    "methods": [
+      "GET"
+    ],
+    "function": "SystemConsistencyCheck",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 2330,
+    "decorator": "g3_bp.route",
+    "path": "/api/paraConfig/getParams",
+    "methods": [
+      "GET"
+    ],
+    "function": "getConfigParams",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 2402,
+    "decorator": "g3_bp.route",
+    "path": "/api/paraConfig/getData",
+    "methods": [
+      "GET"
+    ],
+    "function": "getConfigDatafromParams",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_g3.py",
+    "line": 2516,
+    "decorator": "g3_bp.route",
+    "path": "/api/paraConfig/modifyParams",
+    "methods": [
+      "POST"
+    ],
+    "function": "modifyConfigDatafromParams",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 43,
+    "decorator": "security_bp.route",
+    "path": "/permission/login-notice",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "function": "login_notice",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 60,
+    "decorator": "security_bp.route",
+    "path": "/api/security/password-policy",
+    "methods": [
+      "GET"
+    ],
+    "function": "password_policy",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 65,
+    "decorator": "security_bp.route",
+    "path": "/api/security/roles",
+    "methods": [
+      "GET"
+    ],
+    "function": "roles",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 70,
+    "decorator": "security_bp.route",
+    "path": "/api/security/maintenance",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "function": "maintenance",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 95,
+    "decorator": "security_bp.route",
+    "path": "/api/history/status",
+    "methods": [
+      "GET"
+    ],
+    "function": "history_status",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 100,
+    "decorator": "security_bp.route",
+    "path": "/api/history/export",
+    "methods": [
+      "GET"
+    ],
+    "function": "history_export",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 176,
+    "decorator": "security_bp.route",
+    "path": "/api/security/certificates",
+    "methods": [
+      "GET"
+    ],
+    "function": "certificates",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 184,
+    "decorator": "security_bp.route",
+    "path": "/api/security/certificates/import",
+    "methods": [
+      "POST"
+    ],
+    "function": "certificate_import",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 190,
+    "decorator": "security_bp.route",
+    "path": "/api/security/certificates/verify",
+    "methods": [
+      "POST"
+    ],
+    "function": "certificate_verify",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 201,
+    "decorator": "security_bp.route",
+    "path": "/api/security/keys",
+    "methods": [
+      "GET"
+    ],
+    "function": "keys",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 230,
+    "decorator": "security_bp.route",
+    "path": "/api/security/peer-status",
+    "methods": [
+      "GET"
+    ],
+    "function": "peers",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 238,
+    "decorator": "security_bp.route",
+    "path": "/api/security/network-rules",
+    "methods": [
+      "GET"
+    ],
+    "function": "network_rules",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 249,
+    "decorator": "security_bp.route",
+    "path": "/api/system/components",
+    "methods": [
+      "GET"
+    ],
+    "function": "components",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 274,
+    "decorator": "security_bp.route",
+    "path": "/api/security/config-summary",
+    "methods": [
+      "GET"
+    ],
+    "function": "config_summary",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 296,
+    "decorator": "security_bp.route",
+    "path": "/api/security/status",
+    "methods": [
+      "GET"
+    ],
+    "function": "security_status",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 347,
+    "decorator": "security_bp.route",
+    "path": "/api/security/backups",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "function": "backups",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 357,
+    "decorator": "security_bp.route",
+    "path": "/api/security/backups/<identifier>/download",
+    "methods": [
+      "GET"
+    ],
+    "function": "backup_download",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 371,
+    "decorator": "security_bp.route",
+    "path": "/api/security/backups/<identifier>/validate",
+    "methods": [
+      "POST"
+    ],
+    "function": "backup_validate",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 398,
+    "decorator": "security_bp.route",
+    "path": "/api/security/backups/<identifier>/restore",
+    "methods": [
+      "POST"
+    ],
+    "function": "backup_restore",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 413,
+    "decorator": "security_bp.route",
+    "path": "/api/security/factory-reset",
+    "methods": [
+      "POST"
+    ],
+    "function": "factory_reset",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_security.py",
+    "line": 433,
+    "decorator": "security_bp.route",
+    "path": "/api/security/decommission",
+    "methods": [
+      "POST"
+    ],
+    "function": "decommission",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/routes/route_tee.py",
+    "line": 126,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/tee/keys",
+    "methods": [
+      "POST"
+    ],
+    "function": "tee_generate_keys",
+    "scope": "按用户要求排除的功能"
+  },
+  {
+    "file": "exec/app/routes/route_tee.py",
+    "line": 155,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/tee/rotate-rsa",
+    "methods": [
+      "POST"
+    ],
+    "function": "tee_rotate_rsa",
+    "scope": "按用户要求排除的功能"
+  },
+  {
+    "file": "exec/app/routes/route_tee.py",
+    "line": 178,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/tee/public-key",
+    "methods": [
+      "GET"
+    ],
+    "function": "tee_get_public_key",
+    "scope": "按用户要求排除的功能"
+  },
+  {
+    "file": "exec/app/routes/route_tee.py",
+    "line": 210,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/tee/cmac",
+    "methods": [
+      "POST"
+    ],
+    "function": "tee_cmac",
+    "scope": "按用户要求排除的功能"
+  },
+  {
+    "file": "exec/app/routes/route_tee.py",
+    "line": 216,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/tee/sign",
+    "methods": [
+      "POST"
+    ],
+    "function": "tee_sign",
+    "scope": "按用户要求排除的功能"
+  },
+  {
+    "file": "exec/app/routes/route_tee.py",
+    "line": 240,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/tee/verify-cmac",
+    "methods": [
+      "POST"
+    ],
+    "function": "tee_verify_cmac",
+    "scope": "按用户要求排除的功能"
+  },
+  {
+    "file": "exec/app/routes/route_tee.py",
+    "line": 246,
+    "decorator": "g3_bp.route",
+    "path": "/api/cert/tee/verify-signature",
+    "methods": [
+      "POST"
+    ],
+    "function": "tee_verify_signature",
+    "scope": "按用户要求排除的功能"
+  },
+  {
+    "file": "exec/app/upgrade/upgrade.py",
+    "line": 343,
+    "decorator": "upgrade.route",
+    "path": "/api/upgrade/process",
+    "methods": [
+      "GET"
+    ],
+    "function": "status_get",
+    "scope": "已注册HTTP接口"
+  },
+  {
+    "file": "exec/app/upgrade/upgrade.py",
+    "line": 582,
+    "decorator": "socketio.on",
+    "path": "connect",
+    "methods": [
+      "ON"
+    ],
+    "function": "on_connect",
+    "scope": "Socket.IO事件"
+  },
+  {
+    "file": "exec/app/upgrade/upgrade.py",
+    "line": 562,
+    "decorator": "app.route",
+    "path": "/",
+    "methods": [
+      "GET"
+    ],
+    "function": "serve_spa",
+    "scope": "静态页面入口"
+  },
+  {
+    "file": "exec/app/upgrade/upgrade.py",
+    "line": 562,
+    "decorator": "app.route",
+    "path": "/<path:path>",
+    "methods": [
+      "GET"
+    ],
+    "function": "serve_spa",
+    "scope": "静态页面入口"
+  },
+  {
+    "file": "exec/app/main.py",
+    "line": 104,
+    "decorator": "socketio.on",
+    "path": "connect",
+    "methods": [
+      "ON"
+    ],
+    "function": "on_connect",
+    "scope": "Socket.IO事件"
+  },
+  {
+    "file": "exec/app/main.py",
+    "line": 128,
+    "decorator": "socketio.on",
+    "path": "disconnect",
+    "methods": [
+      "ON"
+    ],
+    "function": "on_disconnect",
+    "scope": "Socket.IO事件"
+  },
+  {
+    "file": "exec/app/main.py",
+    "line": 32,
+    "decorator": "app.route",
+    "path": "/",
+    "methods": [
+      "GET"
+    ],
+    "function": "serve_spa",
+    "scope": "静态页面入口"
+  },
+  {
+    "file": "exec/app/main.py",
+    "line": 32,
+    "decorator": "app.route",
+    "path": "/<path:path>",
+    "methods": [
+      "GET"
+    ],
+    "function": "serve_spa",
+    "scope": "静态页面入口"
+  }
+]

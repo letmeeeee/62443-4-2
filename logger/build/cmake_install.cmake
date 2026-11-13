@@ -58,10 +58,11 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/scripts" TYPE PROGRAM FILES
-    "/home/wx/WorkStation/ItemCode/62443-4-2/logger/scripts/modbus_certs.py"
-    "/home/wx/WorkStation/ItemCode/62443-4-2/logger/scripts/modbus_tls_peer.py"
-    )
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/scripts" TYPE PROGRAM FILES "/home/wx/WorkStation/ItemCode/62443-4-2/logger/scripts/modbus_tls_peer.py")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/script" TYPE PROGRAM FILES "/home/wx/WorkStation/ItemCode/62443-4-2/logger/../exec/app/script/modbus_certs.py")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
