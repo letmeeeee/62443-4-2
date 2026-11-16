@@ -195,7 +195,7 @@ def _pki_errors(function):
         except subprocess.TimeoutExpired as error:
             _cert_log('证书脚本执行超时', level='ERROR', timeout_seconds=error.timeout)
             return _cert_error('PKI service unavailable', 503)
-        except (OSError, subprocess.SubprocessError):
+        except (OSError, ImportError, subprocess.SubprocessError):
             _cert_log('证书服务不可用', level='ERROR')
             current_app.logger.exception('PKI service unavailable')
             return _cert_error('PKI service unavailable', 503)
@@ -395,8 +395,85 @@ def import_https_identity():
 @cert_admin_required
 @_pki_errors
 def apply_https_identity():
-    """POST：执行 HTTPS 配置应用脚本，可能触发 Nginx 重载。"""
-    return _cert_success('HTTPS configuration applied', _https_pki([], apply=True))
+    """Apply all pending certificate changes; preserve the existing no-body API."""
+    from script import pki_common as pki
+
+    settings = pki.read_config(config.INI_PATH)
+    services = {}
+    https_dir = Path(current_app.config.get('HTTPS_CERT_DIR', '/etc/ssl/g3'))
+    with pki.operation_lock(settings):
+        pending = pki.pending_services(settings)
+        # Keep support for HTTPS identities imported before shared markers existed.
+        if (https_dir / '.reload-required').exists() and 'nginx' not in pending:
+            pending.insert(0, 'nginx')
+        for service in pending:
+            _cert_log('应用证书变更', service=service)
+            action = 'reload-or-start' if service == 'nginx' else 'restart'
+            try:
+                if service == 'nginx':
+                    _https_pki([], apply=True)
+                else:
+                    for arguments in (
+                        ['systemctl', '--no-ask-password', 'restart', 'tems.service'],
+                        ['systemctl', '--no-ask-password', 'is-active', '--quiet', 'tems.service'],
+                    ):
+                        result = subprocess.run(arguments, capture_output=True, text=True, timeout=120, check=False)
+                        if result.returncode:
+                            current_app.logger.error('Certificate service application failed: %s', result.stderr[-2000:])
+                            raise OSError('tems service operation failed')
+                pki.pending_path(settings, service).unlink(missing_ok=True)
+                services[service] = dict(action=action, status='success')
+                _cert_log('证书服务应用成功', service=service)
+            except (OSError, subprocess.SubprocessError):
+                services[service] = dict(action=action, status='failed')
+                _cert_log('证书服务应用失败，保留待应用标记', level='ERROR', service=service)
+                current_app.logger.exception('Certificate service application failed: %s', service)
+        remaining = pki.pending_services(settings)
+        if services.get('nginx', {}).get('status') == 'failed' and 'nginx' not in remaining:
+            remaining.append('nginx')
+    data = dict(changed=bool(services), applied=not remaining, services=services, pending=remaining)
+    if remaining:
+        return jsonify(ok=False, status=config.STATE_ERROR, code='CERTIFICATE_APPLY_FAILED',
+                       message='Some certificate changes could not be applied', data=data), 503
+    return _cert_success('Certificate changes applied' if services else 'No certificate changes pending', data)
+
+
+@g3_bp.route('/api/cert/crls', methods=['GET'])
+@cert_admin_required
+@_pki_errors
+def get_crls():
+    """List authenticated CRLs, freshness and services awaiting application."""
+    from script import crl_store, pki_common as pki
+
+    settings = pki.read_config(config.INI_PATH)
+    try:
+        entries = crl_store.inventory(settings)
+    except ValueError as error:
+        raise CertificateScriptError(str(error)) from error
+    return _cert_success('Certificate revocation lists',
+                         dict(crls=entries, pending=pki.pending_services(settings)))
+
+
+@g3_bp.route('/api/cert/crls/import', methods=['POST'])
+@cert_admin_required
+@_pki_errors
+def import_crls():
+    """Multipart file: PEM/DER CRL; optional chain: PEM issuer/intermediates."""
+    from script import crl_store, pki_common as pki
+
+    settings = pki.read_config(config.INI_PATH)
+    with tempfile.TemporaryDirectory(prefix='crl-import-') as directory:
+        files = _uploaded_pki(directory)
+        try:
+            result = crl_store.import_crls(settings, files['file'].read_bytes(),
+                                           files['chain'].read_bytes() if 'chain' in files else b'')
+        except ValueError as error:
+            raise CertificateScriptError(str(error)) from error
+    for entry in result['crls']:
+        _cert_log('CRL 已验证并保存', issuer=entry['issuer'], crl_number=entry['crlNumber'],
+                  freshness=entry['status'], revoked_count=entry['revokedCount'])
+    result['pending'] = pki.pending_services(settings)
+    return _cert_success('CRLs imported; apply to restart Modbus', result)
 
 
 @g3_bp.route('/api/cert/https/status', methods=['GET'])
@@ -421,12 +498,17 @@ def get_certificate_identity():
 @cert_admin_required
 @_pki_errors
 def check_certificate():
-    """GET ?role=master|slave：校验证书链、角色和私钥匹配；不提供吊销状态。"""
+    """GET ?role=master|slave：校验链、角色、私钥匹配及已部署 CRL。"""
     role = _cert_validate_role(request.args.get('role'))
     _cert_run_script(['check', '--role', role])
+    from script import crl_store, pki_common as pki
+    settings = pki.read_config(config.INI_PATH)
+    directory = Path(current_app.config.get('MODBUS_CERT_DIR', str(CERT_DIR)))
+    revocation = crl_store.certificate_status((directory / CERT_FILES[role]).read_bytes(),
+                                             settings['ca_file'], settings['crl_file'])
     return _cert_success(
         'CA chain, role and private key verified',
-        dict(role=role, valid=True, chain_verified=True, revocation_status='unavailable'),
+        dict(role=role, valid=True, chain_verified=True, revocation_status=revocation['revocationStatus']),
     )
 
 

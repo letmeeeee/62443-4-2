@@ -30,6 +30,8 @@
 static pthread_once_t certificate_once = PTHREAD_ONCE_INIT;
 static int certificate_mode = 1;
 static char ca_file[PATH_MAX] = MODBUS_TLS_CA_CERT;
+static char crl_file[PATH_MAX] = MODBUS_TLS_CA_CERT ".crls.pem";
+static int explicit_crl;
 
 static char *trim(char *value)
 {
@@ -71,6 +73,14 @@ static void load_certificate_mode(void)
             } else if (!strcasecmp(name, "ca_file")) {
                 if (*value != '/' || strlen(value) >= sizeof(ca_file)) { certificate_mode = -1; break; }
                 strcpy(ca_file, value);
+                if (!explicit_crl) {
+                    int length = snprintf(crl_file, sizeof(crl_file), "%s.crls.pem", ca_file);
+                    if (length < 0 || (size_t)length >= sizeof(crl_file)) { certificate_mode = -1; break; }
+                }
+            } else if (!strcasecmp(name, "crl_file")) {
+                if (*value != '/' || strlen(value) >= sizeof(crl_file)) { certificate_mode = -1; break; }
+                strcpy(crl_file, value);
+                explicit_crl = 1;
             }
         }
     }
@@ -87,6 +97,12 @@ int Modbus_Certificate_Mode(void)
 const char *Modbus_CA_File(void)
 {
     return Modbus_Certificate_Mode() < 0 ? NULL : ca_file;
+}
+
+const char *Modbus_CRL_File(void)
+{
+    if (Modbus_Certificate_Mode() < 0) return NULL;
+    return strcmp(crl_file, ca_file) ? crl_file : NULL;
 }
 
 static pthread_once_t backend_once = PTHREAD_ONCE_INIT;

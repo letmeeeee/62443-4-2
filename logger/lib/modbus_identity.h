@@ -12,4 +12,6 @@ int Modbus_Identity_Check(X509 *certificate, unsigned role, const char *certific
 /* [TLS] certificate_mode in LC_INI_PATH (default device INI): 1 CA, -1 invalid; legacy non-CA settings are rejected. */
 int Modbus_Certificate_Mode(void);
 const char *Modbus_CA_File(void);
+/* Defaults to ca_file + ".crls.pem"; absence preserves legacy verification. */
+const char *Modbus_CRL_File(void);
 #endif

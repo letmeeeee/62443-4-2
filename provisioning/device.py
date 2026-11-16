@@ -103,7 +103,8 @@ class DeviceProvisioner:
             csr_path = (self.https/'g3.csr') if role == 'https' else (self.modbus/(role+'.csr'))
             csr = read_file(csr_path)
             leaf, clean = self.pki.validate_identity(read_file(bundle/(role+'-leaf.pem')), chain,
-                         bundle/'roots.pem', 'sslclient' if role=='master' else 'sslserver', csr)
+                         bundle/'roots.pem', 'sslclient' if role=='master' else 'sslserver', csr,
+                         self.settings['crl_file'])
             public = self.pki.public_key(leaf)
             if public in keys:
                 raise ValueError('三个角色不能共用私钥')
@@ -130,7 +131,8 @@ class DeviceProvisioner:
             for filename in names: (stage/filename).write_bytes(read_file(Path(bundle)/filename))
             checked = self.preflight(stage, fingerprints)
             targets = [self.settings['ca_file'], self.modbus/'master.crt', self.modbus/'slave.crt',
-                       self.https/'g3.crt', self.https/'.reload-required']
+                       self.https/'g3.crt', self.https/'.reload-required',
+                       self.pki.pending_path(self.settings, 'nginx'), self.pki.pending_path(self.settings, 'tems')]
             previous = {}
             for path in targets:
                 if path.is_symlink(): raise ValueError('不能覆盖符号链接: ' + str(path))
@@ -179,7 +181,10 @@ class DeviceProvisioner:
             recovery = self.modbus/'deployment-recovery'
             entries = json.loads(read_file(recovery/'manifest.json'))
             targets = [self.settings['ca_file'], self.modbus/'master.crt', self.modbus/'slave.crt',
-                       self.https/'g3.crt', self.https/'.reload-required']
+                       self.https/'g3.crt', self.https/'.reload-required',
+                       self.pki.pending_path(self.settings, 'nginx'), self.pki.pending_path(self.settings, 'tems')]
+            if isinstance(entries, list) and len(entries) == 5:
+                targets = targets[:5]  # Recovery records created by older deployment tools.
             if not isinstance(entries, list) or len(entries) != len(targets):
                 raise ValueError('恢复记录不完整，请人工核查，不自动修改文件')
             restored = []
@@ -205,14 +210,35 @@ class DeviceProvisioner:
         values['https'] = json.loads(self.run(self.https_command('check')))
         return dict(valid=True, backend=self.backend, identities=values)
 
+    def import_crl(self, crl_file, chain=None):
+        """Separate public-material step, usable for initial or later deployment."""
+        try:
+            crl_store = importlib.import_module('crl_store')
+        except ImportError as error:
+            raise ValueError('CRL 导入需要设备安装 cryptography>=42.0.8 及匹配的 app/script/crl_store.py') from error
+        with self.locked():
+            result = crl_store.import_crls(self.settings, read_file(crl_file), read_file(chain) if chain else b'')
+        result['message'] = 'CRL 签名、发行方及编号已校验并导入；应用并重启 tems 后用于握手。'
+        return result
+
     def apply(self, tems_service, install_https=True):
         if not re.fullmatch(r'[A-Za-z0-9_@.-]+\.service', tems_service or ''):
             raise ValueError('必须明确提供实际 tems systemd 服务名（含 .service）')
-        with self.locked():
+        with self.locked(), self.pki.operation_lock(self.settings):
             if (self.modbus/'deployment-recovery').exists():
                 raise ValueError('存在未完成导入的恢复记录，禁止应用')
-            checked = self.check()
-            if install_https and (str(self.config) != '/home/zlg/lc_data_set.ini' or str(self.https) != '/etc/ssl/g3'):
+            marker = self.pki.pending_path(self.settings, 'tems')
+            crl_only = (self.pki.pending_services(self.settings) == ['tems'] and
+                        not (self.https/'.reload-required').exists() and
+                        json.loads(marker.read_text()).get('reason') == 'crl')
+            if crl_only:
+                # Do not let a newly revoked local identity prevent the restart
+                # that terminates its old connections. tems validates on startup.
+                crl_store = importlib.import_module('crl_store')
+                checked = dict(crls=crl_store.inventory(self.settings))
+            else:
+                checked = self.check()
+            if not crl_only and install_https and (str(self.config) != '/home/zlg/lc_data_set.ini' or str(self.https) != '/etc/ssl/g3'):
                 raise ValueError('现有 HTTPS 定时服务使用默认 INI/证书路径；自定义路径请使用 --no-install-timer 并自行维护服务环境')
             loaded = self.run(['systemctl','show',tems_service,'--property=LoadState','--value'])
             if loaded != 'loaded':
@@ -225,13 +251,18 @@ class DeviceProvisioner:
                 raise ValueError('tems 服务 Environment 的 INI 路径与部署工具不一致')
             # No config writes: assumes the device INI and both service environments are already configured.
             log = []
-            log.append(self.run(['bash',self.app/'script/enable_https.sh',
-                                 '--install-service' if install_https else '--apply']))
+            if not crl_only:
+                log.append(self.run(['bash',self.app/'script/enable_https.sh',
+                                     '--install-service' if install_https else '--apply']))
+                self.pki.pending_path(self.settings, 'nginx').unlink(missing_ok=True)
             try:
                 log.append(self.run(['systemctl','restart',tems_service]))
                 self.run(['systemctl','is-active','--quiet',tems_service])
+                self.pki.pending_path(self.settings, 'tems').unlink(missing_ok=True)
             except Exception as exc:
-                raise RuntimeError('HTTPS 已应用，但 tems 重启/状态检查失败，请核查服务日志；未自动撤回已应用配置。\n'+str(exc)) from exc
-            return dict(applied=True, https_applied=True, tems_service=tems_service,
+                prefix = 'CRL 已导入，但' if crl_only else 'HTTPS 已应用，但'
+                raise RuntimeError(prefix + ' tems 重启/状态检查失败，请核查服务日志；未自动撤回已应用配置。\n'+str(exc)) from exc
+            return dict(applied=True, https_applied=not crl_only, tems_service=tems_service,
                         validation=checked, log=log,
-                        message='HTTPS 配置已应用，tems 服务处于 active；仍需业务连接和真实 TLS 握手验收。')
+                        message='CRL 已应用，tems 服务处于 active。' if crl_only else
+                                'HTTPS 配置已应用，tems 服务处于 active；仍需业务连接和真实 TLS 握手验收。')

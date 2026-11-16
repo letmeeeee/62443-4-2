@@ -36,7 +36,7 @@ device_ips = 192.168.2.136
 | GET | `/api/cert/https/csr/export` | 下载 HTTPS CSR |
 | POST | `/api/cert/https/identity/import` | FormData：file、chain，导入 HTTPS 叶证书及中间链 |
 | GET | `/api/cert/https/status` | 校验当前 HTTPS 身份，返回有效性、待 reload/续签状态 |
-| POST | `/api/cert/https/apply` | 调用固定部署脚本 --apply，校验并应用 Nginx 配置 |
+| POST | `/api/cert/https/apply` | 无请求体，按待应用变更操作 Nginx／tems；见文末 CRL 应用说明 |
 
 旧 generate、renew、trust-add、trust-remove、trust-list 接口已停止原行为，返回 HTTP 410 / CA_CSR_REQUIRED；前端删除本地生成证书、直接信任主机叶证书的交互。不能将旧 renew 改名后继续当作本地续签功能。
 
@@ -74,10 +74,40 @@ CSR 生成不会修改已部署证书。续签重复生成 CSR 时复用原私�
 
 `GET /api/security/certificates` 提供结构化公开清单。身份包括 master、slave、https，另列 ca-root；一份 fullchain 只计一个身份，中间证书不冒充设备身份。chainVerified 为公开链校验结果。每次 GET `/api/security/certificates`、`/api/security/status` 或 `/api/security/config-summary` 均重新执行 master、slave、https 的持钥自检，privateKeyVerified 为 true（通过）、false（检查失败）或 null（未能完成/不适用），privateKeyCheckReason 提供原因；ca-root 不持有设备私钥，返回 null / NOT_APPLICABLE。检查只使用已有密钥，不生成、轮换或导出 TEE 私钥。Modbus 复用既有 file/tee 后端的 check 命令（单角色超时 15 秒），HTTPS 使用文件私钥签名随机挑战并用证书公钥验签；工具缺失、超时不会使整份列表失败。此结果独立于有效期和证书链结果，不改变原 errorCount 的证书状态统计。请求耗时会增加，前端应避免重叠轮询。
 
-有效期见 validityStatus；链失败时 status 为 invalid。revocationStatus:unavailable 表示尚未接入 CRL/OCSP，不能展示为“未吊销”。`/api/security/certificates/import` 保留为 Modbus identity/import 的别名；不再支持 POST 创建或 DELETE 钉扎叶证书。
+有效期见 validityStatus；链失败时 status 为 invalid。revocationStatus 现已接入 CRL，具体状态和应用步骤见文末“CRL 导入与按需应用”；unavailable 不能展示为“未吊销”。`/api/security/certificates/import` 保留为 Modbus identity/import 的别名；不再支持 POST 创建或 DELETE 钉扎叶证书。
 
 私钥默认位置：HTTPS 为 `/etc/ssl/g3/g3.key`；Modbus file 后端为 `/etc/ems/modbus/master.key` 和 slave.key，TEE 后端分别在两个既有角色槽。文件私钥为 0600；不得跨角色复制同一个私钥。CSR、证书、中间链和根证书均为公共材料，但根信任变更必须经过管理员授权和可信指纹核对。
 
 ## 企业内部 CA 与首次部署工具
 
 项目根目录新增 `ca_manager.py`（CA 管理 GUI/CLI）和 `device_deploy.py`（设备本地首次部署 GUI/CLI）。支持三份 CSR 交接、企业 CA 统一签发、证书包整包预检/导入、校验、HTTPS 应用及 tems 重启，INI 沿用设备现有配置。使用说明见 [provisioning/README.md](../../provisioning/README.md)。根目录运行 `python3 build_provisioning_tools.py` 可生成两个仅含代码的 .pyz 单文件发行包。
+
+## CRL 导入与按需应用（2026-11-13，以本节为准）
+
+设备不访问 CA 签发服务，由上层获取并推送 CRL。接口沿用管理员 Bearer、CSRF 和审计；CA 工具已有 revoke/crl 命令，CA 私钥保留在管理电脑。
+
+| 方法 | 接口 | 参数／结果 |
+|---|---|---|
+| POST | `/api/cert/crls/import` | FormData：file（完整 PEM CRL 包或单份 DER CRL），chain（可选 PEM 发行方证书链）；返回 crls、restart_required、pending |
+| GET | `/api/cert/crls` | 返回 crls 和 pending；每份含 issuer、issuerKeyId、crlNumber、thisUpdate、nextUpdate、status、reason、revokedCount |
+| POST | `/api/cert/https/apply` | 保持无请求体；改为应用所有待生效的证书／CRL 变更 |
+
+新增可选 `[TLS] crl_file`，默认取 ca_file 完整路径加 `.crls.pem`，例如 `/etc/ems/pki/ca-roots.crt.crls.pem`；必须为独立绝对路径。首次导入签发 CA 的 CRL 时，chain 应包含签发 CA 及所需中间证书；直接由可信根签发可省略。后续可复用已存发行方链。上传链不成为根信任。
+
+校验 CRL 签名、发行方/AKI、CA/cRLSign、SHA-256 及以上签名、可信链、thisUpdate/nextUpdate 和 CRLNumber。拒绝编号回退、同编号不同内容、移除既有永久吊销记录、delta/间接/分区 CRL 和临时挂起。允许相同名单重试，允许已过期但真实有效的 CRL，拒绝未来发布或无 nextUpdate 的名单。单字段和合并存储各限 1 MiB。错误材料返回 422，保留原文件。有效名单即使列出本机身份也允许导入。
+
+各发行方最新 CRL 及公开发行方链存为一个原子替换的 PEM 包，编号与名单一起提交。此文件是防编号回退的持久依据，禁止通过手工删除／恢复旧文件清除吊销。
+
+**握手策略：** 无 CRL 时兼容已有设备，保留原有证书链校验，状态为 unavailable。已有 CRL 存储后，缺少叶证书发行方名单返回 unknown，Modbus TLS 拒绝。有效名单拒绝已列出的证书；名单过期仍拒绝原有吊销记录，其余证书允许连接，状态为 stale。证书自身有效期、链、EKU、IP SAN 校验继续执行。中间 CA 若提供对应上级 CRL，也执行吊销检查；本版不要求必须具备上级 CRL，不宣称已实现完整中间 CA 吊销发布。根撤信通过受控根包更新。
+
+**按需应用：** HTTPS 更新操作 Nginx（按需 reload，未运行则 start）；Modbus master/slave 更新重启固定 tems.service；共享 CA 更新操作两者；CRL 更新重启 tems。合并多项更新，每个服务操作一次；没有更新不操作服务。兼容历史 HTTPS `.reload-required` 标记。服务名不接受客户端传入。
+
+响应仍为 status/message/data；data 新增 changed、applied、services、pending。services 每项含 action/status；Nginx 的 action 为 reload-or-start，tems 为 restart。按命令成功及 tems active 判定，无运行时批次回执。一项失败返回 HTTP 503 / CERTIFICATE_APPLY_FAILED，保留失败项标记；成功项不重复操作。导入与应用通过操作锁串行化。接口可能耗时数分钟，上层应设置请求超时，超时后查询 pending。仍需设备授予固定服务管理权限，后端不自动 sudo。
+
+CRL 导入只更新磁盘；应用重启 tems 才影响正在运行的 TLS，并终止旧连接。被吊销身份不能重连；本机身份已吊销时，重启后该角色初始化失败，需更换身份恢复。名单到期只影响新握手检查，不触发定时重启。日志记录上传、验证失败、保存、服务操作及失败原因，不记录私钥。
+
+`GET /api/security/certificates` 的 revocationStatus 改为真实结果：good（当前有效名单未列出）、revoked（证书或中间 CA 已吊销，即使名单过期仍保持）、stale（对应名单过期且未确认吊销）、unknown（缺发行方名单）、unavailable（无名单或检查失败）、not_applicable（根信任锚）。同时返回 revocationReason、revocationCheckedAt；匹配名单时带 crlNumber（十进制字符串，避免 JS 精度损失）及 crlNextUpdate。确认吊销时整体 status 为 invalid，chainVerified、validityStatus 和 privateKeyVerified 仍独立。applyPending 表示相应服务尚待应用，磁盘检查不等于旧连接已阻断。
+
+HTTPS 导入及应用检查已存 CRL，但浏览器端对 HTTPS 服务端证书的吊销检查由客户端策略负责；本版未开启 Web mTLS。升级需部署匹配的 app/script 并重新构建部署 tems。启用 CRL 的设备维护 Python 需 cryptography（后端既有 requirements-security.txt 要求 >=42.0.8）；未导入 CRL 的旧脚本路径不额外加载该依赖。
+
+补充：生产统一错误响应会移除 HTTP >=400 时的路由 data，应用 503 后前端应重新 GET `/api/cert/crls` 获取 pending；校验失败的吊销详情从证书清单读取。前端适配详见 [2026-11-13 修改反馈](LC400-前端联调修改反馈-2026-11-13.md)。

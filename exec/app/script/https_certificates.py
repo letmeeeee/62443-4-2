@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """HTTPS external-CA CSR/import/renewal requests; CA signing remains offline."""
 import argparse
+import contextlib
 import hashlib
 import json
 import os
@@ -49,7 +50,7 @@ def check(directory,settings,match_csr=False):
     if certificate.is_symlink():
         raise ValueError('Certificate cannot be a symbolic link')
     csr=(directory/'g3.csr').read_bytes() if match_csr else None
-    leaf,chain=pki.validate_identity(certificate.read_bytes(),None,settings['ca_file'],'sslserver',csr)
+    leaf,chain=pki.validate_identity(certificate.read_bytes(),None,settings['ca_file'],'sslserver',csr,settings['crl_file'])
     if pki.public_key(leaf)!=key_public(directory/'g3.key'):
         raise ValueError('HTTPS certificate does not match the device private key')
     expected={('IP',ip) for ip in read_device_ips(settings['config_file'])}
@@ -79,7 +80,10 @@ def main():
     if settings['mode']!='external_ca':
         raise ValueError('HTTPS CA provisioning requires [TLS] certificate_mode=external_ca')
     directory=args.dir.absolute()
-    with pki.locked(directory):
+    with contextlib.ExitStack() as stack:
+        if args.command in ('identity-import', 'ca-import'):
+            stack.enter_context(pki.operation_lock(settings))
+        stack.enter_context(pki.locked(directory))
         if args.command=='csr':
             result=generate_csr(directory,settings['config_file'])
         elif args.command=='csr-export':
@@ -95,7 +99,7 @@ def main():
             csr=(directory/'g3.csr').read_bytes()
             anchors=settings['ca_file'].read_bytes()
             leaf,chain=pki.validate_identity(args.cert.read_bytes(),args.chain.read_bytes() if args.chain else None,
-                settings['ca_file'],'sslserver',csr)
+                settings['ca_file'],'sslserver',csr,settings['crl_file'])
             if pki.public_key(leaf)!=key_public(directory/'g3.key'):
                 raise ValueError('Issued certificate does not match the HTTPS device key')
             expected={('IP',ip) for ip in read_device_ips(settings['config_file'])}
@@ -108,6 +112,7 @@ def main():
                 backup=directory/'backup';backup.mkdir(mode=0o700,exist_ok=True)
                 pki.atomic_write(backup/('g3-'+str(time.time_ns())+'.crt'),certificate.read_bytes())
             pki.atomic_write(directory/'.reload-required',b'New external-CA identity imported\n')
+            pki.mark_pending(settings, 'nginx', 'https')
             pki.atomic_write(certificate,leaf+chain,0o644)
             result=dict(imported=True,sha256=pki.fingerprint(leaf),reload_required=True,
                         chain_certificates=1+len(pki.certificates(chain)) if chain else 1)

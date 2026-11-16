@@ -274,6 +274,9 @@ def certificate_inventory():
         (settings['ca_file'], 'ca-root'),
     ]
     items = []
+    pending = set(pki.pending_services(settings))
+    role_services = {'master': ('tems',), 'slave': ('tems',),
+                     'https': ('nginx',), 'ca-root': ('nginx', 'tems')}
     now = datetime.now(timezone.utc)
     for path, role in paths:
         try:
@@ -330,6 +333,7 @@ def certificate_inventory():
                         )
                 except (OSError, ValueError, subprocess.SubprocessError):
                     verified = False
+                revocation = _certificate_revocation(data, settings, role)
                 items.append(dict(
                     id=digest,
                     role=role,
@@ -340,16 +344,29 @@ def certificate_inventory():
                     sha256=digest,
                     keyId=hashlib.sha256(public).hexdigest(),
                     signatureAlgorithmOid=cert.signature_algorithm_oid.dotted_string,
-                    status=validity if verified else 'invalid',
+                    status=validity if verified and revocation['revocationStatus'] != 'revoked' else 'invalid',
                     validityStatus=validity,
                     chainVerified=verified,
                     privateKeyVerified=None,
                     validityOnly=False,
-                    revocationStatus='unavailable',
+                    **revocation,
+                    applyPending=bool(pending.intersection(role_services[role])),
                 ))
             except ValueError:
                 items.append(dict(role=role, status='invalid', reason='INVALID_CERTIFICATE'))
     return items
+
+
+def _certificate_revocation(data, settings, role):
+    """Keep list collection available when one CRL cannot be evaluated."""
+    if role == 'ca-root':
+        return dict(revocationStatus='not_applicable', revocationReason='TRUST_ANCHOR')
+    from script import crl_store
+    try:
+        return crl_store.certificate_status(data, settings['ca_file'], settings['crl_file'])
+    except (OSError, ValueError, subprocess.SubprocessError):
+        current_app.logger.exception('Certificate CRL check failed role=%s', role)
+        return dict(revocationStatus='unavailable', revocationReason='CRL_CHECK_FAILED')
 
 
 def _https_private_key_check(certificate, directory):
@@ -506,15 +523,25 @@ def certificate_verify():
     """
     from routes.route_cert import _cert_run_script, _cert_validate_role, CertificateScriptError
     role = _cert_validate_role(_body().get('role'))
+    import config
+    from script import pki_common as pki
+    settings = pki.read_config(config.INI_PATH)
+    directory = Path(current_app.config.get('MODBUS_CERT_DIR', '/etc/ems/modbus'))
+    try:
+        revocation = _certificate_revocation((directory / (role + '.crt')).read_bytes(), settings, role)
+    except OSError:
+        revocation = dict(revocationStatus='unavailable', revocationReason='CERTIFICATE_UNAVAILABLE')
     try:
         _cert_run_script(['check', '--role', role])
-        return jsonify(ok=True, valid=True, role=role, revocationStatus='unavailable')
+        valid = revocation['revocationStatus'] not in ('revoked', 'unknown')
+        return jsonify(ok=valid, valid=valid, role=role, **revocation), 200 if valid else 422
     except CertificateScriptError:
         return jsonify(
             ok=False,
             code='CERTIFICATE_INVALID',
             message='Certificate verification failed',
             valid=False,
+            **revocation,
         ), 422
 
 

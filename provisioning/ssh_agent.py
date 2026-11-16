@@ -38,7 +38,7 @@ def dispatch(request, workspace):
     if operation == 'info':
         app = Path(options.get('app','/home/zlg/app'))
         helper = Path(options.get('helper') or app/'bin/modbus_tee_identity')
-        expected = [app/'script/pki_common.py',app/'script/https_certificates.py',
+        expected = [app/'script/pki_common.py',app/'script/crl_store.py',app/'script/https_certificates.py',
                     app/'script/https_config.py',app/'script/enable_https.sh',
                     app/'script/modbus_certs.py',helper]
         missing = [str(path) for path in expected if not path.is_file()]
@@ -62,6 +62,11 @@ def dispatch(request, workspace):
         return method(workspace/'bundle',fingerprints)
     if operation == 'check':
         return tool.check()
+    if operation == 'crl-import':
+        has_chain = request.get('has_chain', False)
+        if type(has_chain) is not bool:
+            raise ValueError('Invalid CRL chain flag')
+        return tool.import_crl(workspace/'crl.pem', workspace/'crl-chain.pem' if has_chain else None)
     if operation == 'recover':
         if request.get('confirm') != 'RESTORE_PUBLIC_CERTIFICATES':
             raise ValueError('Recovery confirmation required')

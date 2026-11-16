@@ -4,11 +4,13 @@ import contextlib
 import fcntl
 import hashlib
 import ipaddress
+import json
 import os
 from pathlib import Path
 import re
 import subprocess
 import tempfile
+import time
 
 DEFAULT_CONFIG = '/home/zlg/lc_data_set.ini'
 DEFAULT_CA = '/etc/ems/pki/ca-roots.crt'
@@ -37,7 +39,10 @@ def read_config(path=None):
     ca=Path(parser.get('TLS','ca_file',fallback=DEFAULT_CA).strip())
     if not ca.is_absolute():
         raise ValueError('[TLS] ca_file must be an absolute path')
-    return dict(mode=mode,ca_file=ca,config_file=source)
+    crl = Path(parser.get('TLS', 'crl_file', fallback=str(ca) + '.crls.pem').strip())
+    if not crl.is_absolute() or crl == ca:
+        raise ValueError('[TLS] crl_file must be absolute and different from ca_file')
+    return dict(mode=mode,ca_file=ca,crl_file=crl,config_file=source)
 
 
 def certificates(data):
@@ -110,7 +115,7 @@ def validate_roots(data):
     return b''.join(roots)
 
 
-def validate_identity(data, chain, roots_path, purpose, csr=None):
+def validate_identity(data, chain, roots_path, purpose, csr=None, crl_path=None):
     roots=validate_roots(Path(roots_path).read_bytes())
     anchors={fingerprint(cert) for cert in certificates(roots)}
     incoming=certificates(data)
@@ -156,6 +161,14 @@ def validate_identity(data, chain, roots_path, purpose, csr=None):
         if clean:
             command+=['-untrusted',untrusted]
         run(*command,certificate)
+    if crl_path is not None and (Path(crl_path).exists() or Path(crl_path).is_symlink()):
+        try:
+            from . import crl_store
+        except ImportError:
+            import crl_store
+        result = crl_store.certificate_status(leaf + b''.join(clean), roots_path, crl_path)
+        if result['revocationStatus'] in ('revoked', 'unknown'):
+            raise ValueError('Certificate revocation check failed: ' + result['revocationReason'])
     return leaf,b''.join(clean)
 
 
@@ -191,6 +204,27 @@ def locked(directory):
         yield
 
 
+def operation_lock(settings):
+    """Serialize identity/CA/CRL imports with the application endpoint."""
+    return locked(settings['ca_file'].parent / '.certificate-operations')
+
+
+def pending_path(settings, service):
+    if service not in ('nginx', 'tems'):
+        raise ValueError('Unknown certificate service')
+    return settings['ca_file'].parent / ('.' + service + '-apply-required')
+
+
+def mark_pending(settings, service, reason):
+    path = pending_path(settings, service)
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o755)
+    atomic_write(path, json.dumps(dict(reason=reason, updatedAt=time.time_ns())).encode(), 0o600)
+
+
+def pending_services(settings):
+    return [service for service in ('nginx', 'tems') if pending_path(settings, service).exists()]
+
+
 def import_roots(path, data, expected=None):
     validated=validate_roots(data)
     roots=certificates(validated)
@@ -204,5 +238,7 @@ def import_roots(path, data, expected=None):
     with locked(path.parent):
         if path.exists():
             atomic_write(path.with_name(path.name+'.previous'),path.read_bytes())
+        for service in ('nginx', 'tems'):
+            mark_pending(dict(ca_file=path), service, 'shared-ca')
         atomic_write(path,validated,0o644)
     return [fingerprint(cert) for cert in roots]

@@ -11,6 +11,8 @@
 #include <openssl/x509v3.h>
 #include "modbus_identity.h"
 #include <openssl/err.h>
+#include <openssl/pem.h>
+#include <sys/stat.h>
 #include "zlog.h"
 #include <fcntl.h>
 #include <limits.h>
@@ -127,8 +129,65 @@ static int ca_store_valid(X509_STORE *store)
     return anchors > 0;
 }
 
+/* Expiry is the only CRL validation failure deliberately allowed. OpenSSL
+ * continues signature/serial checks, so an expired list still rejects revocations.
+ * Issuer CRLs cover leaves; optional upper-level CRLs cover intermediates too.
+ */
+static int verify_crl_policy(int verified, X509_STORE_CTX *context)
+{
+    int error = X509_STORE_CTX_get_error(context);
+    if (!verified && error == X509_V_ERR_CRL_HAS_EXPIRED) {
+        dzlog_warn("Modbus TLS CRL expired: retaining revoked-serial checks depth=%d",
+                   X509_STORE_CTX_get_error_depth(context));
+        X509_STORE_CTX_set_error(context, X509_V_OK);
+        return 1;
+    }
+    if (!verified && error == X509_V_ERR_UNABLE_TO_GET_CRL &&
+        X509_STORE_CTX_get_error_depth(context) > 0) {
+        X509_STORE_CTX_set_error(context, X509_V_OK);
+        return 1;
+    }
+    if (!verified)
+        dzlog_error("Modbus TLS certificate rejected depth=%d reason=%s",
+                    X509_STORE_CTX_get_error_depth(context), X509_verify_cert_error_string(error));
+    return verified;
+}
+
+static int load_crls(SSL_CTX *ctx)
+{
+    const char *path = Modbus_CRL_File();
+    struct stat info;
+    if (!path) return 0;
+    if (lstat(path, &info) != 0) {
+        if (errno != ENOENT) return 0;
+        dzlog_warn("Modbus TLS CRL unavailable; existing certificate checks retained path=%s", path);
+        return 1;
+    }
+    if (!S_ISREG(info.st_mode) || (info.st_mode & 0022) || info.st_size <= 0 || info.st_size > 1024 * 1024)
+        return 0;
+    BIO *input = BIO_new_file(path, "r");
+    STACK_OF(X509_INFO) *objects = input ? PEM_X509_INFO_read_bio(input, NULL, NULL, NULL) : NULL;
+    BIO_free(input);
+    int count = 0, ok = objects != NULL;
+    for (int i = 0; ok && i < sk_X509_INFO_num(objects); ++i) {
+        X509_INFO *object = sk_X509_INFO_value(objects, i);
+        if (object->crl) {
+            ok = X509_STORE_add_crl(SSL_CTX_get_cert_store(ctx), object->crl) == 1;
+            ++count;
+        }
+        /* Embedded issuers are not promoted into the trusted store. */
+    }
+    sk_X509_INFO_pop_free(objects, X509_INFO_free);
+    if (!ok || !count) return 0;
+    if (X509_STORE_set_flags(SSL_CTX_get_cert_store(ctx),
+            X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL) != 1) return 0;
+    dzlog_info("Modbus TLS CRLs loaded path=%s count=%d", path, count);
+    return 1;
+}
+
 static int verify_peer(int verified, X509_STORE_CTX *context)
 {
+    verified = verify_crl_policy(verified, context);
     if (!verified || X509_STORE_CTX_get_error_depth(context) != 0) return verified;
     SSL *ssl = X509_STORE_CTX_get_ex_data(context, SSL_get_ex_data_X509_STORE_CTX_idx());
     /* A slave expects a clientAuth master; a master expects a serverAuth slave. */
@@ -149,6 +208,7 @@ static int verify_local_chain(SSL_CTX *context, int server)
     X509_VERIFY_PARAM *parameters = X509_STORE_CTX_get0_param(verification);
     X509_VERIFY_PARAM_set_auth_level(parameters, 2);
     X509_VERIFY_PARAM_set_depth(parameters, 8);
+    X509_STORE_CTX_set_verify_cb(verification, verify_crl_policy);
     ok = X509_verify_cert(verification) == 1;
 out:
     X509_STORE_CTX_free(verification);
@@ -178,7 +238,7 @@ static SSL_CTX *make_context(int server)
         goto fail;
     {
         if (SSL_CTX_load_verify_locations(ctx, Modbus_CA_File(), NULL) != 1 ||
-            !ca_store_valid(SSL_CTX_get_cert_store(ctx)) || !verify_local_chain(ctx, server))
+            !ca_store_valid(SSL_CTX_get_cert_store(ctx)) || !load_crls(ctx) || !verify_local_chain(ctx, server))
             goto fail;
         if (server) {
             STACK_OF(X509_NAME) *names = SSL_load_client_CA_file(Modbus_CA_File());

@@ -274,3 +274,53 @@ def test_probe_and_connection_choose_same_recorded_key(ssh_server,workspace):
     assert result['ssh_fingerprint']==fingerprint(rsa)
     with client(ssh_server,workspace,host_fingerprint=result['ssh_fingerprint'],known_hosts=known) as connected:
         assert connected.info()['ready']
+
+
+def test_remote_crl_import_uses_public_material_and_preserves_keys(ssh_server, workspace, tmp_path):
+    from provisioning.tests.test_provisioning import PASSWORD
+    tool = workspace['tool']
+    tool.import_bundle(workspace['bundle'], [workspace['ca'].fingerprint()])
+    previous = [(tool.modbus / (role + '.key')).read_bytes() for role in ('master', 'slave')]
+    crl = tmp_path / 'issuer-crl.pem'
+    workspace['ca'].export_crl(crl, PASSWORD)
+    with client(ssh_server, workspace) as remote:
+        result = remote.import_crl(crl, workspace['ca'].directory / 'intermediates.pem')
+        assert result['imported'] and result['restart_required']
+        assert result['crls'][0]['status'] == 'valid'
+        assert remote.check()['valid']
+    assert tool.settings['crl_file'].is_file()
+    assert previous == [(tool.modbus / (role + '.key')).read_bytes() for role in ('master', 'slave')]
+
+
+def test_gui_session_reuses_disconnects_and_reconnects(ssh_server, workspace):
+    from provisioning.ssh_device import SSHDeploymentSession
+    session = SSHDeploymentSession(factory=lambda **settings: client(ssh_server, workspace, **settings))
+    try:
+        first = session.get()
+        assert first.info()['ready']
+        assert session.get() is first
+        transport = first.client.get_transport()
+        assert session.close() is True
+        assert not transport.is_active()
+        assert first.client is None and first.sftp is None
+        assert session.close() is False
+        # The remote SSH service remains available after our session is closed.
+        second = session.get()
+        assert second is not first and second.info()['ready']
+    finally:
+        session.close()
+
+
+def test_gui_session_changed_settings_closes_old_connection_even_if_reconnect_fails(ssh_server, workspace):
+    from provisioning.ssh_device import SSHDeploymentSession
+    session = SSHDeploymentSession(factory=lambda **settings: client(ssh_server, workspace, **settings))
+    try:
+        first = session.get()
+        transport = first.client.get_transport()
+        with pytest.raises(RemoteDeploymentError, match='指纹不匹配'):
+            session.get(host_fingerprint='SHA256:' + base64.b64encode(b'X' * 32).decode().rstrip('='))
+        assert first.client is None and not transport.is_active()
+        assert session.close() is False
+        assert session.get().info()['ready']
+    finally:
+        session.close()

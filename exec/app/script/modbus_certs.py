@@ -149,7 +149,7 @@ def import_identity(args,directory,settings):
         raise ValueError('Generate the local role CSR before importing its signed identity')
     anchors=settings['ca_file'].read_bytes()
     leaf,chain=pki.validate_identity(args.cert.read_bytes(),args.chain.read_bytes() if args.chain else None,
-        settings['ca_file'],'sslclient' if args.role=='master' else 'sslserver',csr.read_bytes())
+        settings['ca_file'],'sslclient' if args.role=='master' else 'sslserver',csr.read_bytes(), settings['crl_file'])
     with tempfile.TemporaryDirectory(prefix='.identity-',dir=directory) as temporary:
         candidate=Path(temporary)/'identity.pem'
         candidate.write_bytes(leaf+chain)
@@ -158,6 +158,7 @@ def import_identity(args,directory,settings):
         raise ValueError('CA trust changed during verification; retry import')
     if destination.exists():
         print('Previous identity backup:',backup(directory,[destination]))
+    pki.mark_pending(settings, 'tems', 'modbus-' + args.role)
     atomic_write(destination,leaf+chain,0o644)
     print('Imported identity:',destination,'SHA256:',fingerprint(leaf))
     print('Full chain verified, CSR/private key matched; restart tems during maintenance.')
@@ -192,7 +193,10 @@ def main():
     if args.config:
         os.environ['LC_INI_PATH']=str(args.config.absolute())
     directory=args.dir.absolute()
-    with locked(directory):
+    with contextlib.ExitStack() as stack:
+        if args.command in ('identity-import', 'ca-import'):
+            stack.enter_context(pki.operation_lock(settings))
+        stack.enter_context(locked(directory))
         if args.command=='csr':
             create_csr(args,directory)
         elif args.command=='csr-export':
@@ -214,7 +218,7 @@ def main():
             certs=certificates(data)
             if args.command=='check':
                 pki.validate_identity(data,None,settings['ca_file'],
-                    'sslclient' if args.role=='master' else 'sslserver')
+                    'sslclient' if args.role=='master' else 'sslserver', crl_path=settings['crl_file'])
                 tee_identity('check',args.role,cert_path,directory=directory)
                 print('Verified CA chain, validity, role and device private key')
             elif args.command=='export':

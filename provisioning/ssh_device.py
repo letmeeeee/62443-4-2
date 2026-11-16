@@ -5,6 +5,7 @@ import hashlib
 import importlib.resources
 import io
 import json
+import logging
 import os
 from pathlib import Path
 import secrets
@@ -18,6 +19,44 @@ import zipfile
 from .common import ROLES, MAX_FILE, device_name, public_package, read_file
 
 MAX_RESPONSE = 8 * 1024 * 1024
+LOG = logging.getLogger(__name__)
+
+
+class SSHDeploymentSession:
+    """GUI-owned connection, reused only while connection settings are unchanged.
+
+    The GUI serializes operations; callers must wait for an operation to finish
+    before closing. Each operation still cleans its own remote staging workspace.
+    CLI context-manager connections retain their original short-lived behavior.
+    """
+    def __init__(self, factory=None):
+        self._factory = factory or SSHDeviceProvisioner
+        self._tool = None
+        self._settings = None
+
+    def get(self, **settings):
+        if self._tool is not None and settings == self._settings:
+            transport = self._tool.client.get_transport() if self._tool.client else None
+            if transport and transport.is_active() and transport.is_authenticated():
+                return self._tool
+        self.close()
+        tool = self._factory(**settings)
+        try:
+            tool.connect()
+        except Exception:
+            tool.close()
+            raise
+        self._tool, self._settings = tool, settings
+        LOG.info('Deployment SSH connected host=%s port=%s', tool.host, tool.port)
+        return tool
+
+    def close(self):
+        tool = self._tool
+        self._tool = self._settings = None
+        if tool is not None:
+            tool.close()
+            LOG.info('Deployment SSH disconnected host=%s port=%s', tool.host, tool.port)
+        return tool is not None
 
 
 class RemoteDeploymentError(RuntimeError):
@@ -299,6 +338,15 @@ class SSHDeviceProvisioner:
 
     def check(self):
         with self._workspace() as workspace: return self._rpc(workspace,'check')
+
+    def import_crl(self, crl_file, chain=None):
+        material = read_file(crl_file)
+        issuer_chain = read_file(chain) if chain else None
+        with self._workspace() as workspace:
+            self._upload(workspace + '/crl.pem', material)
+            if issuer_chain is not None:
+                self._upload(workspace + '/crl-chain.pem', issuer_chain)
+            return self._rpc(workspace, 'crl-import', has_chain=issuer_chain is not None)
 
     def recover(self):
         with self._workspace() as workspace:

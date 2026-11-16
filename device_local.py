@@ -19,12 +19,14 @@ def gui():
     w.field('output', 'CSR 输出目录（必须不存在）', '/tmp/LC400-001-csr')
     w.field('bundle', 'CA 返回的证书包目录', '', True)
     w.field('fingerprints', '可信渠道确认的根 SHA-256（多根用逗号分隔）', '')
+    w.field('crl_file', 'CRL 文件（PEM / DER）', '', file=True)
+    w.field('crl_chain', 'CRL 发行方证书链（可选）', '', file=True)
     w.field('tems_service', '实际 tems systemd 服务名（含 .service）', '')
     def action(kind):
         if w.busy: return
         values = w.values()
-        if kind in ('import', 'apply', 'recover'):
-            prompt = {'import':'将导入共享根 CA 及三份身份证书，替换设备公开证书文件。确认已核对根指纹？',
+        if kind in ('import', 'apply', 'recover', 'crl-import'):
+            prompt = {'crl-import':'将导入 CA 签名 CRL；应用并重启后生效。确认继续？', 'import':'将导入共享根 CA 及三份身份证书，替换设备公开证书文件。确认已核对根指纹？',
                       'apply':'将刷新 HTTPS 服务及定时器、应用 Nginx 配置，并重启指定 tems 服务。确认处于维护窗口？',
                       'recover':'将按未完成导入的恢复记录还原导入前的根信任和公开证书。确认继续？'}[kind]
             if not messagebox.askyesno('确认设备操作', prompt): return
@@ -34,11 +36,12 @@ def gui():
             if kind == 'generate': return tool.generate(values['device_id'], values['output'])
             if kind == 'preview': return tool.preflight(values['bundle'], fingerprints)
             if kind == 'import': return tool.import_bundle(values['bundle'], fingerprints)
+            if kind == 'crl-import': return tool.import_crl(values['crl_file'], values['crl_chain'] or None)
             if kind == 'check': return tool.check()
             if kind == 'recover': return tool.recover()
             return tool.apply(values['tems_service'])
         w.task(work)
-    for label, kind in [('1 生成/导出三份 CSR','generate'),('2 预检证书包','preview'),('3 导入证书包','import'),('4 本机校验','check'),('5 应用并重启','apply'),('恢复中断导入','recover')]:
+    for label, kind in [('1 生成/导出三份 CSR','generate'),('2 预检证书包','preview'),('3 导入证书包','import'),('导入 CRL','crl-import'),('4 本机校验','check'),('5 应用并重启','apply'),('恢复中断导入','recover')]:
         w.button(label, lambda k=kind: action(k))
     w.run()
 
@@ -57,6 +60,7 @@ def main():
     for operation in ('preview','import'):
         cmd = sub.add_parser(operation); cmd.add_argument('--bundle', required=True)
         cmd.add_argument('--fingerprint', required=True, action='append', help='每个根重复一次，必须经可信渠道核对')
+    crl = sub.add_parser('crl-import'); crl.add_argument('--file', required=True); crl.add_argument('--chain')
     sub.add_parser('check')
     recover = sub.add_parser('recover'); recover.add_argument('--confirm', required=True, choices=['RESTORE_PUBLIC_CERTIFICATES'])
     apply = sub.add_parser('apply'); apply.add_argument('--tems-service', required=True)
@@ -68,6 +72,7 @@ def main():
     if args.command == 'generate': result = tool.generate(args.device_id, args.out)
     elif args.command == 'preview': result = tool.preflight(args.bundle, args.fingerprint)
     elif args.command == 'import': result = tool.import_bundle(args.bundle, args.fingerprint)
+    elif args.command == 'crl-import': result = tool.import_crl(args.file, args.chain)
     elif args.command == 'check': result = tool.check()
     elif args.command == 'recover': result = tool.recover()
     else: result = tool.apply(args.tems_service, not args.no_install_timer)

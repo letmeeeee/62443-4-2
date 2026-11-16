@@ -1,4 +1,5 @@
-# PC client; device agent itself uses only its existing Python standard library.
+# PC SSH client dependencies; device CRL support also needs cryptography.
+# See exec/app/requirements-security.txt and provisioning/README.md.
 paramiko==3.5.1
 cryptography>=42.0.8
 bcrypt==4.2.1

@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from provisioning.ssh_device import SSHDeviceProvisioner
+from provisioning.ssh_device import SSHDeviceProvisioner, SSHDeploymentSession
 
 
 DEVICE_FIELDS=('app','config','backend','modbus_dir','https_dir','helper')
@@ -15,6 +15,7 @@ DEVICE_FIELDS=('app','config','backend','modbus_dir','https_dir','helper')
 def gui():
     from provisioning.ui import Window, filedialog, messagebox, tk, ttk
     w=Window('LC400 PC SSH 部署 — 设备 CSR / CA 身份证书')
+    session = SSHDeploymentSession()
     w.root.geometry('1120x900')
     notebook=ttk.Notebook(w.root);notebook.pack(before=w.form,fill='x',padx=12,pady=8)
     connection=ttk.Frame(notebook,padding=10);device=ttk.Frame(notebook,padding=10)
@@ -42,8 +43,10 @@ def gui():
     w.field('bundle','PC 上 CA 返回的证书包目录','',directory=True,parent=device)
     w.field('fingerprints','可信根 CA SHA-256（十六进制，多根逗号分隔）','',parent=device)
     w.field('tems_service','设备实际 tems 服务名（含 .service）','',parent=device)
+    w.field('crl_file','PC 上的 CRL 文件（PEM / DER）','',file=True,parent=device)
+    w.field('crl_chain','CRL 发行方证书链（首次导入必需，根直接签发可省略）','',file=True,parent=device)
     install_timer=tk.BooleanVar(value=True)
-    ttk.Checkbutton(device,text='应用时安装/刷新 HTTPS 定时服务',variable=install_timer).grid(row=11,column=0,columnspan=3,sticky='w')
+    ttk.Checkbutton(device,text='应用时安装/刷新 HTTPS 定时服务',variable=install_timer).grid(row=13,column=0,columnspan=3,sticky='w')
     def load_delivery():
         if w.busy:return
         filename=filedialog.askopenfilename(title='选择 CA 签发包中的 deployment.json（旧包可选 manifest.json）',
@@ -63,37 +66,61 @@ def gui():
     def action(kind):
         if w.busy:return
         values=w.values();use_sudo=sudo.get();install=install_timer.get()
-        if kind in ('import','apply','recover'):
-            messages={'import':'将通过 SSH 导入共享根和三份身份证书。确认已核对 CA 根指纹？',
+        if kind in ('import','apply','recover','crl-import'):
+            messages={'crl-import':'将导入签名 CRL，应用前不会重启服务。确认继续？', 'import':'将通过 SSH 导入共享根和三份身份证书。确认已核对 CA 根指纹？',
                 'apply':'将应用 HTTPS 配置并重启指定 tems 服务。确认设备处于维护窗口？',
                 'recover':'将恢复设备上未完成导入前的公开证书。确认继续？'}
             if not messagebox.askyesno('确认远程设备操作',values['host']+'\n'+messages[kind]):return
         def work():
             options={key:values[key] for key in DEVICE_FIELDS if values[key]}
-            tool=SSHDeviceProvisioner(values['host'],int(values['port']),values['username'],
+            connection_settings=dict(host=values['host'],port=int(values['port']),username=values['username'],
                 password=values['password'] or None,identity_file=values['identity_file'] or None,
                 key_passphrase=values['key_passphrase'] or None,host_fingerprint=values['host_fingerprint'] or None,
                 known_hosts=values['known_hosts'] or None,sudo=use_sudo,remote_python=values['remote_python'],options=options)
-            if kind=='probe':return tool.probe()
-            with tool:
+            if kind=='probe':return SSHDeviceProvisioner(**connection_settings).probe()
+            tool = session.get(**connection_settings)
+            try:
                 fingerprints=[v.strip() for v in values['fingerprints'].split(',') if v.strip()]
                 if kind=='connect':result=tool.info()
                 elif kind=='generate':result=tool.generate(values['device_id'],values['output'])
                 elif kind=='preview':result=tool.preflight(values['bundle'],fingerprints)
                 elif kind=='import':result=tool.import_bundle(values['bundle'],fingerprints)
+                elif kind=='crl-import':result=tool.import_crl(values['crl_file'],values['crl_chain'] or None)
                 elif kind=='check':result=tool.check()
                 elif kind=='recover':result=tool.recover()
                 else:result=tool.apply(values['tems_service'],install)
                 if getattr(tool,'cleanup_warning',None):result['cleanup_warning']=tool.cleanup_warning
+                result['sshConnected'] = True
                 return result
+            except Exception:
+                session.close()
+                raise
         w.task(work)
     for label,kind in [('探测 SSH 指纹','probe'),('测试连接','connect'),('生成并下载 CSR','generate'),
-        ('预检证书包','preview'),('导入证书包','import'),('校验身份','check'),('应用并重启','apply'),('恢复中断导入','recover')]:
+        ('预检证书包','preview'),('导入证书包','import'),('导入 CRL','crl-import'),('校验身份','check'),('应用并重启','apply'),('恢复中断导入','recover')]:
         w.button(label,lambda k=kind:action(k))
+    def disconnect():
+        if w.busy:
+            messagebox.showinfo('操作进行中', '请等待当前操作完成后再断开 SSH，避免中断部署。')
+            return
+        def work():
+            disconnected = session.close()
+            return dict(sshConnected=False,
+                        message='已断开当前设备的 SSH 连接。' if disconnected else '当前没有已建立的 SSH 连接。')
+        w.task(work)
+    ttk.Button(connection, text='断开 SSH 连接', command=disconnect).grid(row=10, column=0, sticky='w', pady=8)
+    def close_window():
+        if not w.busy:
+            session.close()
+        w.close()
+    w.root.protocol('WM_DELETE_WINDOW', close_window)
     credentials=ttk.Frame(w.root,padding=4);credentials.pack(before=w.buttons,fill='x')
     def clear():
         if not w.busy:
+            session.close()
             w.fields['password'].set('');w.fields['key_passphrase'].set('')
+            w.output.insert('end', '已清除 SSH 口令并断开当前连接。\n')
+            w.output.see('end')
     ttk.Button(credentials,text='清除当前窗口 SSH 口令',command=clear).pack(side='left')
     ttk.Label(credentials,text='SSH 登录口令不保存到磁盘；未知主机需独立核对指纹。').pack(side='left',padx=8)
     w.run()
@@ -120,6 +147,7 @@ def main():
     for operation in ('preview','import'):
         item=sub.add_parser(operation);item.add_argument('--bundle',required=True,help='PC 上的证书包目录')
         item.add_argument('--fingerprint',required=True,action='append',help='可信 CA 根十六进制指纹，每根重复一次')
+    crl=sub.add_parser('crl-import');crl.add_argument('--file',required=True);crl.add_argument('--chain')
     sub.add_parser('check')
     recover=sub.add_parser('recover');recover.add_argument('--confirm',required=True,choices=['RESTORE_PUBLIC_CERTIFICATES'])
     apply=sub.add_parser('apply');apply.add_argument('--tems-service',required=True)
@@ -139,6 +167,7 @@ def main():
             elif args.command=='generate':result=tool.generate(args.device_id,args.out)
             elif args.command=='preview':result=tool.preflight(args.bundle,args.fingerprint)
             elif args.command=='import':result=tool.import_bundle(args.bundle,args.fingerprint)
+            elif args.command=='crl-import':result=tool.import_crl(args.file,args.chain)
             elif args.command=='check':result=tool.check()
             elif args.command=='recover':result=tool.recover()
             else:result=tool.apply(args.tems_service,not args.no_install_timer)

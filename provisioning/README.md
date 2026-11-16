@@ -202,7 +202,7 @@ python3 ca_manager.py --ca-dir /secure/company-ca revoke HEX_SERIAL --reason key
 python3 ca_manager.py --ca-dir /secure/company-ca crl ./issuer-crl.pem
 ```
 
-GUI 支持签发记录查询、填序列号吊销、导出签发 CA 的签名 CRL。CRL 默认 7 天有效，编号递增。**当前设备端还未接入 CRL/OCSP 校验，因此 CA 标记吊销或导出 CRL 不会自动阻断现有设备证书连接。** 设备反馈继续为 revocationStatus:unavailable；涉及密钥泄露应由管理员在维护窗口更换身份/信任，并按实际系统能力阻断旧身份。此程序不宣称具有尚未接入的在线吊销执行能力。
+GUI 支持签发记录查询、填序列号吊销、导出签发 CA 的签名 CRL。CRL 默认 7 天有效，编号递增。设备已支持受控导入 CRL 和 Modbus TLS 检查，导出 CRL 后还需分发至各验证设备并应用重启；CA 仅登记吊销不会自动阻断连接。离线/SSH 导入步骤见文末。过期名单仍拒绝已吊销身份，其余允许握手并显示 stale；HTTPS 浏览器侧由客户端策略负责。
 
 ## 5. 验证
 
@@ -270,3 +270,24 @@ sudo ./LC400_Device_Agent --backend file generate \
 CA GUI/CLI 的 inspect/sign 同时支持原三身份 lc400-csr 和新增 lc400-role-csr 请求包。使用 tools/modbus_gui 的企业CA页面生成请求，CA选择其 request/ 子目录，审查后签发。返回 lc400-role-certificates，使用原签发台账、角色复用/泄露吊销保护和根体系；有效期仍为1–825天且不能超过中间CA。单角色包仅给PC调试工具导入，不作为设备三身份部署包。
 
 CLI沿用：`python3 ca_manager.py --ca-dir /path/to/ca inspect /path/to/pc-identity/request`；`python3 ca_manager.py --ca-dir /path/to/ca sign /path/to/pc-identity/request /path/to/new-output`（口令交互输入）。不接受裸CSR拖入签发；请求清单确保角色和PC编号一起审查。PC私钥不交给CA。
+
+## CRL 首次部署与后续更新（2026-11-13）
+
+先按原流程导入共享根及三份证书，再导入 CA 工具导出的 CRL（即使没有吊销记录，也可导入空名单），最后应用。CRL 是公开材料；发行方中间链作为辅助验签材料，不含 CA 私钥。设备运行该功能的 Python 需安装 cryptography，建议与 app 的 requirements-security.txt 保持一致；其余未启用 CRL 的原部署流程保持兼容。
+
+PC SSH GUI 在“设备路径与证书材料”增加 CRL 文件、发行方链字段和“导入 CRL”按钮；本地 GUI 也有对应操作。根与身份导入后执行，不自动重启：
+
+```bash
+# PC SSH 客户端，其他 SSH 参数沿用既有配置。
+python3 device_deploy.py --host DEVICE_IP --identity PC_SSH_KEY \
+  crl-import --file ./issuer-crl.pem --chain ./intermediates.pem
+
+# 设备本地应急后端。
+python3 device_local.py crl-import --file /tmp/issuer-crl.pem --chain /tmp/intermediates.pem
+```
+
+同一发行方首次导入需要签发 CA 的证书链；后续可省略 chain，复用已验证保存的链。返回名单编号、有效期和吊销数量；签名错误、发行方不可信、编号回退等均拒绝。有效但已过期的名单可导入并显示 stale。
+
+导入之后沿用“应用并重启”，或由上层调用 `/api/cert/https/apply`。部署工具的证书部署步骤保留原有全量本机检查及 HTTPS/tems 应用流程；仅 CRL 待应用时只重启 tems，不会因本机身份新近被吊销而跳过必要重启。HTTP 接口根据待应用标记按需处理。模板中的设备路径和服务名应按实际部署填写。
+
+旧名单列出的身份过期后仍拒绝，其余允许连接；更新仍须在到期前安排，紧急吊销立即推送给相关验证设备。密钥泄露需要换钥和重新签发。证书导入中断恢复只回滚公开证书及应用标记，不回退独立 CRL 存储；已吊销身份不可通过恢复旧证书重新启用。各接口及状态见 `exec/app/CERT_API.md` 文末。
