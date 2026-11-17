@@ -1,0 +1,908 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SCL xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Header id="WRWF-0I002-04 KH_PCS_GOOSE" version="V1.1.1" nameStructure="IEDName">
+    <History>
+      <Hitem version="V1.0" revision="0" when="2011-12-20" who="User" what="NewProject" why="Test"/>
+    </History>
+  </Header>
+  <Communication>
+    <SubNetwork name="SUBNET" type="8-MMS">
+      <ConnectedAP iedName="TEMPLATE" apName="G1">
+        <Address>
+          <P type="OSI-PSEL">00000001</P>
+          <P type="OSI-SSEL">0001</P>
+          <P type="OSI-TSEL">0001</P>
+          <P type="IP">127.0.0.1</P>
+          <P type="IP-SUBNET">255.255.255.0</P>
+          <P type="IP-GATEWAY">10.0.0.101</P>
+          <P type="OSI-AP-Title">1,3,9999,33</P>
+          <P type="OSI-AE-Qualifier">33</P>
+        </Address>
+        <GSE cbName="gocb1" ldInst="PIGO">
+          <Address>
+            <P type="MAC-Address">01-0C-CD-01-00-01</P>
+            <P type="APPID">0001</P>
+            <P type="VLAN-ID">000</P>
+            <P type="VLAN-PRIORITY">4</P>
+          </Address>
+          <MinTime unit="s" multiplier="m">2</MinTime>
+          <MaxTime unit="s" multiplier="m">5000</MaxTime>
+        </GSE>
+      </ConnectedAP>
+    </SubNetwork>
+  </Communication>
+  <IED name="TEMPLATE" desc="三相储能变流器" type="BCS1725K-B-HUD" manufacturer="Kehua" configVersion="V1.00">
+    <Services>
+      <GetDirectory/>
+      <GetDataObjectDefinition/>
+      <GetDataSetValue/>
+      <DataSetDirectory/>
+      <ReadWrite/>
+      <GetCBValues/>
+      <GSESettings appID="Conf" cbName="Conf" datSet="Conf"/>
+      <GOOSE max="1"/>
+    </Services>
+    <AccessPoint name="G1">
+      <Server>
+        <Authentication/>
+        <LDevice inst="PIGO" desc="三相储能变流器">
+          <LN0 lnClass="LLN0" lnType="LLN0" inst="">
+            <DataSet name="dsGOOSE1" desc="发布数据集">
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind1" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind2" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind3" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind4" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI1" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI1" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI2" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI2" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI3" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI3" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI4" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI4" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI5" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI5" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI6" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI6" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI7" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI7" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI8" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI8" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI9" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI9" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI10" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI10" daName="mag.i" fc="MX"/>
+  			  <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI11" daName="mag.f" fc="MX"/>
+  			  <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI11" daName="mag.i" fc="MX"/>  
+  			  <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI12" daName="mag.f" fc="MX"/>
+  			  <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI12" daName="mag.i" fc="MX"/> 
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI13" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI13" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI14" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI14" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI15" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI15" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI16" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI16" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI17" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI17" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI18" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI18" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI19" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI19" daName="mag.i" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI20" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI20" daName="mag.i" fc="MX"/>       
+			  <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI21" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI21" daName="mag.i" fc="MX"/>                                    
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI22" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI22" daName="mag.i" fc="MX"/>  
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="1" doName="AI23" daName="mag.f" fc="MX"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="MMXU" lnInst="2" doName="AI23" daName="mag.i" fc="MX"/>                
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind5" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind6" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind7" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind8" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind9" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind10" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind11" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind12" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind13" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind14" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind15" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind16" daName="stVal" fc="ST"/>       
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind17" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind18" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind19" daName="stVal" fc="ST"/>
+              <FCDA ldInst="PIGO" prefix="GOOUT" lnClass="GGIO" lnInst="1" doName="Ind20" daName="stVal" fc="ST"/>                                       
+            </DataSet>
+            <DOI name="Mod"/>
+            <DOI name="Beh"/>
+            <DOI name="Health"/>
+            <DOI name="NamPlt"/>
+            <Inputs>
+              <ExtRef iedName="null" ldInst="null" lnClass="GGIO" lnInst="0" doName="null" intAddr="PIGO/GOINGGIO1.AnIn1.mag.f"/>
+              <ExtRef iedName="null" ldInst="null" lnClass="GGIO" lnInst="0" doName="null" intAddr="PIGO/GOINGGIO1.AnIn2.mag.f"/>
+            </Inputs>
+            <GSEControl name="gocb1" confRev="1" datSet="dsGOOSE1" appID="TEMPLATEPIGO/LLN0.gocb1"/>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD" inst="1"/>
+          <LN prefix="GOIN" lnClass="GGIO" lnType="AnIn_GGIO" inst="1" desc="订阅">
+            <DOI name="Mod"/>
+            <DOI name="Beh"/>
+            <DOI name="Health"/>
+            <DOI name="AnIn1">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,5,yt1"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>有功功率</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AnIn2">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,5,yt2"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>无功功率</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN inst="1" lnClass="GGIO" lnType="GGIO_OUT" prefix="GOOUT" desc="状态量">
+            <DOI name="Mod"/>
+            <DOI name="Beh"/>
+            <DOI name="Health"/>
+            <DOI name="NamPlt"/>
+            <DOI name="Ind1" desc="并网状态">
+              <DAI name="stVal" sAddr="1,1,2,yx1"/>
+              <DAI name="dU">
+                <Val>并网状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind2" desc="脱网状态">
+              <DAI name="stVal" sAddr="1,1,2,yx2"/>
+              <DAI name="dU">
+                <Val>脱网状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind3" desc="低穿状态">
+              <DAI name="stVal" sAddr="1,1,2,yx3"/>
+              <DAI name="dU">
+                <Val>低穿状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind4" desc="高穿状态">
+              <DAI name="stVal" sAddr="1,1,2,yx4"/>
+              <DAI name="dU">
+                <Val>高穿状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind5" desc="可控状态">
+              <DAI name="stVal" sAddr="1,1,2,yx5"/>
+              <DAI name="dU">
+                <Val>可控状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind6" desc="协控使能状态">
+              <DAI name="stVal" sAddr="1,1,2,yx6"/>
+              <DAI name="dU">
+                <Val>协控使能状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind7" desc="PCS充电状态">
+              <DAI name="stVal" sAddr="1,1,2,yx7"/>
+              <DAI name="dU">
+                <Val>PCS充电状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind8" desc="PCS放电状态">
+              <DAI name="stVal" sAddr="1,1,2,yx8"/>
+              <DAI name="dU">
+                <Val>PCS放电状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind9" desc="PCS停机状态">
+              <DAI name="stVal" sAddr="1,1,2,yx9"/>
+              <DAI name="dU">
+                <Val>PCS停机状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind10" desc="PCS运行状态">
+              <DAI name="stVal" sAddr="1,1,2,yx10"/>
+              <DAI name="dU">
+                <Val>PCS运行状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind11" desc="PCS故障状态">
+              <DAI name="stVal" sAddr="1,1,2,yx11"/>
+              <DAI name="dU">
+                <Val>PCS故障状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind12" desc="预留">
+              <DAI name="stVal" sAddr="1,1,2,yx12"/>
+              <DAI name="dU">
+                <Val>预留</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind13" desc="预留">
+              <DAI name="stVal" sAddr="1,1,2,yx13"/>
+              <DAI name="dU">
+                <Val>预留</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind14" desc="预留">
+              <DAI name="stVal" sAddr="1,1,2,yx14"/>
+              <DAI name="dU">
+                <Val>预留</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind15" desc="预留">
+              <DAI name="stVal" sAddr="1,1,2,yx15"/>
+              <DAI name="dU">
+                <Val>预留</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind16" desc="预留">
+              <DAI name="stVal" sAddr="1,1,2,yx16"/>
+              <DAI name="dU">
+                <Val>预留</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind17" desc="预留">
+              <DAI name="stVal" sAddr="1,1,2,yx17"/>
+              <DAI name="dU">
+                <Val>预留</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind18" desc="预留">
+              <DAI name="stVal" sAddr="1,1,2,yx18"/>
+              <DAI name="dU">
+                <Val>预留</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind19" desc="预留">
+              <DAI name="stVal" sAddr="1,1,2,yx19"/>
+              <DAI name="dU">
+                <Val>预留</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Ind20" desc="预留">
+              <DAI name="stVal" sAddr="1,1,2,yx20"/>
+              <DAI name="dU">
+                <Val>预留</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN inst="1" lnClass="MMXU" lnType="MMXU_OUT_FLOAT" prefix="GOOUT" desc="浮点型数据">
+            <DOI name="Mod"/>
+            <DOI name="Beh"/>
+            <DOI name="Health"/>
+            <DOI name="NamPlt"/>
+            <DOI name="AI1" desc="有功功率实时值">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc1"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>有功功率实时值(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI2" desc="无功功率实时值">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc2"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>无功功率实时值(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI3" desc="SOC运行值">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc3"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>SOC运行值(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI4" desc="最大可充功率">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc4"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>最大可充功率(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI5" desc="最大可放功率">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc5"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>最大可放功率(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI6" desc="额定功率">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc6"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>额定功率(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI7" desc="最大容性无功能力">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc7"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>最大容性无功能力(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI8" desc="最大感性无功能力">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc8"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>最大感性无功能力(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI9" desc="PCS运行状态">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc9"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>PCS运行状态(float)</Val>
+              </DAI>
+            </DOI>
+   			<DOI name="AI10" desc="最大充电电量">
+  				<SDI name="mag">
+  					<DAI name="f" sAddr="1,1,2,yc10"/>
+  				</SDI>
+  				<DAI name="dU">
+  					<Val>最大充电电量(float)</Val>
+  				</DAI>
+  			</DOI>   
+            <DOI name="AI11" desc="有功功率给定值">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc11"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>有功功率实时值(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI12" desc="无功功率给定值">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc12"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>无功功率实时值(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI13" desc="预留1(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc13"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留1(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI14" desc="预留2(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc14"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留2(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI15" desc="额定电池容量(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc15"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>额定电池容量(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI16" desc="预留3(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc16"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留3(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI17" desc="预留4(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc17"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留(4float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI18" desc="预留5(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc18"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留5(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI19" desc="预留6(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc19"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留6(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI20" desc="预留7(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc20"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留7(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI21" desc="预留8(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc21"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留8(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI22" desc="预留9(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc22"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留9(float)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI23" desc="预留10(float)">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc23"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留10(float)</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN inst="2" lnClass="MMXU" lnType="MMXU_OUT_I32" prefix="GOOUT" desc="整型数据">
+            <DOI name="Mod"/>
+            <DOI name="Beh"/>
+            <DOI name="Health"/>
+            <DOI name="NamPlt"/>
+            <DOI name="AI1" desc="有功功率实时值">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc1"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>有功功率实时值</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI2" desc="无功功率实时值">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc2"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>无功功率实时值</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI3" desc="SOC运行值">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc3"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>SOC运行值</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI4" desc="最大可充功率">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc4"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>最大可充功率</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI5" desc="最大可放功率">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc5"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>最大可放功率</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI6" desc="额定功率">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc6"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>额定功率</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI7" desc="最大容性无功能力">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc7"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>最大容性无功能力</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI8" desc="最大感性无功能力">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc8"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>最大感性无功能力</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI9" desc="PCS运行状态">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc9"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>PCS运行状态</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI10" desc="最大充电电量">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc10"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>最大充电电量</Val>
+              </DAI>
+            </DOI>   
+            <DOI name="AI11" desc="有功功率给定值">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc11"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>有功功率实时值</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI12" desc="无功功率给定值">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc12"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>无功功率实时值</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI13" desc="PCS运行状态2">
+              <SDI name="mag">
+                <DAI name="f" sAddr="1,1,2,yc13"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>PCS运行状态2</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI14" desc="PCS运行状态3">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc14"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>PCS运行状态3</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI15" desc="额定电池容量">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc15"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>额定电池容量</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI16" desc="预留3">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc16"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留3</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI17" desc="预留4">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc17"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留4</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI18" desc="预留5">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc18"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留5</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI19" desc="预留6">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc19"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留6</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI20" desc="预留7">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc20"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留7</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI21" desc="预留8">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc21"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留8</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI22" desc="预留9">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc22"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留9</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AI23" desc="预留10">
+              <SDI name="mag">
+                <DAI name="i" sAddr="1,1,2,yc23"/>
+              </SDI>
+              <DAI name="dU">
+                <Val>预留10</Val>
+              </DAI>
+            </DOI>
+          </LN>
+        </LDevice>
+      </Server>
+    </AccessPoint>
+  </IED>
+  <DataTypeTemplates>
+    <LNodeType id="LLN0" lnClass="LLN0" desc="Logical node zero">
+      <DO name="Mod" type="Mod_KHPCS"/>
+      <DO name="Beh" type="Beh_KHPCS"/>
+      <DO name="Health" type="Health_KHPCS"/>
+      <DO name="NamPlt" type="LplLLN0_KHPCS"/>
+    </LNodeType>
+    <LNodeType id="LPHD" lnClass="LPHD" desc="Physical device information">
+      <DO name="PhyNam" type="DPL"/>
+      <DO name="PhyHealth" type="INS"/>
+      <DO name="Proxy" type="SPS"/>
+    </LNodeType>
+    <LNodeType id="AnIn_GGIO" desc="模拟量输入" lnClass="GGIO">
+      <DO name="Mod" type="Mod_KHPCS"/>
+      <DO name="Beh" type="Beh_KHPCS"/>
+      <DO name="Health" type="Health_KHPCS"/>
+      <DO name="NamPlt" type="Lpl_KHPCS"/>
+      <DO name="AnIn1" desc="模入1" type="MV"/>
+      <DO name="AnIn2" desc="模入2" type="MV"/>
+    </LNodeType>
+    <LNodeType id="MMXU_OUT_FLOAT" lnClass="MMXU" desc="Measurement">
+      <DO name="Mod" type="Mod_KHPCS"/>
+      <DO name="Beh" type="Beh_KHPCS"/>
+      <DO name="Health" type="Health_KHPCS"/>
+      <DO name="NamPlt" type="Lpl_KHPCS"/>
+      <DO name="AI1" type="MV"/>
+      <DO name="AI2" type="MV"/>
+      <DO name="AI3" type="MV"/>
+      <DO name="AI4" type="MV"/>
+      <DO name="AI5" type="MV"/>
+      <DO name="AI6" type="MV"/>
+      <DO name="AI7" type="MV"/>
+      <DO name="AI8" type="MV"/>
+      <DO name="AI9" type="MV"/>
+      <DO name="AI10" type="MV"/>           
+      <DO name="AI11" type="MV"/>
+      <DO name="AI12" type="MV"/>
+      <DO name="AI13" type="MV"/>
+      <DO name="AI14" type="MV"/>
+      <DO name="AI15" type="MV"/>
+      <DO name="AI16" type="MV"/>
+      <DO name="AI17" type="MV"/>
+      <DO name="AI18" type="MV"/>
+      <DO name="AI19" type="MV"/>
+      <DO name="AI20" type="MV"/>    
+      <DO name="AI21" type="MV"/>    
+      <DO name="AI22" type="MV"/>    
+      <DO name="AI23" type="MV"/>    
+    </LNodeType>
+    <LNodeType id="MMXU_OUT_I32" lnClass="MMXU" desc="Measurement">
+      <DO name="Mod" type="Mod_KHPCS"/>
+      <DO name="Beh" type="Beh_KHPCS"/>
+      <DO name="Health" type="Health_KHPCS"/>
+      <DO name="NamPlt" type="Lpl_KHPCS"/>
+      <DO name="AI1" type="MV_I32"/>
+      <DO name="AI2" type="MV_I32"/>
+      <DO name="AI3" type="MV_I32"/>
+      <DO name="AI4" type="MV_I32"/>
+      <DO name="AI5" type="MV_I32"/>
+      <DO name="AI6" type="MV_I32"/>
+      <DO name="AI7" type="MV_I32"/>
+      <DO name="AI8" type="MV_I32"/>
+      <DO name="AI9" type="MV_I32"/>
+      <DO name="AI10" type="MV_I32"/>
+      <DO name="AI11" type="MV_I32"/>
+      <DO name="AI12" type="MV_I32"/>    
+      <DO name="AI13" type="MV_I32"/>
+      <DO name="AI14" type="MV_I32"/>
+      <DO name="AI15" type="MV_I32"/>
+      <DO name="AI16" type="MV_I32"/>
+      <DO name="AI17" type="MV_I32"/>
+      <DO name="AI18" type="MV_I32"/>
+      <DO name="AI19" type="MV_I32"/>
+      <DO name="AI20" type="MV_I32"/>
+      <DO name="AI21" type="MV_I32"/>
+      <DO name="AI22" type="MV_I32"/>
+      <DO name="AI23" type="MV_I32"/>
+    </LNodeType>
+    <LNodeType id="GGIO_OUT" lnClass="GGIO">
+      <DO name="Mod" type="Mod_KHPCS"/>
+      <DO name="Beh" type="Beh_KHPCS"/>
+      <DO name="Health" type="Health_KHPCS"/>
+      <DO name="NamPlt" type="Lpl_KHPCS"/>
+      <DO name="Ind1" type="SPS"/>
+      <DO name="Ind2" type="SPS"/>
+      <DO name="Ind3" type="SPS"/>
+      <DO name="Ind4" type="SPS"/>
+      <DO name="Ind5" type="SPS"/>
+      <DO name="Ind6" type="SPS"/>
+      <DO name="Ind7" type="SPS"/>
+      <DO name="Ind8" type="SPS"/>
+      <DO name="Ind9" type="SPS"/>
+      <DO name="Ind10" type="SPS"/>
+      <DO name="Ind11" type="SPS"/>
+      <DO name="Ind12" type="SPS"/>
+      <DO name="Ind13" type="SPS"/>
+      <DO name="Ind14" type="SPS"/>
+      <DO name="Ind15" type="SPS"/>
+      <DO name="Ind16" type="SPS"/>
+      <DO name="Ind17" type="SPS"/>
+      <DO name="Ind18" type="SPS"/>
+      <DO name="Ind19" type="SPS"/>
+      <DO name="Ind20" type="SPS"/>
+    </LNodeType>
+    <DOType id="INS" cdc="INS" desc="Integer status">
+      <DA name="stVal" fc="ST" bType="INT32" dchg="true"/>
+      <DA name="q" fc="ST" bType="Quality" qchg="true">
+        <Val>0000000000000</Val>
+      </DA>
+      <DA name="t" fc="ST" bType="Timestamp"/>
+      <DA name="subEna" fc="SV" bType="BOOLEAN"/>
+      <DA name="subVal" fc="SV" bType="Dbpos"/>
+      <DA name="subQ" fc="SV" bType="Quality"/>
+      <DA name="subID" fc="SV" bType="VisString64"/>
+      <DA name="dataNs" fc="EX" bType="VisString255">
+        <Val>DL/T860.2003</Val>
+      </DA>
+    </DOType>
+    <DOType id="Lpl_KHPCS" cdc="LPL">
+      <DA name="vendor" fc="DC" bType="VisString255" valKind="RO">
+        <Val>Kehua</Val>
+      </DA>
+      <DA name="swRev" fc="DC" bType="VisString255" valKind="RO">
+        <Val>V1.0</Val>
+      </DA>
+      <DA name="d" fc="DC" bType="VisString255" valKind="RO"/>
+      <DA name="dataNs" fc="EX" bType="VisString255">
+        <Val>DL/T860.2003</Val>
+      </DA>
+    </DOType>
+    <DOType id="LplLLN0_KHPCS" cdc="LPL">
+      <DA name="vendor" fc="DC" bType="VisString255" valKind="RO">
+        <Val>Kehua</Val>
+      </DA>
+      <DA name="swRev" fc="DC" bType="VisString255" valKind="RO">
+        <Val>V1.0</Val>
+      </DA>
+      <DA name="d" fc="DC" bType="VisString255" valKind="RO"/>
+      <DA name="configRev" fc="DC" bType="VisString255" valKind="RO">
+        <Val>V1.0</Val>
+      </DA>
+      <DA name="ldNs" fc="EX" bType="VisString255">
+        <Val>IEC 61850-7-4:2003</Val>
+      </DA>
+      <DA name="dataNs" fc="EX" bType="VisString255">
+        <Val>DL/T860.2003</Val>
+      </DA>
+    </DOType>
+    <DOType id="DPL" cdc="DPL" desc="Device name plate">
+      <DA name="vendor" fc="DC" bType="VisString255">
+        <Val>Kehua</Val>
+      </DA>
+      <DA name="dataNs" fc="EX" bType="VisString255">
+        <Val>DL/T860.2003</Val>
+      </DA>
+    </DOType>
+    <DOType id="SPS" cdc="SPS" desc="Single point status">
+      <DA name="stVal" fc="ST" bType="BOOLEAN" dchg="true"/>
+      <DA name="q" fc="ST" bType="Quality" qchg="true">
+        <Val>0000000000000</Val>
+      </DA>
+      <DA name="t" fc="ST" bType="Timestamp"/>
+      <DA name="subEna" fc="SV" bType="BOOLEAN"/>
+      <DA name="subVal" fc="SV" bType="BOOLEAN"/>
+      <DA name="subQ" fc="SV" bType="Quality"/>
+      <DA name="subID" fc="SV" bType="VisString64"/>
+      <DA name="dataNs" fc="EX" bType="VisString255">
+        <Val>DL/T860.2003</Val>
+      </DA>
+      <DA name="dU" fc="DC" bType="Unicode255"/>
+    </DOType>
+    <DOType id="MV" cdc="MV" desc="Measured value">
+      <DA name="mag" fc="MX" bType="Struct" type="AnalogueValue" dchg="true"/>
+      <DA name="q" fc="MX" bType="Quality" qchg="true">
+        <Val>0000000000000</Val>
+      </DA>
+      <DA name="t" fc="MX" bType="Timestamp"/>
+      <DA name="dU" fc="DC" bType="Unicode255"/>
+    </DOType>
+    <DOType id="MV_I32" cdc="MV" desc="Measured value">
+      <DA name="mag" fc="MX" bType="Struct" type="AnalogueValue_I" dchg="true"/>
+      <DA name="dU" fc="DC" bType="Unicode255"/>
+    </DOType>
+    <DOType id="Mod_KHPCS" cdc="INC">
+      <DA name="stVal" fc="ST" bType="Enum" type="Beh" dchg="true">
+        <Val>off</Val>
+      </DA>
+      <DA name="q" fc="ST" bType="Quality" qchg="true">
+        <Val>0000000000000</Val>
+      </DA>
+      <DA name="t" fc="ST" bType="Timestamp"/>
+      <DA name="ctlModel" fc="CF" bType="Enum" type="ctlModel" valKind="RO">
+        <Val>status-only</Val>
+      </DA>
+      <DA name="dataNs" fc="EX" bType="VisString255">
+        <Val>DL/T860.2003</Val>
+      </DA>
+    </DOType>
+    <DOType id="Beh_KHPCS" cdc="INS">
+      <DA name="stVal" fc="ST" bType="Enum" type="Beh" dchg="true">
+        <Val>off</Val>
+      </DA>
+      <DA name="q" fc="ST" bType="Quality" qchg="true">
+        <Val>0000000000000</Val>
+      </DA>
+      <DA name="t" fc="ST" bType="Timestamp"/>
+      <DA name="dataNs" fc="EX" bType="VisString255">
+        <Val>DL/T860.2003</Val>
+      </DA>
+    </DOType>
+    <DOType id="Health_KHPCS" cdc="INS">
+      <DA name="stVal" fc="ST" bType="Enum" type="Health" dchg="true">
+        <Val>Ok</Val>
+      </DA>
+      <DA name="q" fc="ST" bType="Quality" qchg="true">
+        <Val>0000000000000</Val>
+      </DA>
+      <DA name="t" fc="ST" bType="Timestamp"/>
+      <DA name="dataNs" fc="EX" bType="VisString255">
+        <Val>DL/T860.2003</Val>
+      </DA>
+    </DOType>
+    <DAType id="AnalogueValue">
+      <BDA name="f" bType="FLOAT32"/>
+    </DAType>
+    <DAType id="AnalogueValue_I">
+      <BDA name="i" bType="INT32"/>
+    </DAType>
+    <EnumType id="ctlModel">
+      <EnumVal ord="0">status-only</EnumVal>
+      <EnumVal ord="1">direct-with-normal-security</EnumVal>
+      <EnumVal ord="2">sbo-with-normal-security</EnumVal>
+      <EnumVal ord="3">direct-with-enhanced-security</EnumVal>
+      <EnumVal ord="4">sbo-with-enhanced-security</EnumVal>
+    </EnumType>
+    <EnumType id="Beh">
+      <EnumVal ord="1">on</EnumVal>
+      <EnumVal ord="2">blocked</EnumVal>
+      <EnumVal ord="3">test</EnumVal>
+      <EnumVal ord="4">test/blocked</EnumVal>
+      <EnumVal ord="5">off</EnumVal>
+    </EnumType>
+    <EnumType id="Health">
+      <EnumVal ord="1">Ok</EnumVal>
+      <EnumVal ord="2">Warning</EnumVal>
+      <EnumVal ord="3">Alarm</EnumVal>
+    </EnumType>
+  </DataTypeTemplates>
+</SCL>
