@@ -30,10 +30,10 @@ def generate_csr(directory,config):
     if not key.exists():
         if key.is_symlink() or csr.exists() or (directory/'g3.crt').exists():
             raise ValueError('HTTPS identity key was lost; automatic key replacement is forbidden')
-        pki.atomic_write(key,pki.run('genpkey','-algorithm','RSA','-pkeyopt','rsa_keygen_bits:3072'))
+        pki.atomic_write(key,pki.run('genpkey','-algorithm','RSA','-pkeyopt','rsa_keygen_bits:2048'))
     public=key_public(key)
     ips=read_device_ips(config)
-    data=pki.run('req','-new','-key',key,'-passin','pass:','-sha256','-subj','/CN=logger',
+    data=pki.run('req','-new','-key',key,'-passin','pass:','-sha256','-subj','/CN=LC400-logger',
         '-addext','subjectAltName='+','.join('IP:'+ip for ip in ips),
         '-addext','basicConstraints=critical,CA:FALSE',
         '-addext','extendedKeyUsage=serverAuth',
@@ -50,11 +50,11 @@ def check(directory,settings,match_csr=False):
     if certificate.is_symlink():
         raise ValueError('Certificate cannot be a symbolic link')
     csr=(directory/'g3.csr').read_bytes() if match_csr else None
-    leaf,chain=pki.validate_identity(certificate.read_bytes(),None,settings['ca_file'],'sslserver',csr,settings['crl_file'])
+    leaf,chain=pki.validate_identity(certificate.read_bytes(),None,settings['ca_file'],'sslserver',csr,settings['crl_file'],require_fresh_crl=True)
     if pki.public_key(leaf)!=key_public(directory/'g3.key'):
         raise ValueError('HTTPS certificate does not match the device private key')
     expected={('IP',ip) for ip in read_device_ips(settings['config_file'])}
-    if pki.subject_cn(leaf)!='logger' or not expected.issubset(pki.san_values(leaf)):
+    if not pki.subject_cn(leaf).startswith('LC400-') or not expected.issubset(pki.san_values(leaf)):
         raise ValueError('HTTPS certificate CN/SAN does not match the current device configuration')
     return leaf,chain
 
@@ -73,6 +73,7 @@ def main():
     roots.add_argument('--cert',type=Path,required=True)
     roots.add_argument('--fingerprint',action='append')
     sub.add_parser('check')
+    sub.add_parser('status')
     renewal=sub.add_parser('reconcile')
     renewal.add_argument('--renew-window-days',type=int,default=30)
     args=parser.parse_args()
@@ -94,16 +95,17 @@ def main():
                 stream.write(data)
             result=dict(exported=str(args.out))
         elif args.command=='ca-import':
-            result=dict(fingerprints=pki.import_roots(settings['ca_file'],args.cert.read_bytes(),args.fingerprint))
+            result=dict(fingerprints=pki.import_roots(settings['ca_file'],args.cert.read_bytes(),args.fingerprint,
+                (Path(os.environ.get('MODBUS_CERT_DIR', '/etc/ems/modbus')), directory)))
         elif args.command=='identity-import':
             csr=(directory/'g3.csr').read_bytes()
             anchors=settings['ca_file'].read_bytes()
             leaf,chain=pki.validate_identity(args.cert.read_bytes(),args.chain.read_bytes() if args.chain else None,
-                settings['ca_file'],'sslserver',csr,settings['crl_file'])
+                settings['ca_file'],'sslserver',csr,settings['crl_file'],require_fresh_crl=True)
             if pki.public_key(leaf)!=key_public(directory/'g3.key'):
                 raise ValueError('Issued certificate does not match the HTTPS device key')
             expected={('IP',ip) for ip in read_device_ips(settings['config_file'])}
-            if pki.subject_cn(leaf)!='logger' or not expected.issubset(pki.san_values(leaf)):
+            if not pki.subject_cn(leaf).startswith('LC400-') or not expected.issubset(pki.san_values(leaf)):
                 raise ValueError('Issued certificate does not match current HTTPS CN/SAN')
             if settings['ca_file'].read_bytes()!=anchors:
                 raise ValueError('CA trust changed during verification; retry import')
@@ -114,16 +116,31 @@ def main():
             pki.atomic_write(directory/'.reload-required',b'New external-CA identity imported\n')
             pki.mark_pending(settings, 'nginx', 'https')
             pki.atomic_write(certificate,leaf+chain,0o644)
+            # Explicit return to the CSR flow; old endpoints remain available.
+            pki.identity_source_path(directory, 'https').unlink(missing_ok=True)
             result=dict(imported=True,sha256=pki.fingerprint(leaf),reload_required=True,
                         chain_certificates=1+len(pki.certificates(chain)) if chain else 1)
-        elif args.command=='check':
-            leaf,_=check(directory,settings)
+        elif args.command in ('check', 'status'):
+            result=dict(valid=False,reload_required=(directory/'.reload-required').exists(),
+                        pki_mode='trina' if pki.is_external_identity(directory, 'https') else 'general')
+            try:
+                leaf,_=check(directory,settings)
+                result.update(valid=True,sha256=pki.fingerprint(leaf))
+            except (OSError,ValueError) as error:
+                if args.command=='check':
+                    raise
+                result.update(reason='HTTPS_IDENTITY_INVALID_OR_MISSING',detail=str(error))
             pending=directory/'renewal-status.json'
-            result=dict(valid=True,sha256=pki.fingerprint(leaf),reload_required=(directory/'.reload-required').exists(),
-                        renewal=json.loads(pending.read_text()) if pending.exists() else None)
+            try:
+                result['renewal']=json.loads(pending.read_text()) if pending.exists() else None
+                if isinstance(result['renewal'], dict) and result['renewal'].get('pki_mode') == 'custom':
+                    result['renewal']['pki_mode'] = 'trina'
+            except (OSError,ValueError):
+                result['renewal']=None
         else:
             if not 1<=args.renew_window_days<=365:
                 raise ValueError('Invalid renewal window')
+            external=pki.is_external_identity(directory, 'https')
             reason=None
             try:
                 leaf,_=check(directory,settings)
@@ -134,10 +151,14 @@ def main():
             except (OSError,ValueError):
                 reason='missing_invalid_or_configuration_changed'
             status=dict(mode='external_ca',renewal_required=bool(reason),reason=reason)
-            if reason:
+            if external:
+                status.update(pki_mode='trina',external_issuance_required=bool(reason),csr_generated=False)
+            if reason and not external:
                 status.update(generate_csr(directory,settings['config_file']))
             pki.atomic_write(directory/'renewal-status.json',json.dumps(status).encode(),0o644)
             if reason=='missing_invalid_or_configuration_changed':
+                if external:
+                    raise ValueError('External HTTPS identity is unavailable/invalid; import a replacement certificate/key; no CSR generated')
                 raise ValueError('Signed HTTPS identity is unavailable/invalid; CSR ready, external CA issuance required')
             result=status
         print(json.dumps(result,ensure_ascii=False))

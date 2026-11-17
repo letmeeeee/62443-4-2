@@ -521,7 +521,14 @@ def certificate_verify():
     成功返回 ok、valid、role、revocationStatus；脚本校验失败返回 422 CERTIFICATE_INVALID。
     role 的合法性由证书模块校验。
     """
-    from routes.route_cert import _cert_run_script, _cert_validate_role, CertificateScriptError
+    from routes.route_cert import (
+        _cert_run_script, _cert_validate_role, CertificateScriptError,
+        _cert_validate_general_mode, _cert_error,
+    )
+    try:
+        _cert_validate_general_mode()
+    except ValueError:
+        return _cert_error('pki_mode must be general for this endpoint', 400)
     role = _cert_validate_role(_body().get('role'))
     import config
     from script import pki_common as pki

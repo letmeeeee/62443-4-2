@@ -113,7 +113,7 @@ class DeviceProvisioner:
                 if public != self.https_tool.key_public(self.https/'g3.key'):
                     raise ValueError('HTTPS 证书与本机私钥不匹配')
                 expected_ips = {('IP', ip) for ip in self.https_config.read_device_ips(self.config)}
-                if self.pki.subject_cn(leaf) != 'logger' or not expected_ips.issubset(self.pki.san_values(leaf)):
+                if not self.pki.subject_cn(leaf).startswith('LC400-') or not expected_ips.issubset(self.pki.san_values(leaf)):
                     raise ValueError('HTTPS CN/SAN 不符合本机配置')
             else:
                 with tempfile.TemporaryDirectory(prefix='lc-proof-') as temporary:
@@ -121,6 +121,15 @@ class DeviceProvisioner:
                     self.run([self.helper, '--dir', self.modbus, 'check', role, certificate])
             identities.append(dict(role=role, sha256=self.pki.fingerprint(leaf), private_key_verified=True))
         return dict(valid=True, device_id=manifest['device_id'], root_fingerprints=sorted(actual), identities=identities)
+
+    def _certificate_targets(self):
+        # Source metadata must roll back together with the public identity it describes.
+        return [self.settings['ca_file'], self.modbus/'master.crt', self.modbus/'slave.crt',
+                self.https/'g3.crt', self.https/'.reload-required',
+                self.pki.pending_path(self.settings, 'nginx'), self.pki.pending_path(self.settings, 'tems'),
+                self.pki.identity_source_path(self.modbus, 'master'),
+                self.pki.identity_source_path(self.modbus, 'slave'),
+                self.pki.identity_source_path(self.https, 'https')]
 
     def import_bundle(self, bundle, fingerprints):
         # Work from immutable local copies; an external USB/share cannot change the package between steps.
@@ -130,9 +139,7 @@ class DeviceProvisioner:
             names = ['manifest.json','roots.pem','intermediates.pem'] + [r+'-leaf.pem' for r in ROLES]
             for filename in names: (stage/filename).write_bytes(read_file(Path(bundle)/filename))
             checked = self.preflight(stage, fingerprints)
-            targets = [self.settings['ca_file'], self.modbus/'master.crt', self.modbus/'slave.crt',
-                       self.https/'g3.crt', self.https/'.reload-required',
-                       self.pki.pending_path(self.settings, 'nginx'), self.pki.pending_path(self.settings, 'tems')]
+            targets = self._certificate_targets()
             previous = {}
             for path in targets:
                 if path.is_symlink(): raise ValueError('不能覆盖符号链接: ' + str(path))
@@ -180,11 +187,9 @@ class DeviceProvisioner:
         with self.locked():
             recovery = self.modbus/'deployment-recovery'
             entries = json.loads(read_file(recovery/'manifest.json'))
-            targets = [self.settings['ca_file'], self.modbus/'master.crt', self.modbus/'slave.crt',
-                       self.https/'g3.crt', self.https/'.reload-required',
-                       self.pki.pending_path(self.settings, 'nginx'), self.pki.pending_path(self.settings, 'tems')]
-            if isinstance(entries, list) and len(entries) == 5:
-                targets = targets[:5]  # Recovery records created by older deployment tools.
+            targets = self._certificate_targets()
+            if isinstance(entries, list) and len(entries) in (5, 7):
+                targets = targets[:len(entries)]  # Recovery records created by older deployment tools.
             if not isinstance(entries, list) or len(entries) != len(targets):
                 raise ValueError('恢复记录不完整，请人工核查，不自动修改文件')
             restored = []

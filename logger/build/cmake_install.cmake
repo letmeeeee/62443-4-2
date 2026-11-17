@@ -49,7 +49,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/modbus_tee_identity")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/modbus_tee_identity"
-         OLD_RPATH "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib:/home/wx/WorkStation/ItemCode/62443-4-2/logger/mysqlib/lib:/home/wx/WorkStation/ItemCode/62443-4-2/logger/.deps/optee-arm64/lib:"
+         OLD_RPATH "/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib:/home/wx/WorkStation/ItemCode/62443-4-2/logger/mysqlib/lib:"
          NEW_RPATH "\$ORIGIN/../lib:\$ORIGIN/../mysqlib/lib")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/aarch64-linux-gnu-strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/modbus_tee_identity")

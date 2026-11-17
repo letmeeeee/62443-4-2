@@ -128,7 +128,7 @@ sudo python3 /home/zlg/device_agent.pyz --backend file generate \
 
 - master CSR 的 CN 为 `设备编号-master`，EKU clientAuth。
 - slave CSR 的 CN 为 `设备编号-slave`，EKU serverAuth，IP SAN 使用现有 `[HTTPS] device_ips` 全部地址，确保覆盖常用访问网口。实际 Modbus 连接 IP 必须位于已有设备访问 IP 配置中；本工具不修改 INI。若两类地址不同，请先通过既有配置维护流程确认地址，再生成交接包。
-- HTTPS CSR CN 为 logger，IP SAN 使用现有配置，EKU serverAuth。
+- HTTPS CSR 默认 CN 为 `LC400-logger`，签发与导入要求 CN 以 `LC400-` 开头，IP SAN 使用现有配置，EKU serverAuth。
 - 自动核对三种公钥互不相同。存在私钥时复用；已有身份/CSR 却丢失私钥时失败。
 
 输出目录仅含 `master.csr`、`slave.csr`、`https.csr` 和 `manifest.json`，将整个目录传给 CA 管理员。传输可使用企业现有 SFTP 或移动介质；本工具不自动连接设备 SSH，也不修改网口、INI 或服务环境。
@@ -145,7 +145,7 @@ python3 ca_manager.py --ca-dir /secure/company-ca sign \
   ./LC400-001-csr ./LC400-001-certificates --days 365
 ```
 
-程序检查 CSR 自身签名、SHA-256 及以上签名、RSA 至少 3072 位、CN、SAN、CA 权限和 EKU，拒绝未知扩展、跨角色/跨设备复用公钥以及已因密钥泄露吊销的公钥。签发时明确 CA:FALSE、digitalSignature/keyEncipherment；master 仅 clientAuth，slave/HTTPS 仅 serverAuth，不签双用途叶证书。
+程序检查 CSR 自身签名、SHA-256 及以上签名、RSA 至少 2048 位（兼容 2048/3072）、CN、SAN、CA 权限和 EKU，拒绝未知扩展、跨角色/跨设备复用公钥以及已因密钥泄露吊销的公钥。签发时明确 CA:FALSE、digitalSignature/keyEncipherment；master 仅 clientAuth，slave/HTTPS 仅 serverAuth，不签双用途叶证书。设备文件后端新建密钥默认使用 RSA-2048，已有 RSA-3072 密钥继续复用；CA 自身密钥及 TEE 后端保持原有规格。
 
 证书包包含 `roots.pem`、`intermediates.pem`、`master-leaf.pem`、`slave-leaf.pem`、`https-leaf.pem`、`manifest.json`，没有任何私钥。将整个目录带回设备。同时通过独立可信渠道将 CA GUI 显示的完整根 SHA-256 指纹交给设备管理员。交接 manifest 用于摘要校验；其内自带指纹不作为信任依据。
 

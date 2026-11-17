@@ -66,7 +66,7 @@ def modbus_csr(args, staging, old):
         ):
             raise ValueError('invalid DNS SAN')
     key = staging / (args.target + '.key')
-    pki.atomic_write(key, pki.run('genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:3072'))
+    pki.atomic_write(key, pki.run('genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:2048'))
     command = [
         'req', '-new', '-key', key, '-passin', 'pass:', '-sha256', '-subj', '/CN=' + name,
         '-addext', 'basicConstraints=critical,CA:FALSE',
@@ -81,7 +81,7 @@ def modbus_csr(args, staging, old):
 
 def main():
     parser = argparse.ArgumentParser(prog='rotate_identity_key.sh', description=(
-        'Rotate a FILE-backed RSA-3072 identity and generate its new CSR. '
+        'Rotate a FILE-backed identity to RSA-2048 and generate its new CSR. '
         'Stop tems/nginx first. Old key/CSR/certificate are backed up; '
         'the old certificate is removed. No service is stopped or restarted automatically.'
     ))
@@ -129,7 +129,7 @@ def main():
         # 所有生成及校验先在临时目录完成，失败时不替换现有身份。
         with tempfile.TemporaryDirectory(prefix='.key-rotation-', dir=directory) as temporary:
             staging = Path(temporary)
-            log('generating new RSA-3072 key and CSR: target=' + args.target)
+            log('generating new RSA-2048 key and CSR: target=' + args.target)
             if args.target == 'https':
                 generate_csr(staging, settings['config_file'])
             else:

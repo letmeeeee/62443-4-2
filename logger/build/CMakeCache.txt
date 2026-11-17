@@ -208,7 +208,7 @@ MODBUS_OPENSSL_INCLUDE_DIR:PATH=
 
 //Include optional TEE identity backend (runtime default remains
 // file)
-MODBUS_WITH_TEE:BOOL=ON
+MODBUS_WITH_TEE:BOOL=OFF
 
 //Target tee_client_api.h directory
 OPTEE_CLIENT_INCLUDE_DIR:PATH=

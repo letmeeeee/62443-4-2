@@ -179,9 +179,10 @@ static EVP_PKEY *read_key(int directory, const char *name)
     if (!file) { close(fd); return NULL; }
     key = PEM_read_PrivateKey(file, NULL, no_password, NULL);
     fclose(file);
-    if (!key || EVP_PKEY_base_id(key) != EVP_PKEY_RSA || EVP_PKEY_bits(key) != 3072 ||
+    if (!key || EVP_PKEY_base_id(key) != EVP_PKEY_RSA ||
+        (EVP_PKEY_bits(key) != 2048 && EVP_PKEY_bits(key) != 3072) ||
         RSA_check_key(EVP_PKEY_get0_RSA(key)) != 1) {
-        fprintf(stderr, "Modbus private key must contain a valid unencrypted RSA-3072 keypair\n");
+        fprintf(stderr, "Modbus private key must contain a valid unencrypted RSA-2048 or RSA-3072 keypair\n");
         EVP_PKEY_free(key);
         return NULL;
     }
@@ -229,7 +230,7 @@ int Modbus_Identity_Ensure(unsigned role, const char *certificate_path)
     if (errno != ENOENT) goto out;
     ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
     if (!ctx || EVP_PKEY_keygen_init(ctx) <= 0 ||
-        EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, 3072) <= 0 || EVP_PKEY_keygen(ctx, &key) <= 0 ||
+        EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, 2048) <= 0 || EVP_PKEY_keygen(ctx, &key) <= 0 ||
         RAND_bytes(random, sizeof(random)) != 1) goto out;
     strcpy(temporary, ".modbus-key-");
     for (size_t i = 0; i < sizeof(random); ++i) sprintf(temporary + 12 + i * 2, "%02x", random[i]);

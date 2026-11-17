@@ -502,3 +502,71 @@ Source file was:
 #endif
 int main(void) { return 0; }
 
+Performing C SOURCE FILE Test MODBUS_OPENSSL_HEADERS_OK succeeded with the following output:
+Change Dir: /home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_a0416/fast && /usr/bin/make -f CMakeFiles/cmTC_a0416.dir/build.make CMakeFiles/cmTC_a0416.dir/build
+make[1]: 进入目录“/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp”
+Building C object CMakeFiles/cmTC_a0416.dir/src.c.o
+/usr/bin/aarch64-linux-gnu-gcc  -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/.deps/openssl-arm64/include -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib  -g -Wall -DMODBUS_OPENSSL_HEADERS_OK   -std=gnu99 -o CMakeFiles/cmTC_a0416.dir/src.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_a0416
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a0416.dir/link.txt --verbose=1
+/usr/bin/aarch64-linux-gnu-gcc  -g -Wall -DMODBUS_OPENSSL_HEADERS_OK    CMakeFiles/cmTC_a0416.dir/src.c.o  -o cmTC_a0416 
+make[1]: 离开目录“/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp”
+
+
+Source file was:
+
+#include <openssl/ssl.h>
+#include <openssl/opensslv.h>
+#if OPENSSL_VERSION_NUMBER < 0x10101000L || OPENSSL_VERSION_NUMBER >= 0x10200000L
+#error Expected target OpenSSL 1.1.1 headers for libssl.so.1.1
+#endif
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test MODBUS_OPENSSL_HEADERS_OK succeeded with the following output:
+Change Dir: /home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_b4144/fast && /usr/bin/make -f CMakeFiles/cmTC_b4144.dir/build.make CMakeFiles/cmTC_b4144.dir/build
+make[1]: 进入目录“/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp”
+Building C object CMakeFiles/cmTC_b4144.dir/src.c.o
+/usr/bin/aarch64-linux-gnu-gcc  -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/.deps/openssl-arm64/include -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib  -g -Wall -DMODBUS_OPENSSL_HEADERS_OK   -std=gnu99 -o CMakeFiles/cmTC_b4144.dir/src.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_b4144
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b4144.dir/link.txt --verbose=1
+/usr/bin/aarch64-linux-gnu-gcc  -g -Wall -DMODBUS_OPENSSL_HEADERS_OK    CMakeFiles/cmTC_b4144.dir/src.c.o  -o cmTC_b4144 
+make[1]: 离开目录“/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp”
+
+
+Source file was:
+
+#include <openssl/ssl.h>
+#include <openssl/opensslv.h>
+#if OPENSSL_VERSION_NUMBER < 0x10101000L || OPENSSL_VERSION_NUMBER >= 0x10200000L
+#error Expected target OpenSSL 1.1.1 headers for libssl.so.1.1
+#endif
+int main(void) { return 0; }
+
+Performing C SOURCE FILE Test MODBUS_OPENSSL_HEADERS_OK succeeded with the following output:
+Change Dir: /home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_07d74/fast && make[1]: 进入目录“/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp”
+/usr/bin/make -f CMakeFiles/cmTC_07d74.dir/build.make CMakeFiles/cmTC_07d74.dir/build
+make[2]: 进入目录“/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp”
+Building C object CMakeFiles/cmTC_07d74.dir/src.c.o
+/usr/bin/aarch64-linux-gnu-gcc  -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/.deps/openssl-arm64/include -I/home/wx/WorkStation/ItemCode/62443-4-2/logger/lib  -g -Wall -DMODBUS_OPENSSL_HEADERS_OK   -std=gnu99 -o CMakeFiles/cmTC_07d74.dir/src.c.o   -c /home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_07d74
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_07d74.dir/link.txt --verbose=1
+/usr/bin/aarch64-linux-gnu-gcc  -g -Wall -DMODBUS_OPENSSL_HEADERS_OK    CMakeFiles/cmTC_07d74.dir/src.c.o  -o cmTC_07d74 
+make[2]: 离开目录“/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp”
+make[1]: 离开目录“/home/wx/WorkStation/ItemCode/62443-4-2/logger/build/CMakeFiles/CMakeTmp”
+
+
+Source file was:
+
+#include <openssl/ssl.h>
+#include <openssl/opensslv.h>
+#if OPENSSL_VERSION_NUMBER < 0x10101000L || OPENSSL_VERSION_NUMBER >= 0x10200000L
+#error Expected target OpenSSL 1.1.1 headers for libssl.so.1.1
+#endif
+int main(void) { return 0; }
+

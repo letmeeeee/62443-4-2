@@ -59,6 +59,7 @@ def test_three_independent_keys_and_ca_chains(device,authority,tmp_path):
         args=['--ip','127.0.0.1'] if role=='slave' else []
         tool('modbus','csr','--role',role,'--name','test-'+role,*args)
         csr=device['modbus']/(role+'.csr')
+        assert b'2048 bit' in openssl('req', '-in', csr, '-text', '-noout')
         public.append(pki.csr_public_key(csr.read_bytes()))
         leaf=sign_csr(csr,tmp_path/(role+'.crt'),authority,role='client' if role=='master' else 'server',ips=['127.0.0.1'] if role=='slave' else [])
         tool('modbus','identity-import','--role',role,'--cert',leaf,'--chain',authority['intermediate'])
@@ -71,6 +72,8 @@ def test_three_independent_keys_and_ca_chains(device,authority,tmp_path):
         assert exported.read_bytes()==csr.read_bytes()
     tool('https','csr')
     csr=device['https']/'g3.csr'
+    assert pki.subject_cn(csr.read_bytes(), csr=True) == 'LC400-logger'
+    assert b'2048 bit' in openssl('req', '-in', csr, '-text', '-noout')
     public.append(pki.csr_public_key(csr.read_bytes()))
     assert len(set(public))==3
     leaf=sign_csr(csr,tmp_path/'https.crt',authority,ips=['127.0.0.1'])
@@ -78,6 +81,43 @@ def test_three_independent_keys_and_ca_chains(device,authority,tmp_path):
     tool('https','check')
     assert (device['https']/'g3.crt').read_bytes().count(b'BEGIN CERTIFICATE')==2
     assert not any(path.name in ('root.key','intermediate.key') for path in tmp_path.rglob('*.key'))
+
+
+@pytest.mark.parametrize('bits', [2048, 3072])
+@pytest.mark.parametrize('role', ['master', 'slave', 'https'])
+def test_existing_file_key_sizes_reused_and_signed_identity_accepted(device, authority, tmp_path, bits, role):
+    directory = device['https'] if role == 'https' else device['modbus']
+    directory.mkdir(mode=0o700, exist_ok=True)
+    stem = 'g3' if role == 'https' else role
+    key = directory / (stem + '.key')
+    openssl('genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:' + str(bits), '-out', key)
+    key.chmod(0o600)
+    original = key.read_bytes()
+    tool = device['tool']
+    csr_args = [] if role == 'https' else ['--role', role, '--name', 'test-' + role, '--ip', '127.0.0.1']
+    kind = 'https' if role == 'https' else 'modbus'
+    tool(kind, 'csr', *csr_args)
+    csr = directory / (stem + '.csr')
+    assert key.read_bytes() == original
+    assert (str(bits) + ' bit').encode() in openssl('req', '-in', csr, '-text', '-noout')
+    leaf = sign_csr(csr, tmp_path / 'issued.crt', authority,
+                    role='client' if role == 'master' else 'server', ips=['127.0.0.1'])
+    role_args = [] if role == 'https' else ['--role', role]
+    tool(kind, 'identity-import', *role_args, '--cert', leaf, '--chain', authority['intermediate'])
+    tool(kind, 'check', *role_args)
+    tool(kind, 'csr', *csr_args)
+    assert key.read_bytes() == original
+
+
+@pytest.mark.parametrize('bits', [1024, 4096])
+def test_unsupported_modbus_file_key_sizes_still_rejected(device, bits):
+    key = device['modbus'] / 'master.key'
+    openssl('genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:' + str(bits), '-out', key)
+    key.chmod(0o600)
+    original = key.read_bytes()
+    device['tool']('modbus', 'csr', '--role', 'master', '--name', 'test-master', success=False)
+    assert key.read_bytes() == original
+    assert not (device['modbus'] / 'master.csr').exists()
 
 
 @pytest.mark.parametrize('failure',['missing-chain','wrong-role','wrong-key','wrong-ca','missing-san','expired','tampered'])

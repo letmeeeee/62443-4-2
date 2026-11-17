@@ -69,7 +69,7 @@ class RotationTests(unittest.TestCase):
                 self.assertEqual(openssl('pkey', '-in', key, '-pubout'),
                                  openssl('req', '-in', csr, '-pubkey', '-noout'))
                 text = openssl('req', '-in', csr, '-text', '-noout')
-                self.assertIn(b'3072 bit', text)
+                self.assertIn(b'2048 bit', text)
                 self.assertIn(b'TLS Web Client Authentication' if target == 'master'
                               else b'TLS Web Server Authentication', text)
                 self.assertIn(b'192.0.2.10' if target == 'https' else b'old.example', text)
@@ -111,6 +111,18 @@ class RotationTests(unittest.TestCase):
         self.assertIn(b'new-slave', text)
         self.assertIn(b'192.0.2.30', text)
         self.assertNotIn(b'old.example', text)
+
+    def test_existing_2048_file_keys_can_be_rotated_again(self):
+        for target, stem in [('master', 'master'), ('slave', 'slave'), ('https', 'g3')]:
+            with self.subTest(target=target):
+                self.seed(stem)
+                self.rotate(target)
+                key = self.directory / (stem + '.key')
+                first = key.read_bytes()
+                self.rotate(target)
+                self.assertNotEqual(key.read_bytes(), first)
+                self.assertIn(b'2048 bit', openssl('req', '-in', self.directory / (stem + '.csr'),
+                                                 '-text', '-noout'))
 
     def test_https_generation_failure_keeps_original_files(self):
         old = self.seed('g3')

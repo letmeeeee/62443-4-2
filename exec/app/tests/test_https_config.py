@@ -45,7 +45,7 @@ def deployment(tmp_path):
         'export PATH="' + str(root / "bin") + ':$PATH"' if line.startswith("export PATH=") else line
         for line in script.splitlines()) + "\n"
     (script_dir / "enable_https.sh").write_text(script)
-    for helper in ("https_config.py", "https_certificates.py", "pki_common.py"):
+    for helper in ("https_config.py", "https_certificates.py", "pki_common.py", "crl_store.py"):
         (script_dir / helper).write_text((SOURCE / helper).read_text())
     stubs = {
         "id": "echo 0",
@@ -133,11 +133,12 @@ def test_install_and_apply_ca_certificate(deployment):
     root,_,run,tool,ca=provision(deployment)
     result=run('--install-service')
     assert result.returncode==0,result.stdout+result.stderr
-    for helper in ('https_config.py','https_certificates.py','pki_common.py'):
+    for helper in ('https_config.py','https_certificates.py','pki_common.py','crl_store.py'):
         assert (root/'usr/local/lib/g3-https'/helper).is_file()
     calls=root/'calls';calls.write_text('')
     assert run('--apply').returncode==0
     assert 'reload nginx' not in calls.read_text()
+    assert 'start g3-cert-renew.timer' in calls.read_text()
     tool('identity-import','--cert',root/'issued.crt','--chain',ca['intermediate'])
     assert run('--apply').returncode==0
     assert 'reload nginx' in calls.read_text()

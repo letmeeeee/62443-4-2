@@ -92,7 +92,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 # Only CA-issued identities may be deployed. Renewal never creates a local leaf certificate.
 python3 "$SCRIPT_DIR/https_certificates.py" --config "$CONFIG_FILE" --dir "$CERT_DIR" reconcile \
-    --renew-window-days "$RENEW_WINDOW_DAYS" || die "CA 证书尚未就绪；请签发并导入 CSR 对应的身份证书"
+    --renew-window-days "$RENEW_WINDOW_DAYS" || die "CA 证书尚未就绪；请按当前 PKI 流程导入有效身份证书"
 CURRENT_CERT_HASH="$(openssl dgst -sha256 -r "$CERT_FILE")"
 CURRENT_CERT_HASH="${CURRENT_CERT_HASH%% *}"
 APPLIED_CERT_HASH="$(cat "$CERT_DIR/.applied-cert.sha256" 2>/dev/null || true)"
@@ -170,6 +170,7 @@ if [ "$MODE" = --install-service ]; then
         install -m 644 "$SCRIPT_DIR/https_config.py" /usr/local/lib/g3-https/https_config.py
         install -m 644 "$SCRIPT_DIR/https_certificates.py" /usr/local/lib/g3-https/https_certificates.py
         install -m 644 "$SCRIPT_DIR/pki_common.py" /usr/local/lib/g3-https/pki_common.py
+        install -m 644 "$SCRIPT_DIR/crl_store.py" /usr/local/lib/g3-https/crl_store.py
     fi
     if ! systemctl cat nginx.service >/dev/null 2>&1; then
         NGINX_BIN="$(command -v nginx)"
@@ -241,7 +242,7 @@ if [ "$MODE" != --prepare ]; then
     else
         systemctl start nginx
     fi
-    if [ "$MODE" = --install-service ]; then
+    if systemctl cat g3-cert-renew.timer >/dev/null 2>&1; then
         systemctl start g3-cert-renew.timer
     fi
 fi

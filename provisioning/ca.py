@@ -59,14 +59,14 @@ def validate_csr(data, role):
     if csr.signature_hash_algorithm.name not in ('sha256', 'sha384', 'sha512'):
         raise ValueError('CSR 必须使用 SHA-256 或更强签名')
     key = csr.public_key()
-    if not isinstance(key, rsa.RSAPublicKey) or key.key_size < 3072:
-        raise ValueError('设备身份必须使用至少 RSA-3072 公钥')
+    if not isinstance(key, rsa.RSAPublicKey) or key.key_size < 2048:
+        raise ValueError('设备身份必须使用至少 RSA-2048 公钥')
     cn = csr.subject.get_attributes_for_oid(NameOID.COMMON_NAME)
     if len(cn) != 1 or len(csr.subject) != 1:
         raise ValueError('CSR 主题必须只含一个 CN')
     if role == 'https':
-        if cn[0].value != 'logger':
-            raise ValueError('HTTPS CN 必须为 logger')
+        if not cn[0].value.startswith('LC400-'):
+            raise ValueError('HTTPS CN 必须以 LC400- 开头')
     elif not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,63}', cn[0].value):
         raise ValueError('Modbus CN 不符合设备身份命名规则')
     allowed = {x509.ExtensionOID.BASIC_CONSTRAINTS, x509.ExtensionOID.KEY_USAGE,

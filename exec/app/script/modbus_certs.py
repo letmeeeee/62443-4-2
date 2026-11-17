@@ -14,7 +14,10 @@ import sys
 import tempfile
 import uuid
 
-import pki_common as pki
+try:
+    from . import pki_common as pki
+except ImportError:
+    import pki_common as pki
 
 PEM = re.compile(rb'-----BEGIN CERTIFICATE-----\s+.*?-----END CERTIFICATE-----', re.S)
 TEE_IDENTITY = os.environ.get('MODBUS_TEE_IDENTITY', '/home/zlg/app/bin/modbus_tee_identity')
@@ -149,7 +152,8 @@ def import_identity(args,directory,settings):
         raise ValueError('Generate the local role CSR before importing its signed identity')
     anchors=settings['ca_file'].read_bytes()
     leaf,chain=pki.validate_identity(args.cert.read_bytes(),args.chain.read_bytes() if args.chain else None,
-        settings['ca_file'],'sslclient' if args.role=='master' else 'sslserver',csr.read_bytes(), settings['crl_file'])
+        settings['ca_file'],'sslclient' if args.role=='master' else 'sslserver',csr.read_bytes(), settings['crl_file'],
+        require_fresh_crl=True)
     with tempfile.TemporaryDirectory(prefix='.identity-',dir=directory) as temporary:
         candidate=Path(temporary)/'identity.pem'
         candidate.write_bytes(leaf+chain)
@@ -160,6 +164,7 @@ def import_identity(args,directory,settings):
         print('Previous identity backup:',backup(directory,[destination]))
     pki.mark_pending(settings, 'tems', 'modbus-' + args.role)
     atomic_write(destination,leaf+chain,0o644)
+    pki.identity_source_path(directory, args.role).unlink(missing_ok=True)
     print('Imported identity:',destination,'SHA256:',fingerprint(leaf))
     print('Full chain verified, CSR/private key matched; restart tems during maintenance.')
 
@@ -208,7 +213,8 @@ def main():
         elif args.command=='identity-import':
             import_identity(args,directory,settings)
         elif args.command=='ca-import':
-            print('Shared root CA fingerprints:',pki.import_roots(settings['ca_file'],args.cert.read_bytes(),args.fingerprint))
+            print('Shared root CA fingerprints:',pki.import_roots(settings['ca_file'],args.cert.read_bytes(),args.fingerprint,
+                (directory, Path(os.environ.get('HTTPS_CERT_DIR', '/etc/ssl/g3')))))
         elif args.command=='ca-list':
             for cert in certificates(settings['ca_file'].read_bytes()):
                 show_cert(cert)

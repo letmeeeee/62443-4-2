@@ -115,7 +115,8 @@ def validate_roots(data):
     return b''.join(roots)
 
 
-def validate_identity(data, chain, roots_path, purpose, csr=None, crl_path=None):
+def validate_identity(data, chain, roots_path, purpose, csr=None, crl_path=None,
+                      require_fresh_crl=False):
     roots=validate_roots(Path(roots_path).read_bytes())
     anchors={fingerprint(cert) for cert in certificates(roots)}
     incoming=certificates(data)
@@ -167,7 +168,8 @@ def validate_identity(data, chain, roots_path, purpose, csr=None, crl_path=None)
         except ImportError:
             import crl_store
         result = crl_store.certificate_status(leaf + b''.join(clean), roots_path, crl_path)
-        if result['revocationStatus'] in ('revoked', 'unknown'):
+        if result['revocationStatus'] in ('revoked', 'unknown') or (
+                require_fresh_crl and result['revocationStatus'] == 'stale'):
             raise ValueError('Certificate revocation check failed: ' + result['revocationReason'])
     return leaf,b''.join(clean)
 
@@ -225,7 +227,21 @@ def pending_services(settings):
     return [service for service in ('nginx', 'tems') if pending_path(settings, service).exists()]
 
 
-def import_roots(path, data, expected=None):
+def identity_source_path(directory, role):
+    if role not in ('master', 'slave', 'https'):
+        raise ValueError('Unknown identity role')
+    return Path(directory) / ('.' + ('g3' if role == 'https' else role) + '-pki-source.json')
+
+
+def is_external_identity(directory, role):
+    # Presence is conservative: even damaged metadata must not trigger automatic key/CSR creation.
+    marker = identity_source_path(directory, role)
+    if marker.is_symlink():
+        raise ValueError('Identity source marker cannot be a symbolic link')
+    return marker.exists()
+
+
+def import_roots(path, data, expected=None, identity_dirs=None):
     validated=validate_roots(data)
     roots=certificates(validated)
     if expected:
@@ -236,6 +252,26 @@ def import_roots(path, data, expected=None):
     path=Path(path)
     path.parent.mkdir(parents=True,exist_ok=True,mode=0o755)
     with locked(path.parent):
+        if not path.exists() or path.read_bytes() != validated:
+            modbus, https = identity_dirs or (
+                Path(os.environ.get('MODBUS_CERT_DIR', '/etc/ems/modbus')),
+                Path(os.environ.get('HTTPS_CERT_DIR', '/etc/ssl/g3')),
+            )
+            with tempfile.TemporaryDirectory(prefix='root-check-') as folder:
+                candidate = Path(folder) / 'roots.pem'
+                candidate.write_bytes(validated)
+                for role, certificate in (('master', Path(modbus) / 'master.crt'),
+                                          ('slave', Path(modbus) / 'slave.crt'),
+                                          ('https', Path(https) / 'g3.crt')):
+                    if certificate.is_symlink():
+                        raise ValueError('Symbolic link identity rejected: ' + role)
+                    if certificate.exists():
+                        try:
+                            validate_identity(certificate.read_bytes(), None, candidate,
+                                              'sslclient' if role == 'master' else 'sslserver')
+                        except ValueError as error:
+                            raise ValueError('Shared root replacement invalidates role=' + role
+                                             + ': ' + str(error)) from error
         if path.exists():
             atomic_write(path.with_name(path.name+'.previous'),path.read_bytes())
         for service in ('nginx', 'tems'):

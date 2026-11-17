@@ -995,36 +995,6 @@ lib/modbus_rtu_poll.c.s:
 	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_rtu_poll.c.s
 .PHONY : lib/modbus_rtu_poll.c.s
 
-lib/modbus_tee.o: lib/modbus_tee.c.o
-
-.PHONY : lib/modbus_tee.o
-
-# target to build an object file
-lib/modbus_tee.c.o:
-	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/lib/modbus_tee.c.o
-	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_tee.c.o
-.PHONY : lib/modbus_tee.c.o
-
-lib/modbus_tee.i: lib/modbus_tee.c.i
-
-.PHONY : lib/modbus_tee.i
-
-# target to preprocess a source file
-lib/modbus_tee.c.i:
-	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/lib/modbus_tee.c.i
-	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_tee.c.i
-.PHONY : lib/modbus_tee.c.i
-
-lib/modbus_tee.s: lib/modbus_tee.c.s
-
-.PHONY : lib/modbus_tee.s
-
-# target to generate assembly for a file
-lib/modbus_tee.c.s:
-	$(MAKE) -f CMakeFiles/modbus_tee_identity.dir/build.make CMakeFiles/modbus_tee_identity.dir/lib/modbus_tee.c.s
-	$(MAKE) -f CMakeFiles/tems.dir/build.make CMakeFiles/tems.dir/lib/modbus_tee.c.s
-.PHONY : lib/modbus_tee.c.s
-
 lib/modbus_transport.o: lib/modbus_transport.c.o
 
 .PHONY : lib/modbus_transport.o
@@ -3235,9 +3205,6 @@ help:
 	@echo "... lib/modbus_rtu_poll.o"
 	@echo "... lib/modbus_rtu_poll.i"
 	@echo "... lib/modbus_rtu_poll.s"
-	@echo "... lib/modbus_tee.o"
-	@echo "... lib/modbus_tee.i"
-	@echo "... lib/modbus_tee.s"
 	@echo "... lib/modbus_transport.o"
 	@echo "... lib/modbus_transport.i"
 	@echo "... lib/modbus_transport.s"

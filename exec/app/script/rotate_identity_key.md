@@ -1,7 +1,8 @@
 # 设备身份密钥轮换
 
 `rotate_identity_key.sh` 为 `master`、`slave` 或 `https` 更换文件形式的
-RSA-3072 公私钥对，并生成与新密钥匹配的 CSR。依赖 Python 3.8+、OpenSSL
+RSA-2048 公私钥对，并生成与新密钥匹配的 CSR。原 RSA-2048/3072 文件密钥均可轮换。
+依赖 Python 3.8+、OpenSSL
 及同目录下现有 Python 证书工具，无需导入 Flask 或连接数据库。
 
 此脚本用于密钥泄露后的更换或计划轮换。普通证书续期仍调用原 CSR 接口，
@@ -25,7 +26,7 @@ sh /home/zlg/app/script/rotate_identity_key.sh slave \
   --name slave-001 --ip 192.168.2.136 --dns logger.example.com \
   --confirm ROTATE_IDENTITY_KEY
 
-# HTTPS：CN=logger，SAN 按 INI 的 [HTTPS] device_ips 生成
+# HTTPS：CN=LC400-logger，SAN 按 INI 的 [HTTPS] device_ips 生成
 sh /home/zlg/app/script/rotate_identity_key.sh https --confirm ROTATE_IDENTITY_KEY
 ```
 

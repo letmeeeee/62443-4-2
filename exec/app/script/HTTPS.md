@@ -16,7 +16,7 @@ device_ips = 192.168.3.136,192.168.2.136
 
 无需 certificate_mode 开关；旧配置如果保留非 external_ca 的 certificate_mode 值会被拒绝，不能恢复旧模式。`LC_INI_PATH` 可指定其他 INI；主服务、证书工具和 tems 应使用一致配置。ca_file 必须为绝对路径，仅保存可信根 CA 公共证书。中间 CA 证书随设备叶证书导入，不当作根信任锚。
 
-HTTPS 私钥为 `/etc/ssl/g3/g3.key`，CSR 为 `g3.csr`，部署文件 `g3.crt` 为“叶证书 + 按签发关系排列的中间链”，不包含 CA 私钥。CSR CN 固定 logger，全部 device_ips 写入 IP SAN。device_ips 是本机访问地址，不是来源白名单，不负责配置网卡。
+HTTPS 私钥为 `/etc/ssl/g3/g3.key`，CSR 为 `g3.csr`，部署文件 `g3.crt` 为“叶证书 + 按签发关系排列的中间链”，不包含 CA 私钥。CSR 默认 CN 为 `LC400-logger`，HTTPS 证书 CN 必须以 `LC400-` 开头（区分大小写），全部 device_ips 写入 IP SAN。device_ips 是本机访问地址，不是来源白名单，不负责配置网卡。
 
 ## 首次签发
 
@@ -28,7 +28,7 @@ python3 /home/zlg/app/script/https_certificates.py csr
 python3 /home/zlg/app/script/https_certificates.py csr-export --out /tmp/https.csr
 ```
 
-将 https.csr 交给外部 CA，按以下身份配置签发：CA:FALSE、digitalSignature、EKU 仅 serverAuth，CN logger，SAN 覆盖所有配置的设备 IP。新建私钥使用 RSA-3072；已有合格 HTTPS 私钥可以复用。不要复制 Modbus 私钥作为 HTTPS 私钥。
+将 https.csr 交给外部 CA，按以下身份配置签发：CA:FALSE、digitalSignature、EKU 仅 serverAuth，CN 以 `LC400-` 开头，SAN 覆盖所有配置的设备 IP。新建私钥默认使用 RSA-2048；已有合格 RSA-2048/3072 HTTPS 私钥继续复用，不会自动降位或轮换。不要复制 Modbus 私钥作为 HTTPS 私钥。
 
 外部 CA 返回 HTTPS 叶证书、按顺序排列的中间链和根 CA 公共证书。通过可信渠道核对根 CA SHA-256 指纹后在设备导入：
 

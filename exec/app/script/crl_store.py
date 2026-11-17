@@ -134,47 +134,73 @@ def _roots(roots_path):
             for block in pki.certificates(Path(roots_path).read_bytes())]
 
 
-def import_crls(settings, data, chain=b''):
-    """Validate before commit; a revoked local identity does not block import."""
+def build_bundle(data, chain, roots_path, path, retained_bundle=False):
+    """Build a verified merged bundle without changing live files or service state."""
     incoming, included = _parse(data, allow_der=True)
-    extra = [x509.load_pem_x509_certificate(block, default_backend()) for block in pki.certificates(chain)] if chain else []
+    extra = [x509.load_pem_x509_certificate(block, default_backend())
+             for block in pki.certificates(chain)] if chain else []
+    path = Path(path)
+    old_crls, old_certs = _read_store(path) if path.exists() or path.is_symlink() else ([], [])
+    candidates = included + extra + old_certs + _roots(roots_path)
+    merged = {_key(crl): crl for crl in old_crls}
+    seen = set()
+    for crl in incoming:
+        key = _key(crl)
+        try:
+            _validate(crl, candidates, roots_path)
+        except ValueError:
+            # A staged bundle includes previously retained lists for old CAs.
+            # Preserve the current copy, never let that bypass incoming trust checks.
+            previous = merged.get(key)
+            if retained_bundle and previous is not None:
+                continue
+            raise
+        if key in seen:
+            raise ValueError('Duplicate issuer CRLs in upload')
+        seen.add(key)
+        previous = merged.get(key)
+        if previous is not None:
+            number = _extension(crl, x509.CRLNumber).crl_number
+            old_number = _extension(previous, x509.CRLNumber).crl_number
+            if retained_bundle and number < old_number:
+                continue
+            if number < old_number or (number == old_number and
+                    crl.public_bytes(serialization.Encoding.DER) != previous.public_bytes(serialization.Encoding.DER)):
+                raise ValueError('CRL number rollback or conflicting same-number content')
+            if _dates(crl)[0] < _dates(previous)[0]:
+                raise ValueError('CRL publication time rollback')
+            # This implementation supports permanent revocations only.
+            if not {r.serial_number for r in previous}.issubset({r.serial_number for r in crl}):
+                raise ValueError('New CRL removes previously revoked serials')
+        merged[key] = crl
+    unique = {_cert_pem(cert): cert for cert in candidates}
+    bundle = b''.join(crl.public_bytes(serialization.Encoding.PEM) for crl in merged.values())
+    bundle += b''.join(unique)
+    if len(bundle) > MAX_BYTES:
+        raise ValueError('Combined CRL store exceeds 1 MiB')
+    _parse(bundle)  # Enforce merged issuer/certificate limits before any write.
+    return bundle
+
+
+def import_crls(settings, data, chain=b''):
+    """Keep the existing upload contract; defer new-root CRLs to matching batches."""
     path = settings['crl_file']
     with pki.operation_lock(settings), pki.locked(settings['ca_file'].parent):
-        old_crls, old_certs = _read_store(path) if path.exists() or path.is_symlink() else ([], [])
-        candidates = included + extra + old_certs + _roots(settings['ca_file'])
-        merged = {_key(crl): crl for crl in old_crls}
-        seen = set()
-        for crl in incoming:
-            _validate(crl, candidates, settings['ca_file'])
-            key = _key(crl)
-            if key in seen:
-                raise ValueError('Duplicate issuer CRLs in upload')
-            seen.add(key)
-            previous = merged.get(key)
-            if previous is not None:
-                number = _extension(crl, x509.CRLNumber).crl_number
-                old_number = _extension(previous, x509.CRLNumber).crl_number
-                if number < old_number or (number == old_number and
-                        crl.public_bytes(serialization.Encoding.DER) != previous.public_bytes(serialization.Encoding.DER)):
-                    raise ValueError('CRL number rollback or conflicting same-number content')
-                if _dates(crl)[0] < _dates(previous)[0]:
-                    raise ValueError('CRL publication time rollback')
-                # This implementation supports permanent revocations only.
-                if not {r.serial_number for r in previous}.issubset({r.serial_number for r in crl}):
-                    raise ValueError('New CRL removes previously revoked serials')
-            merged[key] = crl
-        unique = {_cert_pem(cert): cert for cert in candidates}
-        bundle = b''.join(crl.public_bytes(serialization.Encoding.PEM) for crl in merged.values())
-        bundle += b''.join(unique)
-        if len(bundle) > MAX_BYTES:
-            raise ValueError('Combined CRL store exceeds 1 MiB')
-        _parse(bundle)  # Enforce merged issuer/certificate limits before any write.
+        try:
+            bundle = build_bundle(data, chain, settings['ca_file'], path)
+        except (ValueError, FileNotFoundError) as error:
+            try:
+                from .custom_pki import stage_crls
+            except ImportError:
+                from custom_pki import stage_crls
+            staged = stage_crls(settings, data, chain)
+            if staged is not None:
+                return staged
+            raise error
         path.parent.mkdir(parents=True, exist_ok=True, mode=0o755)
-        # Mark before replacing: interruption may cause a harmless extra restart,
-        # never an unmarked CRL update. The same lock protects service application.
         pki.mark_pending(settings, 'tems', 'crl')
         pki.atomic_write(path, bundle, 0o644)
-        LOG.info('CRL import committed path=%s issuers=%d sha256=%s', path, len(merged), hashlib.sha256(bundle).hexdigest())
+        LOG.info('CRL import committed path=%s sha256=%s', path, hashlib.sha256(bundle).hexdigest())
     return dict(imported=True, restart_required=True, crls=inventory(settings))
 
 

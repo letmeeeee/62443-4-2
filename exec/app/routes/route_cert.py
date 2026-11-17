@@ -1,4 +1,4 @@
-"""设备证书接口：生成 CSR → 外部 CA 签发 → 导入证书 → 校验/导出。
+"""设备证书接口：通用 CSR 流程，以及外部私钥/证书的定制批次导入流程。
 
 Modbus 主机、从机和 HTTPS 使用独立身份；私钥始终保留在各自槽位。
 这里只记录操作元数据，不打印请求体、证书/CSR 正文或私钥。
@@ -39,6 +39,7 @@ def _cert_log(event, *, level='INFO', **details):
         'method': request.method,
         'path': request.path,
         'ip': request.remote_addr,
+        'pki_mode': getattr(g, 'pki_mode', '-'),
         **details,
     }
     fields = ' '.join(f'{key}={value!r}' for key, value in context.items())
@@ -57,6 +58,13 @@ def cert_admin_required(function):
         if user.get('permission') not in config.PERMISSION_TABLE.get('usermanage', []):
             _cert_log('拒绝请求：需要管理员权限', level='WARNING', status=403)
             return _cert_error('administrator permission required', 403)
+        if not request.path.startswith('/api/cert/custom/'):
+            # Only the HTTP parameter changes. Legacy callers and CLI tools keep their behavior.
+            try:
+                _cert_validate_general_mode()
+            except ValueError:
+                _cert_log('通用接口 PKI 模式参数无效', level='WARNING', status=400)
+                return _cert_error('pki_mode must be general for this endpoint', 400)
         _cert_log('开始操作', operation=function.__name__)
         try:
             response = function(*args, **kwargs)
@@ -74,6 +82,18 @@ def cert_admin_required(function):
                   elapsed_ms=round((monotonic() - started) * 1000, 1))
         return response
     return wrapped
+
+
+def _cert_validate_general_mode():
+    """旧接口接收 general，缺省兼容旧调用；不允许借参数跳过 CSR 校验。"""
+    values = request.args.getlist('pki_mode') + request.form.getlist('pki_mode')
+    data = request.get_json(silent=True) if request.is_json else None
+    if isinstance(data, dict) and 'pki_mode' in data:
+        values.append(data['pki_mode'])
+    if any(value != 'general' for value in values):
+        raise ValueError('pki_mode must be general')
+    g.pki_mode = 'general'
+    return 'general'
 
 
 def _cert_success(message, data=None):
@@ -122,7 +142,7 @@ def _cert_validate_fingerprint(value):
 
 def _cert_build_identity_args(data):
     """校验 Modbus 身份名及 SAN，返回规范角色、名称和脚本参数。"""
-    if set(data) - {'role', 'name', 'ip', 'dns'}:
+    if set(data) - {'role', 'name', 'ip', 'dns', 'pki_mode'}:
         raise ValueError('unknown CSR field')
     role = _cert_validate_role(data.get('role'))
     name = data.get('name')
@@ -169,6 +189,8 @@ def _cert_run_script(command):
     result = subprocess.run(
         arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         text=True, encoding='utf-8', errors='replace', timeout=CERT_TIMEOUT, check=False,
+        env=dict(os.environ, MODBUS_CERT_DIR=str(directory),
+                 HTTPS_CERT_DIR=current_app.config.get('HTTPS_CERT_DIR', '/etc/ssl/g3')),
     )
     if result.returncode:
         _cert_log('Modbus 证书脚本拒绝操作', level='ERROR', operation=command[0],
@@ -215,6 +237,7 @@ def _https_pki(command, apply=False):
         ]
     environment = dict(
         os.environ, LC_INI_PATH=str(config.INI_PATH), HTTPS_CERT_DIR=certificate_dir,
+        MODBUS_CERT_DIR=str(current_app.config.get('MODBUS_CERT_DIR', str(CERT_DIR))),
     )
     operation = 'apply' if apply else command[0]
     started = monotonic()
@@ -431,6 +454,12 @@ def apply_https_identity():
         remaining = pki.pending_services(settings)
         if services.get('nginx', {}).get('status') == 'failed' and 'nginx' not in remaining:
             remaining.append('nginx')
+        try:
+            _custom_pki().sync_service_states()
+        except (OSError, ValueError):
+            # A damaged historical batch must not turn a successful service action
+            # into a failed legacy response. Status will recheck when queried.
+            current_app.logger.exception('Could not synchronize custom PKI service state')
     data = dict(changed=bool(services), applied=not remaining, services=services, pending=remaining)
     if remaining:
         return jsonify(ok=False, status=config.STATE_ERROR, code='CERTIFICATE_APPLY_FAILED',
@@ -473,7 +502,8 @@ def import_crls():
         _cert_log('CRL 已验证并保存', issuer=entry['issuer'], crl_number=entry['crlNumber'],
                   freshness=entry['status'], revoked_count=entry['revokedCount'])
     result['pending'] = pki.pending_services(settings)
-    return _cert_success('CRLs imported; apply to restart Modbus', result)
+    return _cert_success('CRLs staged; apply the matching custom batch' if result.get('staged')
+                         else 'CRLs imported; apply to restart Modbus', result)
 
 
 @g3_bp.route('/api/cert/https/status', methods=['GET'])
@@ -481,7 +511,7 @@ def import_crls():
 @_pki_errors
 def https_identity_status():
     """GET：通过 HTTPS 证书脚本检查当前 CA 身份状态。"""
-    return _cert_success('HTTPS CA identity status', _https_pki(['check']))
+    return _cert_success('HTTPS CA identity status', _https_pki(['status']))
 
 
 @g3_bp.route('/api/cert/identity', methods=['GET'])
@@ -528,6 +558,145 @@ def export_certificate():
         io.BytesIO(data), as_attachment=True,
         download_name=role + '-fullchain.crt', mimetype='application/x-pem-file',
     )
+
+
+def _custom_pki():
+    from script.custom_pki import CustomPKI
+    return CustomPKI(
+        config.INI_PATH,
+        current_app.config.get('MODBUS_CERT_DIR', str(CERT_DIR)),
+        current_app.config.get('HTTPS_CERT_DIR', '/etc/ssl/g3'),
+        backend=os.environ.get('MODBUS_KEY_BACKEND', 'file'),
+    )
+
+
+def _custom_mode(data):
+    if data.get('pki_mode') != 'trina':
+        raise ValueError('pki_mode must be trina for this endpoint')
+    g.pki_mode = 'trina'
+
+
+def _custom_call(function, *args, **kwargs):
+    """区分批次冲突与证书校验失败；响应中不返回私钥材料或私钥摘要。"""
+    from script.custom_pki import Conflict
+    try:
+        state = function(*args, **kwargs)
+    except Conflict as error:
+        _cert_log('定制 PKI 批次冲突', level='WARNING', reason=str(error))
+        return jsonify(ok=False, status=config.STATE_ERROR, code='PKI_BATCH_CONFLICT',
+                       message='Custom PKI batch conflict; inspect server log'), 409
+    except ValueError as error:
+        if function.__name__ == 'upload' and args and args[0] == 'key':
+            _cert_log('定制 PKI 私钥校验拒绝', level='WARNING', role=kwargs.get('role'),
+                      batch_id=kwargs.get('batch_id') or '-', reason=str(error))
+        raise CertificateScriptError(str(error)) from error
+    return {key: value for key, value in state.items() if key not in ('active_hashes', 'base_hashes')}
+
+
+def _custom_import(part):
+    """四个导入操作仅更新待应用批次，绝不覆盖正在使用的身份。"""
+    _custom_mode(request.form)
+    role = request.form.get('role') if part != 'ca' else None
+    if part != 'ca' and role not in ('master', 'slave', 'https'):
+        raise ValueError('role must be master, slave or https')
+    clear = request.form.get('clear') == 'true'
+    upload = request.files.get('file')
+    if clear:
+        if part != 'chain' or upload is not None:
+            raise ValueError('clear=true is only valid for a chain without a file')
+        data = b''
+    else:
+        if upload is None:
+            raise ValueError('file required')
+        data = upload.stream.read(MAX_CERT_SIZE + 1)
+        if not data or len(data) > MAX_CERT_SIZE:
+            raise ValueError('invalid upload size')
+    g.audit_target = '定制PKI信任根' if part == 'ca' else '定制PKI身份:' + role
+    state = _custom_call(
+        _custom_pki().upload, part, data, role=role,
+        batch_id=request.form.get('batch_id') or None,
+        expected=request.form.getlist('fingerprint'), actor=g.current_user.get('username', '-'),
+    )
+    if isinstance(state, tuple):
+        return state
+    if part == 'key':
+        _cert_log('定制 PKI 普通 RSA 私钥校验通过', role=role, batch_id=state['batch_id'],
+                  key_algorithm='RSA', allowed_bits='2048/3072')
+    _cert_log('定制 PKI 材料已暂存', part=part, role=role, batch_id=state['batch_id'], size_bytes=len(data))
+    return _cert_success('Custom PKI material staged; use custom apply to activate', state)
+
+
+@g3_bp.route('/api/cert/custom/key/import', methods=['POST'])
+@cert_admin_required
+@_pki_errors
+def custom_key_import():
+    """Multipart pki_mode=trina, role, file, optional batch_id; unencrypted PEM RSA-2048/3072."""
+    return _custom_import('key')
+
+
+@g3_bp.route('/api/cert/custom/ca/import', methods=['POST'])
+@cert_admin_required
+@_pki_errors
+def custom_ca_import():
+    """Multipart pki_mode=trina, file, trusted-channel fingerprint(s), optional batch_id."""
+    return _custom_import('ca')
+
+
+@g3_bp.route('/api/cert/custom/chain/import', methods=['POST'])
+@cert_admin_required
+@_pki_errors
+def custom_chain_import():
+    """Multipart pki_mode=trina, role, file OR clear=true, optional batch_id."""
+    return _custom_import('chain')
+
+
+@g3_bp.route('/api/cert/custom/identity/import', methods=['POST'])
+@cert_admin_required
+@_pki_errors
+def custom_identity_import():
+    """Multipart pki_mode=trina, role, one issued leaf file, optional batch_id; no CSR required."""
+    return _custom_import('identity')
+
+
+def _custom_service_apply(service):
+    _cert_log('定制 PKI 应用服务', service=service)
+    if service == 'nginx':
+        _https_pki([], apply=True)
+    else:
+        for command in (['systemctl', '--no-ask-password', 'restart', 'tems.service'],
+                        ['systemctl', '--no-ask-password', 'is-active', '--quiet', 'tems.service']):
+            result = subprocess.run(command, capture_output=True, text=True, timeout=120, check=False)
+            if result.returncode:
+                current_app.logger.error('Custom PKI tems application failed: %s', result.stderr[-2000:])
+                raise OSError('tems application failed')
+
+
+@g3_bp.route('/api/cert/custom/apply', methods=['POST'])
+@cert_admin_required
+@_pki_errors
+def custom_pki_apply():
+    """JSON {pki_mode:trina,batch_id}: validate, journal-install, apply services; retryable."""
+    data = _cert_get_json()
+    _custom_mode(data)
+    g.audit_target = '定制PKI批次:' + str(data.get('batch_id', ''))[:32]
+    state = _custom_call(_custom_pki().apply, data.get('batch_id'), _custom_service_apply)
+    if isinstance(state, tuple):
+        return state
+    _cert_log('定制 PKI 应用结果', batch_id=state['batch_id'], status=state['status'], pending=state['pending'])
+    if state['status'] != 'applied':
+        return jsonify(ok=False, status=config.STATE_ERROR, code='CUSTOM_PKI_APPLY_FAILED',
+                       message='Files installed; service application failed; retry this batch', data=state), 503
+    return _cert_success('Custom PKI batch applied', state)
+
+
+@g3_bp.route('/api/cert/custom/status', methods=['GET'])
+@cert_admin_required
+@_pki_errors
+def custom_pki_status():
+    """GET ?pki_mode=trina&batch_id=...: public batch state, never file contents."""
+    _custom_mode(request.args)
+    state = _custom_call(_custom_pki().status, request.args.get('batch_id'))
+    return state if isinstance(state, tuple) else _cert_success('Custom PKI batch state', state)
 
 
 @g3_bp.route('/api/cert/generate', methods=['POST'])

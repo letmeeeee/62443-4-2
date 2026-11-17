@@ -253,7 +253,21 @@ def main():
             run(*base,'check','--role','master',env=env,success=False)
         key.write_bytes(original_key)
         run(*base,'check','--role','master',env=env)
+        # Mixed-size peers must still perform the production mutual-TLS/Modbus exchange.
+        for master_bits, slave_bits in ((3072, 2048), (2048, 3072)):
+            for role, bits in (('master', master_bits), ('slave', slave_bits)):
+                path = certdir/(role+'.key')
+                run('openssl', 'genpkey', '-algorithm', 'RSA', '-pkeyopt',
+                    'rsa_keygen_bits:'+str(bits), '-out', path)
+                path.chmod(0o600)
+                before = path.read_bytes()
+                issue(role, ['127.0.0.1'] if role == 'slave' else ())
+                assert path.read_bytes() == before
+                assert (str(bits)+' bit').encode() in run(
+                    'openssl', 'req', '-in', certdir/(role+'.csr'), '-text', '-noout')
+            run(transport, env=env)
         print('PASS: file CSR/CA-chain import, independent persisted keys, mutual TLS Modbus exchange, '
+              'RSA-2048/3072 mixed-size peers and existing-key reuse, '
               'peer IP SAN rejection, no self-signing/fallback, missing/mismatched/insecure keys rejected; '
               'live peer snapshot/Flask read, disconnect cleanup, crash recovery and I/O failure isolation')
 

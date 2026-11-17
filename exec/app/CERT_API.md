@@ -64,7 +64,7 @@ CSR 生成不会修改已部署证书。续签重复生成 CSR 时复用原私�
 
 1. POST https/csr，GET https/csr/export，将 CSR 发给外部 CA。
 2. 在可信渠道核验根指纹，使用 ca/import 导入根信任。
-3. 外部 CA 按 CN logger、serverAuth、设备 INI 的全部 IP SAN 签发。
+3. 外部 CA 按 CN 以 `LC400-` 开头（默认 CSR CN 为 `LC400-logger`）、serverAuth、设备 INI 的全部 IP SAN 签发。
 4. 上传 HTTPS 叶证书和中间链；成功只表示文件导入，返回 reload_required:true。
 5. 调用 https/apply，成功后才显示已应用。失败保留待应用状态，不显示已生效。
 

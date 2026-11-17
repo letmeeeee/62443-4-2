@@ -125,14 +125,56 @@ def test_issuance_duration_limit(workspace, tmp_path, days):
 
 
 def test_csr_privilege_and_weak_key_refused():
-    for bits, ca in ((2048,False),(3072,True)):
+    for bits, ca in ((1024,False),(2048,True),(3072,True)):
         key = rsa.generate_private_key(public_exponent=65537,key_size=bits)
         csr = (x509.CertificateSigningRequestBuilder().subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME,'test')]))
                .add_extension(x509.BasicConstraints(ca=ca,path_length=None),True).sign(key,hashes.SHA256()))
         with pytest.raises(ValueError): validate_csr(csr.public_bytes(serialization.Encoding.PEM),'master')
 
 
-def test_import_rollback_and_crash_recovery(workspace, monkeypatch):
+@pytest.mark.parametrize('bits', [2048, 3072, 4096])
+def test_csr_supported_rsa_sizes_accepted(bits):
+    # CA 原本接受更大 RSA 密钥；放宽下限时保留此行为。
+    key = rsa.generate_private_key(public_exponent=65537, key_size=bits)
+    csr = (x509.CertificateSigningRequestBuilder()
+           .subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, 'test')]))
+           .add_extension(x509.BasicConstraints(ca=False, path_length=None), True)
+           .sign(key, hashes.SHA256()))
+    validated, _ = validate_csr(csr.public_bytes(serialization.Encoding.PEM), 'master')
+    assert validated.public_key().key_size == bits
+
+
+def test_custom_source_metadata_survives_failed_general_import(workspace, monkeypatch):
+    w = workspace
+    tool = w['tool']
+    paths = [tool.pki.identity_source_path(tool.modbus, role) for role in ('master', 'slave')]
+    paths.append(tool.pki.identity_source_path(tool.https, 'https'))
+    before = {path: path.read_bytes() if path.exists() else None for path in paths}
+    originals = {}
+    for path in paths:
+        originals[path] = b'{"pki_mode":"custom"}'
+        path.write_bytes(originals[path])
+    real = tool.run
+    def interrupted(args, timeout=180):
+        if 'identity-import' in args and any(str(value).endswith('https_certificates.py') for value in args):
+            raise RuntimeError('simulated late import failure')
+        return real(args, timeout)
+    try:
+        with monkeypatch.context() as patch:
+            patch.setattr(tool, 'run', interrupted)
+            with pytest.raises(RuntimeError, match='simulated'):
+                tool.import_bundle(w['bundle'], [w['ca'].fingerprint()])
+        assert all(path.read_bytes() == data for path, data in originals.items())
+    finally:
+        for path, data in before.items():
+            if data is None:
+                path.unlink(missing_ok=True)
+            else:
+                path.write_bytes(data)
+
+
+@pytest.mark.parametrize('legacy_record_size', [None, 5, 7])
+def test_import_rollback_and_crash_recovery(workspace, monkeypatch, legacy_record_size):
     w = workspace; tool = w['tool']; real = tool.run
     targets = [tool.settings['ca_file'],tool.modbus/'master.crt',tool.modbus/'slave.crt',tool.https/'g3.crt']
     original_files = {p:p.read_bytes() if p.exists() else None for p in targets}
@@ -155,6 +197,11 @@ def test_import_rollback_and_crash_recovery(workspace, monkeypatch):
         patch.setattr(tool,'run',power_loss)
         with pytest.raises(KeyboardInterrupt): tool.import_bundle(w['bundle'], [w['ca'].fingerprint()])
     assert tool.settings['ca_file'].exists()
+    if legacy_record_size is not None:
+        # Replay actual interrupted-import backups using the older on-disk record formats.
+        record = tool.modbus / 'deployment-recovery/manifest.json'
+        entries = json.loads(record.read_text())
+        record.write_text(json.dumps(entries[:legacy_record_size]))
     assert tool.recover()['recovered']
     assert original_restored()
 
