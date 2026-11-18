@@ -19,6 +19,11 @@ import urllib.request
 import uuid
 
 SERVICES = ('tems.service', 'python_app.service')
+GOOSE_SERVICE = 'goose_middle.service'
+GOOSE_BINARY = 'home/zlg/goose/goose_middle'
+GOOSE_UNIT = 'etc/systemd/system/goose_middle.service'
+EXECUTABLES = {'home/zlg/tems', 'home/zlg/app/bin/modbus_tee_identity',
+               'home/zlg/app/bin/crypto_ta_client', GOOSE_BINARY}
 TA = 'lib/optee_armtz/5319e0a0-0001-4e2a-9c01-0c34da100001.ta'
 
 
@@ -31,7 +36,7 @@ def allowed(name):
         return False
     path = PurePosixPath(name)
     return (path.as_posix() == name and not path.is_absolute() and '..' not in path.parts and
-            (name in {'home/zlg/tems', TA} or
+            (name in {'home/zlg/tems', TA, GOOSE_BINARY, GOOSE_UNIT} or
              name in {'home/zlg/app/bin/modbus_tee_identity', 'home/zlg/app/bin/crypto_ta_client',
                       'inputs/trusted-master.crt'} or
              (name.startswith('home/zlg/app/') and path.suffix in {'.py', '.sh'} and
@@ -47,6 +52,10 @@ def target_for(name):
         base = Path('/home/zlg/dist').resolve()
     elif name.startswith('etc/ems/modbus/'):
         base = Path('/etc/ems/modbus').resolve()
+    elif name == GOOSE_UNIT:
+        base = Path('/etc/systemd/system').resolve()
+    elif name == GOOSE_BINARY:
+        base = Path('/home/zlg/goose').resolve()
     elif name == TA:
         base = Path('/lib/optee_armtz').resolve()
     else:
@@ -86,6 +95,8 @@ def unpack(bundle, directory):
                     'home/zlg/app/script/modbus_certs.py', 'home/zlg/app/script/sign_ini.py'}
         if not required <= set(manifest):
             raise ValueError('Incomplete upgrade bundle')
+        if bool(GOOSE_BINARY in manifest) != bool(GOOSE_UNIT in manifest):
+            raise ValueError('GOOSE binary and service unit must be packaged together')
         return manifest
 
 
@@ -141,18 +152,32 @@ def main():
         if (trusted_input in manifest) != bool(args.trust_master_fingerprint):
             raise ValueError('Trusted master certificate and fingerprint must be supplied together')
         deployment = {name for name in manifest if not name.startswith('inputs/')}
+        with_goose = GOOSE_BINARY in deployment
+        services = SERVICES + ((GOOSE_SERVICE,) if with_goose else ())
+        new_goose_service = False
         for tool in ('systemctl', 'ldd', 'openssl'):
             if not shutil.which(tool):
                 raise RuntimeError('Missing required program: ' + tool)
-        for service in SERVICES:
+        for service in services:
             result = subprocess.run(['systemctl', 'show', service, '--property=LoadState', '--value'],
                                     capture_output=True, text=True)
+            if service == GOOSE_SERVICE and result.stdout.strip() == 'not-found':
+                # First installation: stage a unit, but do not enable/start it before
+                # an administrator imports the four required GOOSE PKI materials.
+                new_goose_service = True
+                if target_for(GOOSE_UNIT).exists() or target_for(GOOSE_UNIT).is_symlink():
+                    raise RuntimeError('Unloaded GOOSE unit already exists; review service configuration')
+                continue
             if result.returncode or result.stdout.strip() != 'loaded':
                 raise RuntimeError('Service is not installed: ' + service)
             execution = subprocess.run(['systemctl', 'show', service, '--property=ExecStart', '--value'],
                                        capture_output=True, text=True)
             if service == 'tems.service':
                 matches = '/home/zlg/tems' in execution.stdout
+            elif service == GOOSE_SERVICE:
+                matches = bool(re.search(r'(?<![\w/])/home/zlg/goose/goose_middle(?![\w/.-])', execution.stdout))
+                # Keep installed unit settings and drop-ins instead of overwriting them.
+                deployment.discard(GOOSE_UNIT)
             else:
                 working = subprocess.run(['systemctl', 'show', service, '--property=WorkingDirectory', '--value'],
                                          capture_output=True, text=True)
@@ -172,7 +197,7 @@ def main():
                 raise RuntimeError('INI baseline mismatch; review configuration before deploying')
         elif not args.initialize_ini_baseline:
             raise RuntimeError('INI baseline missing; review configuration and use --initialize-ini-baseline')
-        for filename in ('home/zlg/tems', 'home/zlg/app/bin/modbus_tee_identity', 'home/zlg/app/bin/crypto_ta_client'):
+        for filename in sorted(EXECUTABLES & deployment):
             candidate = directory / 'payload' / filename
             candidate.chmod(0o755)
             result = subprocess.run(['ldd', str(candidate)], capture_output=True, text=True)
@@ -202,17 +227,22 @@ def main():
                 records[name] = {'mode': stat.st_mode & 0o777, 'uid': stat.st_uid, 'gid': stat.st_gid}
             else:
                 records[name] = None
-        was_active = {service: active(service) for service in SERVICES}
-        (backup / 'state.json').write_text(json.dumps({'files': records, 'active': was_active}, indent=2))
+        was_active = {service: (False if service == GOOSE_SERVICE and new_goose_service else active(service))
+                      for service in services}
+        (backup / 'state.json').write_text(json.dumps({'files': records, 'active': was_active, 'new_goose_service': new_goose_service}, indent=2))
         print('Backup: ' + str(backup), flush=True)
         changed = []
         try:
-            run('systemctl', 'stop', 'python_app.service', 'tems.service')
+            stop_services = tuple(service for service in services
+                                  if not (service == GOOSE_SERVICE and new_goose_service))
+            run('systemctl', 'stop', *reversed(stop_services))
             for name in sorted(deployment):
                 target = target_for(name)
                 changed.append(name)
                 publish(directory / 'payload' / name, target,
-                        name in {'home/zlg/tems', 'home/zlg/app/bin/modbus_tee_identity', 'home/zlg/app/bin/crypto_ta_client'})
+                        name in EXECUTABLES)
+            if new_goose_service:
+                run('systemctl', 'daemon-reload')
             if not checksum.exists():
                 changed.append('home/zlg/signature/lc_data_set.ini.sha256')
                 run('python3', base / 'app/script/sign_ini.py')
@@ -239,11 +269,11 @@ def main():
                 trust = Path('/etc/ems/modbus/master-ca.crt')
                 if not trust.is_file() or not trust.stat().st_size:
                     raise RuntimeError('Import a trusted master certificate before enabling TLS')
-            for service in SERVICES:
+            for service in services:
                 if was_active[service]:
                     run('systemctl', 'start', service)
             time.sleep(3)
-            for service in SERVICES:
+            for service in services:
                 if was_active[service] and not active(service):
                     raise RuntimeError('Service did not stay active: ' + service)
             if was_active['python_app.service']:
@@ -263,7 +293,7 @@ def main():
                     raise RuntimeError('Backend HTTP readiness check failed')
         except BaseException:
             print('Deployment failed; restoring replaced files from ' + str(backup), flush=True)
-            subprocess.run(['systemctl', 'stop', 'python_app.service', 'tems.service'])
+            subprocess.run(['systemctl', 'stop', *reversed(services)])
             for name in reversed(changed):
                 target = target_for(name)
                 old = records[name]
@@ -273,12 +303,18 @@ def main():
                 else:
                     publish(backup / 'files' / name, target, bool(old['mode'] & 0o111))
                     target.chmod(old['mode']); os.chown(target, old['uid'], old['gid'])
-            for service in SERVICES:
+            if new_goose_service:
+                subprocess.run(['systemctl', 'daemon-reload'])
+            for service in services:
                 if was_active[service]:
                     subprocess.run(['systemctl', 'start', service])
             raise
         (backup / 'SUCCESS').write_text('Deployment completed\n')
-        print('Deployment complete. Verify real Modbus TLS connectivity; backup: ' + str(backup), flush=True)
+        if with_goose:
+            print('GOOSE installed: /home/zlg/goose/goose_middle; PKI and existing service enablement preserved.', flush=True)
+            if new_goose_service:
+                print('New GOOSE service left inactive/disabled. Import PKI and apply it before explicitly enabling startup.', flush=True)
+        print('Deployment complete. Verify real Modbus TLS/GOOSE connectivity; backup: ' + str(backup), flush=True)
         if args.master_name:
             print('Distribute /etc/ems/modbus/master.crt to downstream slaves before expecting TLS connections.')
 

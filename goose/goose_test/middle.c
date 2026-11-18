@@ -25,6 +25,15 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include "shm_def.h"
+#include "security/goose_transport.h"
+#include "security/goose_log.h"
+
+/* Keep bridge diagnostics in the independent GOOSE daily log, like DPrint. */
+#define printf(...) GLOG("INFO", __VA_ARGS__)
+#define fprintf(stream, ...) GLOG("ERROR", __VA_ARGS__)
+#define perror(message) GLOG("ERROR", "%s: %s", message, strerror(errno))
+
+static GooseTransport *g_secure_transport;
 static volatile int running = 1;
 
 static void onSig(int sig)
@@ -749,6 +758,10 @@ static void onUpperGooseReceived(GooseSubscriber subscriber, void* parameter)
 {
     (void)parameter;
 
+    if (!GooseSubscriber_isValid(subscriber)) {
+        GLOG("WARNING", "Authenticated GOOSE rejected by dataset decoder; no Modbus forwarding");
+        return;
+    }
     uint32_t stNum = GooseSubscriber_getStNum(subscriber);
     bool is_valid = false;
     uint16_t pcs_group = 0;
@@ -840,6 +853,25 @@ static void onUpperGooseReceived(GooseSubscriber subscriber, void* parameter)
     }
 }
 
+/* Called only by the secure receive thread before the first frame of a new
+ * session. Reset the legacy decoder counters without touching Modbus state. */
+static int resetUpstreamSession(void)
+{
+    uint8_t dst[6] = {0x01, 0x0c, 0xcd, 0x01, 0x00, 0x00};
+    GooseSubscriber next = GooseSubscriber_create(SUbSCRIBER1_goCbRef, NULL);
+    if (!next) return -1;
+    GooseSubscriber_setDstMac(next, dst);
+    GooseSubscriber_setAppId(next, SUbSCRIBER1_APPID);
+    GooseSubscriber_setListener(next, onUpperGooseReceived, NULL);
+    GooseReceiver_removeSubscriber(g_up.receiver, g_up.subscriber);
+    GooseSubscriber_destroy(g_up.subscriber);
+    g_up.subscriber = next;
+    GooseReceiver_addSubscriber(g_up.receiver, next);
+    g_up.lastUpperStNumValid = false;
+    GLOG("INFO", "New authenticated GOOSE session: decoder counters reset");
+    return 0;
+}
+
 static int initUpstreamSubscriber(void)
 {
     uint8_t dst[6] = {0x01, 0x0c, 0xcd, 0x01, 0x00, 0x00};
@@ -865,9 +897,16 @@ static int initUpstreamSubscriber(void)
     GooseSubscriber_setListener(g_up.subscriber, onUpperGooseReceived, NULL);
 
     GooseReceiver_addSubscriber(g_up.receiver, g_up.subscriber);
-    GooseReceiver_start(g_up.receiver);
-
+    const char *pki_directory = getenv("GOOSE_PKI_DIR");
+    if (!pki_directory || !*pki_directory) pki_directory = "/etc/ems/goose";
     g_up.lastUpperStNumValid = false;
+    g_secure_transport = goose_transport_start(g_up.receiver, SUbSCRIBER1_NET,
+        pki_directory, SUbSCRIBER1_APPID, dst, SUbSCRIBER1_goCbRef, resetUpstreamSession);
+    if (!g_secure_transport) {
+        GooseReceiver_destroy(g_up.receiver); /* receiver owns its subscribers */
+        memset(&g_up, 0, sizeof(g_up));
+        return -1;
+    }
 
     printf("=============================================================\n");
     printf("================ Upstream subscriber ready ==================\n");
@@ -880,11 +919,8 @@ static int initUpstreamSubscriber(void)
 
 static void deinitUpstreamSubscriber(void)
 {
-    if (g_up.receiver)
-        GooseReceiver_stop(g_up.receiver);
-
-    if (g_up.subscriber)
-        GooseSubscriber_destroy(g_up.subscriber);
+    goose_transport_stop(g_secure_transport);
+    g_secure_transport = NULL;
 
     if (g_up.receiver)
         GooseReceiver_destroy(g_up.receiver);
@@ -898,6 +934,7 @@ static void deinitUpstreamSubscriber(void)
 int main(void)
 {
     signal(SIGINT, onSig);
+    signal(SIGTERM, onSig);
 
     // if (initDownstreamPublisher() != 0) {
     //     fprintf(stderr, "initDownstreamPublisher failed\n");
@@ -944,9 +981,16 @@ int main(void)
     printf("=================== Press Ctrl+C to exit ====================\n");
     printf("=============================================================\n");
 
+    int security_failed = 0;
     while (running) {
+        if (!goose_transport_is_running(g_secure_transport)) {
+            GLOG("ERROR", "Secure GOOSE receiver failed; stopping bridge without plaintext fallback");
+            security_failed = 1;
+            break;
+        }
         sleep(1);
     }
+    running = 0;
 
     deinitUpstreamSubscriber();
     deinitDownstreamPublisher();
@@ -955,5 +999,5 @@ int main(void)
     printf("=========================== Bye Bye =========================\n");
     printf("=============================================================\n");
 
-    return 0;
+    return security_failed ? 1 : 0;
 }

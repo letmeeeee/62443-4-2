@@ -57,6 +57,7 @@ def main():
         run('sh', ROOT / 'logger/scripts/prepare_optee_client.sh', '--device', args.host)
     if not args.skip_build:
         run('sh', ROOT / 'logger/scripts/prepare_optee_client.sh', '--check')
+        print('Building tems and modbus_tee_identity', flush=True)
         run('make', '-C', ROOT / 'logger', '-j' + str(args.jobs),
             'BUILD_DIR=' + str(ROOT / 'logger/build-deploy'))
         run('make', '-C', ROOT / 'optee_ta_examples/ta/crypto_ta',
@@ -67,8 +68,26 @@ def main():
             '-DCMAKE_TOOLCHAIN_FILE=' + str(ROOT / 'exec/app/tee/cmake/aarch64-linux-gnu.cmake'))
         run('cmake', '--build', ROOT / 'exec/app/tee/build-deploy', '-j', str(args.jobs))
 
+        print('Building libiec61850/HAL and secure goose_middle', flush=True)
+        toolchain = ROOT / 'exec/app/tee/cmake/aarch64-linux-gnu.cmake'
+        goose_library = ROOT / 'goose/libiec61850/build-deploy'
+        run('cmake', '-S', ROOT / 'goose/libiec61850', '-B', goose_library,
+            '-DCMAKE_TOOLCHAIN_FILE=' + str(toolchain),
+            '-DBUILD_EXAMPLES=OFF', '-DBUILD_PYTHON_BINDINGS=OFF')
+        run('cmake', '--build', goose_library, '-j', str(args.jobs))
+        goose_build = ROOT / 'goose/goose_test/build-deploy'
+        run('cmake', '-S', ROOT / 'goose/goose_test', '-B', goose_build,
+            '-DUSE_CROSS=ON', '-DLIBIEC_ROOT=' + str(ROOT / 'goose/libiec61850'),
+            '-DLIBIEC_BUILD=' + str(goose_library),
+            '-DHAL_LIB=' + str(goose_library / 'hal/libhal.a'),
+            '-DOPENSSL_INCLUDE_DIR=' + str(ROOT / 'logger/.deps/openssl-arm64/include'),
+            '-DOPENSSL_CRYPTO_LIBRARY=' + str(ROOT / 'logger/mysqlib/lib/libcrypto.so.1.1'))
+        run('cmake', '--build', goose_build, '--target', 'goose_middle', '-j', str(args.jobs))
+
     files = {
         'home/zlg/tems': ROOT / 'logger/build-deploy/tems',
+        'home/zlg/goose/goose_middle': ROOT / 'goose/goose_test/build-deploy/goose_middle',
+        'etc/systemd/system/goose_middle.service': ROOT / 'goose/goose_test/deploy/goose_middle.service',
         'home/zlg/app/bin/modbus_tee_identity': ROOT / 'logger/build-deploy/modbus_tee_identity',
         'home/zlg/app/bin/crypto_ta_client': ROOT / 'exec/app/tee/build-deploy/crypto_ta_client',
         'lib/optee_armtz/' + UUID + '.ta': ROOT / ('optee_ta_examples/build-deploy/' + UUID + '.ta'),
@@ -92,7 +111,7 @@ def main():
     for destination, source in sorted(files.items()):
         if not source.is_file() or source.is_symlink():
             raise RuntimeError('Missing/invalid build artifact: ' + str(source))
-        if destination.endswith(('/tems', '/modbus_tee_identity', '/crypto_ta_client')):
+        if destination.endswith(('/tems', '/modbus_tee_identity', '/crypto_ta_client', '/goose_middle')):
             elf = source.read_bytes()[:20]
             if len(elf) < 20 or elf[:6] != b'\x7fELF\x02\x01' or elf[18:20] != b'\xb7\x00':
                 raise RuntimeError('Not an AArch64 ELF: ' + str(source))
@@ -107,6 +126,7 @@ def main():
             archive.add(metadata, arcname='manifest.json')
             for destination, source in sorted(files.items()):
                 archive.add(source, arcname='payload/' + destination, recursive=False)
+    print('Bundle components: tems, app, modbus_tee_identity, crypto_ta_client, TA, goose_middle and GOOSE service', flush=True)
     print('Bundle ready: ' + str(bundle), flush=True)
     if args.bundle_only:
         return

@@ -58,7 +58,7 @@ def cert_admin_required(function):
         if user.get('permission') not in config.PERMISSION_TABLE.get('usermanage', []):
             _cert_log('拒绝请求：需要管理员权限', level='WARNING', status=403)
             return _cert_error('administrator permission required', 403)
-        if not request.path.startswith('/api/cert/custom/'):
+        if not request.path.startswith(('/api/cert/custom/', '/api/cert/goose/')):
             # Only the HTTP parameter changes. Legacy callers and CLI tools keep their behavior.
             try:
                 _cert_validate_general_mode()
@@ -85,13 +85,13 @@ def cert_admin_required(function):
 
 
 def _cert_validate_general_mode():
-    """旧接口接收 general，缺省兼容旧调用；不允许借参数跳过 CSR 校验。"""
+    """pki_mode限制为general或trina；不允许借参数跳过 CSR 校验。"""
     values = request.args.getlist('pki_mode') + request.form.getlist('pki_mode')
     data = request.get_json(silent=True) if request.is_json else None
     if isinstance(data, dict) and 'pki_mode' in data:
         values.append(data['pki_mode'])
-    if any(value != 'general' for value in values):
-        raise ValueError('pki_mode must be general')
+    if any(((value != 'general') and (value != 'trina')) for value in values):
+        raise ValueError('pki_mode must be general or trina')
     g.pki_mode = 'general'
     return 'general'
 
@@ -712,3 +712,72 @@ def retired_certificate_operation():
         ok=False, code='CA_CSR_REQUIRED',
         message='Use CSR, CA trust and signed identity import APIs',
     ), 410
+
+
+# GOOSE uses independent PKI generations; TLS role, CA and CRL endpoints stay unchanged.
+def _goose_pki():
+    from script.goose_pki import GoosePKI
+    g.pki_mode = 'goose'
+    return GoosePKI(current_app.config.get('GOOSE_PKI_DIR',
+                    os.environ.get('GOOSE_PKI_DIR', '/etc/ems/goose')))
+
+
+def _goose_service_apply(service):
+    if service != 'goose':
+        raise ValueError('unknown GOOSE service')
+    unit = current_app.config.get('GOOSE_SERVICE', 'goose_middle.service')
+    if not isinstance(unit, str) or not re.fullmatch(r'[A-Za-z0-9_@.-]+\.service', unit):
+        raise ValueError('invalid GOOSE_SERVICE')
+    _cert_log('应用 GOOSE PKI，重启独立服务', service=unit)
+    for action in (['restart', unit], ['is-active', '--quiet', unit]):
+        result = subprocess.run(['systemctl', '--no-ask-password', *action],
+                                capture_output=True, timeout=120, check=False)
+        if result.returncode:
+            raise OSError('GOOSE service application failed')
+
+
+@g3_bp.route('/api/cert/goose/<part>/import', methods=['POST'])
+@cert_admin_required
+@_pki_errors
+def import_goose_pki(part):
+    """Multipart file, optional batch_id; part=identity|key|ca|crl. Stage only."""
+    if part not in ('identity', 'key', 'ca', 'crl'):
+        raise ValueError('invalid GOOSE PKI part')
+    upload = request.files.get('file')
+    if upload is None:
+        raise ValueError('file required')
+    data = upload.stream.read(MAX_CERT_SIZE + 1)
+    if not data or len(data) > MAX_CERT_SIZE:
+        raise ValueError('invalid upload size')
+    g.audit_target = 'GOOSE PKI:' + part
+    manager = _goose_pki()
+    state = _custom_call(manager.upload, part, data,
+                         batch_id=request.form.get('batch_id') or None,
+                         actor=g.current_user.get('username', '-'))
+    if isinstance(state, tuple):
+        return state
+    _cert_log('GOOSE PKI 材料已暂存', part=part, batch_id=state['batch_id'], size_bytes=len(data))
+    return _cert_success('GOOSE PKI material staged; apply batch to activate', state)
+
+
+@g3_bp.route('/api/cert/goose/status', methods=['GET'])
+@cert_admin_required
+@_pki_errors
+def goose_pki_status():
+    state = _custom_call(_goose_pki().status, request.args.get('batch_id'))
+    return state if isinstance(state, tuple) else _cert_success('GOOSE PKI status', state)
+
+
+@g3_bp.route('/api/cert/goose/apply', methods=['POST'])
+@cert_admin_required
+@_pki_errors
+def goose_pki_apply():
+    data = _cert_get_json()
+    state = _custom_call(_goose_pki().apply, data.get('batch_id'), _goose_service_apply)
+    if isinstance(state, tuple):
+        return state
+    _cert_log('GOOSE PKI 应用结果', batch_id=state['batch_id'], status=state['status'])
+    if state['status'] != 'applied':
+        return jsonify(ok=False, status=config.STATE_ERROR, code='GOOSE_PKI_APPLY_FAILED',
+                       message='Files installed; GOOSE service application failed; retry this batch', data=state), 503
+    return _cert_success('GOOSE PKI batch applied', state)

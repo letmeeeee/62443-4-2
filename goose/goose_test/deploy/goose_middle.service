@@ -1,0 +1,19 @@
+[Unit]
+Description=Authenticated GOOSE to Modbus TCP bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Must match the identity file owner used by the backend PKI import process.
+User=root
+WorkingDirectory=/home/zlg/goose
+ExecStart=/home/zlg/goose/goose_middle
+Environment=GOOSE_PKI_DIR=/etc/ems/goose
+Environment=GOOSE_LOG_DIR=/mnt/nvme/goose_log
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

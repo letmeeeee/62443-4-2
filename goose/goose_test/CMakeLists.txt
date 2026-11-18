@@ -29,13 +29,14 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # ======== libiec61850 路径配置 ========
-set(LIBIEC_ROOT "/home/wx/ItemCode/goose_tcp/goose/libiec61850")
-set(LIBIEC_A    "${LIBIEC_ROOT}/build/src/libiec61850.a")
+set(LIBIEC_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../libiec61850" CACHE PATH "libiec61850 source directory")
+set(LIBIEC_BUILD "${LIBIEC_ROOT}/build" CACHE PATH "libiec61850 build directory")
+set(LIBIEC_A "${LIBIEC_BUILD}/src/libiec61850.a")
 
 # ======== 自动查找 HAL 静态库 ========
 find_library(HAL_LIB
   NAMES hal iec61850_hal
-  PATHS "${LIBIEC_ROOT}/build/hal" "${LIBIEC_ROOT}/build"
+  PATHS "${LIBIEC_BUILD}/hal" "${LIBIEC_BUILD}"
   NO_DEFAULT_PATH
 )
 
@@ -81,7 +82,13 @@ add_executable(goose_pub       pub.c)
 add_executable(goose_sub       sub.c)
 add_executable(goose_multi_pub goose_multi_pub.c)
 add_executable(goose_multi_sub goose_multi_sub.c)
-add_executable(goose_middle middle.c)
+find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS Crypto)
+add_executable(goose_middle middle.c security/goose_security.c
+    security/goose_transport.c security/goose_log.c)
+target_compile_options(goose_middle PRIVATE -Wall -Wextra)
+# Do not embed this workstation's cross-SDK library directory in deployed ELF.
+set_target_properties(goose_middle PROPERTIES SKIP_BUILD_RPATH TRUE)
+target_link_libraries(goose_middle PRIVATE OpenSSL::Crypto)
 # ======== 链接库（顺序很重要）========
 target_link_libraries(goose_pub       PRIVATE iec61850 "${HAL_LIB}" pthread rt)
 target_link_libraries(goose_sub       PRIVATE iec61850 "${HAL_LIB}" pthread rt)

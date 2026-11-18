@@ -224,7 +224,7 @@ def main():
                 messagebox.showerror('参数错误', str(exc))
                 return
             if not bundle_only:
-                summary = ('目标：' + self.options().host + '\n\n将编译并替换程序，部署期间暂停 tems 和后端服务。\n'
+                summary = ('目标：' + self.options().host + '\n\n将编译并替换程序，部署期间暂停 tems、后端和原本运行的 GOOSE 服务。\n'
                            '失败时脚本会尝试恢复原文件与服务。请在维护窗口操作。')
                 if self.variables['master_enabled'].get() or self.variables['slave_enabled'].get():
                     summary += '\n\n已选择更新证书，请准备同步更新对端信任。'

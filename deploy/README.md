@@ -24,8 +24,7 @@ GUI 的“检查 SSH”使用同一认证方式。命令行默认仍支持终端
 回滚逻辑仍统一在现有脚本中。
 
 面向已配置好的 AArch64 工控机：已有 `tems.service`、`python_app.service`、
-Python 环境、MySQL、tee-supplicant 和匹配的 OP-TEE。它不会安装操作系统、
-系统库或首次建立设备服务。运行前安排维护窗口，SSH 账号需要 root。
+Python 环境、MySQL、tee-supplicant 和匹配的 OP-TEE。它不会安装操作系统或系统库；tems/Web 服务须已存在，GOOSE 服务可按下文首次安装。运行前安排维护窗口，SSH 账号需要 root。
 
 在仓库根目录执行日常升级：
 
@@ -33,11 +32,41 @@ Python 环境、MySQL、tee-supplicant 和匹配的 OP-TEE。它不会安装操�
 python3 deploy/deploy.py --host root@192.168.2.136
 ```
 
-脚本自动准备项目内依赖、编译 tems/身份工具/通用 CLI/TA、打包代码、上传、
+脚本自动准备项目内依赖、编译 tems/身份工具/通用 CLI/TA、libiec61850/HAL 和安全 GOOSE 桥接程序，打包代码、上传、
 备份、停止服务、安装、检查现有证书与 INI、按原状态恢复服务，并检查
 服务和后端 HTTP 就绪情况。可使用 SSH 密钥免重复输入密码。
 默认包含后端 Python/Shell 代码；添加 `--with-frontend` 才更新 `exec/dist`。
-`lc_data`、设备 INI、Session 配置/密钥、OTA 公钥、系统库和 HTTPS 配置不覆盖。
+`lc_data`、设备 INI、Session 配置/密钥、GOOSE PKI、GOOSE 日志、OTA 公钥、系统库和 HTTPS 配置不覆盖。
+
+## GOOSE 与 Modbus 身份工具
+
+默认构建和打包以下程序，不需要增加开关：
+
+| 组件 | 构建产物 | 设备安装位置 |
+| --- | --- | --- |
+| GOOSE 安全桥接 | `goose/goose_test/build-deploy/goose_middle` | `/home/zlg/goose/goose_middle` |
+| GOOSE 服务模板 | `goose/goose_test/deploy/goose_middle.service` | 首次安装到 `/etc/systemd/system/goose_middle.service` |
+| Modbus 身份工具 | `logger/build-deploy/modbus_tee_identity` | `/home/zlg/app/bin/modbus_tee_identity` |
+
+`modbus_tee_identity` 是可执行辅助工具，不是独立 systemd 服务；它位于升级包的
+`payload/home/zlg/app/bin/` 中。GOOSE 的 libiec61850/HAL 为静态链接输入，会先编译再链接
+到 goose_middle，无需单独部署这两个静态库。libcrypto.so.1.1 等运行依赖仍由设备提供。
+
+- 已有 GOOSE 服务：检查 ExecStart 是否指向上述安装位置，保留原 unit 和 drop-in 配置。
+  更新前停止，更新后仅恢复原本运行的服务；原先停用的服务仍停用，enable 状态不改变。
+- 首次部署 GOOSE：安装程序和默认 unit，执行 daemon-reload，保留服务停用且不执行 enable。
+  先通过 GOOSE PKI 接口导入四类材料并 apply；确认通信后，再在设备显式执行
+  `systemctl enable goose_middle.service` 设置开机启动。未配置 PKI 时不会启动明文通信。
+- 服务已存在但路径不同、被 mask 或配置异常时，安装前拒绝继续，需先确认现场配置，
+  不自动覆盖自定义启动方式。不要同时运行旧的手工启动 GOOSE 进程。
+- GOOSE 程序纳入 ARM64 校验、设备 ldd 依赖检查、文件备份、服务检查和失败回滚。
+  首次安装后失败会删除本次新建的 unit 并 daemon-reload。
+- 不打包、不创建或覆盖 `/etc/ems/goose/` 的证书、私钥、CA、CRL，不改动
+  `/mnt/nvme/goose_log/`，不生成密钥，也不自动执行 GOOSE PKI apply。
+
+`--skip-build` 现在还要求已有 `goose/goose_test/build-deploy/goose_middle`；缺文件或架构
+错误会直接拒绝打包。新包须配套本次 `deploy/install.py`，旧安装器不识别新增 GOOSE 路径。
+没有 GOOSE 载荷的旧升级包仍可由新安装器按原范围安装，不触碰 GOOSE 服务。
 
 ## 首次迁移文件私钥到 TA
 
@@ -79,12 +108,12 @@ python3 install.py --bundle em1000-upgrade.tar.gz
 
 打包时附带 trusted-master 输入的，安装时需同样传入
 `--trust-master-fingerprint`。`--skip-build` 只打包既有 `build-deploy` 产物，
-不会判断它们是否对应最新源码；正常发布使用默认构建。
+不会判断它们是否对应最新源码；正常发布使用默认构建。GOOSE 程序和服务文件已包含在新包中。
 
 ## 备份和恢复范围
 
 每次备份保存到设备 `/home/zlg/deploy-backups/时间-编号/`，包含被替换的
-原文件、权限与服务状态。失败后脚本停止服务并尝试恢复这些文件、清除本次
+原文件、权限与服务状态。失败后脚本停止相关服务并尝试恢复这些文件、清除本次
 新建的目标文件，再恢复原来运行中的服务；备份和上传包保留供排查。
 目录和证书工具额外产生的备份目录不会自动删除。
 
