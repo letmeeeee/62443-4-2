@@ -86,7 +86,7 @@ def main():
 
     files = {
         'home/zlg/tems': ROOT / 'logger/build-deploy/tems',
-        'home/zlg/goose/goose_middle': ROOT / 'goose/goose_test/build-deploy/goose_middle',
+        'home/zlg/goose_middle': ROOT / 'goose/goose_test/build-deploy/goose_middle',
         'etc/systemd/system/goose_middle.service': ROOT / 'goose/goose_test/deploy/goose_middle.service',
         'home/zlg/app/bin/modbus_tee_identity': ROOT / 'logger/build-deploy/modbus_tee_identity',
         'home/zlg/app/bin/crypto_ta_client': ROOT / 'exec/app/tee/build-deploy/crypto_ta_client',

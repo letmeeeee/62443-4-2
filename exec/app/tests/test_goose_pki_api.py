@@ -59,9 +59,41 @@ def test_goose_apply_targets_only_its_service(goose_app,monkeypatch):
                    ['systemctl','--no-ask-password','is-active','--quiet','goose_middle.service']]
 
 
+@pytest.mark.parametrize('failed_action,code', [('restart', 1), ('is-active', 3)])
+def test_goose_service_failure_logs_stage_and_bounded_stderr(goose_app,monkeypatch,failed_action,code):
+    app,route=goose_app
+    logs=[]
+    monkeypatch.setattr(route,'_cert_log',lambda event,**details: logs.append((event,details)))
+    def run(args,**kwargs):
+        return types.SimpleNamespace(returncode=code if args[2]==failed_action else 0,
+                                     stderr=b'Unit goose_middle.service failed\n'+b'x'*2000)
+    monkeypatch.setattr(route.subprocess,'run',run)
+    with app.test_request_context('/api/cert/goose/apply',method='POST'):
+        with pytest.raises(OSError):
+            route._goose_service_apply('goose')
+    details=logs[-1][1]
+    assert details['action']==failed_action and details['returncode']==code
+    assert details['service']=='goose_middle.service'
+    assert len(details['stderr'])==1024
+
+
+def test_goose_service_timeout_is_logged_and_propagated(goose_app,monkeypatch):
+    app,route=goose_app
+    logs=[]
+    monkeypatch.setattr(route,'_cert_log',lambda event,**details: logs.append((event,details)))
+    def run(args,**kwargs):
+        raise route.subprocess.TimeoutExpired(args,120)
+    monkeypatch.setattr(route.subprocess,'run',run)
+    with app.test_request_context('/api/cert/goose/apply',method='POST'):
+        with pytest.raises(route.subprocess.TimeoutExpired):
+            route._goose_service_apply('goose')
+    assert logs[-1][1]['action']=='restart'
+    assert logs[-1][1]['error_type']=='TimeoutExpired'
+
+
 def test_four_file_upload_and_apply_via_existing_authentication(goose_app,monkeypatch,tmp_path):
     # Reuse the independent test-only EC CA generator, not a production identity.
-    source=Path(__file__).resolve().parents[3]/'goose_tcp/goose/goose_test/tests'
+    source=Path(__file__).resolve().parents[3]/'goose/goose_test/tests'
     monkeypatch.syspath_prepend(str(source))
     from test_goose_security import identity,crl,key_bytes,ENC
     root_key,root=identity('api-root',ca=True)

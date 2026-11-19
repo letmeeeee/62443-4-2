@@ -1,0 +1,4 @@
+dist/
+build-windows/
+.venv-windows/
+build-windows-pip.log

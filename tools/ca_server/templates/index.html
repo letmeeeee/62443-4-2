@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>设备 CA 管理服务器</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+<header><div><span class="eyebrow">LC400 · CERTIFICATE AUTHORITY</span><h1>设备 CA 管理服务器</h1><p>生成身份密钥，自动创建 CSR 并签发证书</p></div><button id="logout" hidden>退出登录</button></header>
+<main>
+  <div id="notice" role="status" aria-live="polite">正在连接服务器…</div>
+  <section id="login-panel" hidden><h2>管理员登录</h2><form id="login-form"><label>管理员口令<input name="password" type="password" required autocomplete="current-password"></label><button class="primary">登录</button></form></section>
+  <div id="workspace" hidden>
+    <section><div class="section-head"><h2>CA 状态</h2><span id="lock-state" class="badge">未初始化</span></div><pre id="ca-status"></pre>
+      <div class="actions"><button id="download-ca">下载根证书</button><button id="download-crl">下载 CRL</button><button id="refresh-crl">更新 CRL</button><button id="lock-ca">立即锁定 CA</button></div>
+      <form id="unlock-form" class="inline"><label>CA 保护口令<input name="password" type="password" required minlength="12" autocomplete="off"></label><button class="primary">解锁 CA（30 分钟）</button></form>
+    </section>
+    <section id="initialize-panel" hidden><h2>创建服务器 CA</h2><p>首次生成自签根 CA；CA 算法与设备算法可以分别选择。已有 CA 不会被覆盖。</p>
+      <form id="ca-form"><div class="grid">
+        <label>CA 名称 / CN<input name="cn" value="LC400 Root CA" required maxlength="64"></label>
+        <label>算法<select name="algorithm"><option>P-256</option><option>RSA</option></select></label>
+        <label>RSA 位数<select name="rsa_bits"><option>2048</option><option selected>3072</option><option>4096</option></select></label>
+        <label>有效天数<input name="days" type="number" value="3650" min="365" max="7300" required></label>
+        <label>组织 O（可选）<input name="organization" maxlength="64"></label>
+        <label>国家 C（可选）<input name="country" maxlength="2" placeholder="CN"></label>
+        <label>CA 保护口令<input name="password" type="password" minlength="12" maxlength="1024" required autocomplete="new-password"></label>
+        <label>确认 CA 保护口令<input name="password_confirm" type="password" minlength="12" required autocomplete="new-password"></label>
+      </div><button class="primary">生成 CA 私钥与根证书</button></form>
+    </section>
+    <section><h2>生成设备身份</h2><p>每次签发生成独立的设备私钥及 CSR。GOOSE 使用 P-256；RSA 可用于 TLS 服务器或客户端身份。</p>
+      <form id="device-form"><div class="grid">
+        <label>设备编号<input name="device_id" value="LC400-001" required maxlength="64"></label>
+        <label>设备 CN<input name="cn" value="LC400-001-goose" required maxlength="64"></label>
+        <label>用途<select name="profile"><option value="goose">GOOSE</option><option value="tls_server">TLS 服务器</option><option value="tls_client">TLS 客户端</option></select></label>
+        <label>设备算法<select name="algorithm"><option>P-256</option><option>RSA</option></select></label>
+        <label>RSA 位数<select name="rsa_bits"><option>2048</option><option selected>3072</option><option>4096</option></select></label>
+        <label>有效天数<input name="days" type="number" value="365" min="1" max="825" required></label>
+        <label>组织 O（可选）<input name="organization" maxlength="64"></label>
+        <label>组织单位 OU（可选）<input name="organization_unit" maxlength="64"></label>
+        <label>国家 C（可选）<input name="country" maxlength="2" placeholder="CN"></label>
+        <label>DNS SAN（逗号分隔）<input name="dns_names" placeholder="ems.example.com"></label>
+        <label>IP SAN（逗号分隔）<input name="ip_addresses" placeholder="192.168.3.100"></label>
+      </div><button id="issue-button" class="primary">生成私钥、CSR 并签发证书</button></form>
+    </section>
+    <section><div class="section-head"><h2>设备签发记录</h2><button id="refresh">刷新</button></div>
+      <div class="table-wrap"><table><thead><tr><th>设备 / CN</th><th>用途与算法</th><th>到期时间</th><th>状态</th><th>导出与管理</th></tr></thead><tbody id="devices"></tbody></table></div>
+      <div class="actions"><button id="previous">上一页</button><span id="page-status"></span><button id="next">下一页</button></div>
+    </section>
+    <section><div class="section-head"><h2>近期操作记录</h2><button id="events-refresh">刷新记录</button></div><pre id="events"></pre></section>
+  </div>
+</main>
+<dialog id="export-dialog"><form id="export-form"><h2>导出设备文件包</h2><p>文件包含设备私钥、CSR、证书、信任根和当前 CRL。</p>
+  <label>私钥格式<select name="key_format"><option value="encrypted">加密 PKCS#8（设置独立导出口令）</option><option value="plain">未加密 PKCS#8（供 GOOSE 后端导入）</option></select></label>
+  <label id="export-password-label">导出口令（至少 12 位，不能使用 CA 口令）<input name="export_password" type="password" minlength="12" autocomplete="new-password"></label>
+  <label id="export-confirm-label">确认导出口令<input name="export_password_confirm" type="password" autocomplete="new-password"></label>
+  <p id="plain-note" hidden>下载包将包含未加密设备私钥，请保存到受控位置。GOOSE 后端当前要求此格式。</p>
+  <div class="actions"><button class="primary">下载文件包</button><button id="export-cancel" type="button">取消</button></div>
+</form></dialog>
+</body></html>

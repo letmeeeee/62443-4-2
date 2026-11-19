@@ -22,6 +22,7 @@ from utils import security_store as store
 from utils import security_audit as audit
 from utils.access import ABILITIES
 from utils.utils import DPrint
+from utils.pki_read_cache import cached_pki_read
 
 security_bp = Blueprint('security', __name__)
 DEFAULT_NOTICE = dict(
@@ -253,6 +254,10 @@ def memory_usage():
 
 
 def certificate_inventory():
+    return cached_pki_read('certificate-inventory', _collect_certificate_inventory)
+
+
+def _collect_certificate_inventory():
     """采集 master、slave、HTTPS 和 CA 根证书的公开信息。
 
     缺失文件跳过，无效文件记录 invalid；身份证书的 fullchain 仅取首张叶证书。
@@ -467,6 +472,10 @@ def _certificate_private_key_check(item):
 
 
 def _checked_certificate_inventory():
+    return cached_pki_read('checked-certificate-inventory', _collect_checked_certificate_inventory)
+
+
+def _collect_checked_certificate_inventory():
     """采集公开清单并执行持钥自检，供所有返回完整证书条目的接口复用。"""
     items = certificate_inventory()
     for item in items:
@@ -487,7 +496,7 @@ def certificates():
     """查询证书清单，无入参。
 
     返回：{ok, data, scope, expiringCount, errorCount}。
-    每次请求对设备身份执行持钥自检，独立返回 privateKeyVerified 和原因。
+    文件版本变化或短缓存到期时重新持钥自检，独立返回 privateKeyVerified 和原因。
     expiringCount 按有效期统计，errorCount 包含无效、过期和尚未生效的证书。
     """
     try:
@@ -694,6 +703,11 @@ def network_rules():
     rules.zones 返回区域、端口、服务和来源等；ports 不包含服务隐含的端口。
     采集失败时 rules 为 null，并返回 rulesUnavailableReason；不修改防火墙配置。
     """
+    from utils.public_read_cache import cached_public_read
+    return jsonify(cached_public_read('network-rules', _collect_network_rules))
+
+
+def _collect_network_rules():
     addresses = _command(['ip', '-j', 'address', 'show'])
     routes = _command(['ip', '-j', 'route', 'show'])
     # 固定机器可解析的语言，避免进程语言环境将字段翻译后破坏解析。
@@ -714,7 +728,7 @@ def network_rules():
         DPrint(f'Firewalld rules unavailable: {reason}', level='WARNING')
     else:
         DPrint(f"Firewalld rules collected: zones={len(rules['zones'])}", level='INFO')
-    return jsonify(
+    return dict(
         ok=True,
         interfaces=json.loads(addresses) if addresses else [],
         routes=json.loads(routes) if routes else [],

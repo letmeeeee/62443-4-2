@@ -7,13 +7,19 @@ Wants=network-online.target
 Type=simple
 # Must match the identity file owner used by the backend PKI import process.
 User=root
-WorkingDirectory=/home/zlg/goose
-ExecStart=/home/zlg/goose/goose_middle
+WorkingDirectory=/home/zlg
+ExecStartPre=/bin/mkdir -p /mnt/nvme/goose_log
+ExecStart=/home/zlg/goose_middle
 Environment=GOOSE_PKI_DIR=/etc/ems/goose
 Environment=GOOSE_LOG_DIR=/mnt/nvme/goose_log
 Restart=on-failure
 RestartSec=5
 KillSignal=SIGTERM
+TimeoutStopSec=30
+UMask=0027
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=goose_middle
 
 [Install]
 WantedBy=multi-user.target

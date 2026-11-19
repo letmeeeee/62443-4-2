@@ -18,7 +18,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.x509.oid import NameOID
 
-ROOT = Path(__file__).resolve().parents[4]
+ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / 'exec/app'))
 from script.goose_pki import GoosePKI
 from script.custom_pki import Conflict
@@ -85,7 +85,7 @@ def material(tmp_path):
 def native(tmp_path_factory):
     directory = tmp_path_factory.mktemp('goose-c')
     output = directory / 'libgsec.so'
-    source = ROOT / 'goose_tcp/goose/goose_test/security'
+    source = ROOT / 'goose/goose_test/security'
     subprocess.run(['gcc', '-std=gnu99', '-Wall', '-Wextra', '-Werror', '-fPIC', '-shared',
                     str(source/'goose_security.c'), str(source/'goose_log.c'),
                     '-lcrypto', '-lpthread', '-o', str(output)], check=True)

@@ -46,7 +46,7 @@ static void onSig(int sig)
  * Modbus TCP client (simple)
  * ========================= */
 #define MODBUS_SERVER_IP   "127.0.0.1"
-#define MODBUS_SERVER_PORT 502
+#define MODBUS_SERVER_PORT 1502
 #define MODBUS_UNIT_ID     1
 /* starting register address */
 #define MODBUS_ACTIVE_REG_ADDR1    27204

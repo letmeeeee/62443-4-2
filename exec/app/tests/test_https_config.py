@@ -101,6 +101,9 @@ def test_prepare_preserves_ca_identity_and_private_key(deployment):
     assert key.stat().st_mode&0o777==0o600
     nginx=(root/'etc/nginx/conf.d/g3_https.conf').read_text()
     assert 'location = /api/upgrade/process' in nginx
+    upload = nginx.split('location = /api/upgrade/file {', 1)[1].split('}', 1)[0]
+    assert 'client_max_body_size 512m;' in upload
+    assert 'proxy_pass http://127.0.0.1:8000;' in upload
     assert 'systemctl' not in (root/'calls').read_text()
     config.write_text(config.read_text().replace('192.168.3.136,192.168.2.136','192.168.4.136'))
     assert run().returncode!=0

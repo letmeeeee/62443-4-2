@@ -1,0 +1,42 @@
+[
+  {
+    "name": "EMS Flask Backend",
+    "version": "待确认：设备实际部署版本",
+    "type": "application"
+  },
+  {
+    "name": "EMS Web Frontend",
+    "version": "待确认：前端构建版本",
+    "type": "application"
+  },
+  {
+    "name": "tems",
+    "version": "待确认：设备实际部署版本",
+    "type": "application"
+  },
+  {
+    "name": "modbus_tee_identity",
+    "version": "待确认：设备实际部署版本",
+    "type": "application"
+  },
+  {
+    "name": "Nginx",
+    "version": "待确认：设备 nginx -v 输出",
+    "type": "server"
+  },
+  {
+    "name": "OpenSSL",
+    "version": "待确认：设备 openssl version 输出",
+    "type": "library"
+  },
+  {
+    "name": "MySQL Server",
+    "version": "待确认：实际数据库服务器版本",
+    "type": "database"
+  },
+  {
+    "name": "firewalld",
+    "version": "待确认：设备 firewall-cmd --version 输出",
+    "type": "system-service"
+  }
+]

@@ -180,7 +180,8 @@ def query_pcs_upgrade_status(idx=0):
         return None
 
 # ========== 触发升级脚本 ==========
-def run_upgrade_async(job_id: str, release_version: str, delay_sec: int = 2):
+def run_upgrade_async(job_id: str, release_version: str, delay_sec: int = 2,
+                      package_sha256: Optional[str] = None):
     from utils.method import _write_status
     from config import UPLOAD_DIR
     def _runner():
@@ -206,6 +207,9 @@ def run_upgrade_async(job_id: str, release_version: str, delay_sec: int = 2):
                 f.write(job_id)
             with open(UPLOAD_DIR / 'release_version', 'w') as f:
                 f.write(release_version)
+            # Always replace the marker so legacy callers cannot reuse a stale hash.
+            with open(UPLOAD_DIR / 'package_sha256', 'w') as f:
+                f.write(package_sha256 or '')
             env = dict(os.environ)
             env['PATH'] = env.get('PATH', '') + ':/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 

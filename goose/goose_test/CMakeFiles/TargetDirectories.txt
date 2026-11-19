@@ -1,0 +1,7 @@
+/home/wx/WorkStation/ItemCode/62443-4-2/goose/goose_test/CMakeFiles/rebuild_cache.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/goose/goose_test/CMakeFiles/edit_cache.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/goose/goose_test/CMakeFiles/goose_middle.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/goose/goose_test/CMakeFiles/goose_multi_sub.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/goose/goose_test/CMakeFiles/goose_multi_pub.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/goose/goose_test/CMakeFiles/goose_sub.dir
+/home/wx/WorkStation/ItemCode/62443-4-2/goose/goose_test/CMakeFiles/goose_pub.dir

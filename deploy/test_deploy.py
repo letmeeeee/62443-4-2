@@ -31,7 +31,7 @@ class BundleTests(unittest.TestCase):
             'exec/app/tee/build-deploy/crypto_ta_client': arm64_elf(),
             'optee_ta_examples/build-deploy/' + builder.UUID + '.ta': b'test ta',
             'goose/goose_test/build-deploy/goose_middle': arm64_elf(),
-            'goose/goose_test/deploy/goose_middle.service': b'[Service]\nExecStart=/home/zlg/goose/goose_middle\n',
+            'goose/goose_test/deploy/goose_middle.service': b'[Service]\nExecStart=/home/zlg/goose_middle\n',
             'exec/app/main.py': b'# backend',
             'exec/app/script/modbus_certs.py': b'# cert script',
             'exec/app/script/goose_pki.py': b'# goose pki',
@@ -51,7 +51,7 @@ class BundleTests(unittest.TestCase):
                 run.assert_not_called()
             with tarfile.open(root / 'deploy/build-output/em1000-upgrade.tar.gz') as archive:
                 manifest = json.load(archive.extractfile('manifest.json'))
-                for name in ('home/zlg/goose/goose_middle', 'etc/systemd/system/goose_middle.service',
+                for name in ('home/zlg/goose_middle', 'etc/systemd/system/goose_middle.service',
                              'home/zlg/app/bin/modbus_tee_identity', 'home/zlg/app/script/goose_pki.py'):
                     self.assertIn(name, manifest)
                     payload = archive.extractfile('payload/' + name).read()

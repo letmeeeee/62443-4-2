@@ -20,7 +20,7 @@ import uuid
 
 SERVICES = ('tems.service', 'python_app.service')
 GOOSE_SERVICE = 'goose_middle.service'
-GOOSE_BINARY = 'home/zlg/goose/goose_middle'
+GOOSE_BINARY = 'home/zlg/goose_middle'
 GOOSE_UNIT = 'etc/systemd/system/goose_middle.service'
 EXECUTABLES = {'home/zlg/tems', 'home/zlg/app/bin/modbus_tee_identity',
                'home/zlg/app/bin/crypto_ta_client', GOOSE_BINARY}
@@ -55,7 +55,7 @@ def target_for(name):
     elif name == GOOSE_UNIT:
         base = Path('/etc/systemd/system').resolve()
     elif name == GOOSE_BINARY:
-        base = Path('/home/zlg/goose').resolve()
+        base = Path('/home/zlg').resolve()
     elif name == TA:
         base = Path('/lib/optee_armtz').resolve()
     else:
@@ -175,7 +175,7 @@ def main():
             if service == 'tems.service':
                 matches = '/home/zlg/tems' in execution.stdout
             elif service == GOOSE_SERVICE:
-                matches = bool(re.search(r'(?<![\w/])/home/zlg/goose/goose_middle(?![\w/.-])', execution.stdout))
+                matches = bool(re.search(r'(?<![\w/])/home/zlg/goose_middle(?![\w/.-])', execution.stdout))
                 # Keep installed unit settings and drop-ins instead of overwriting them.
                 deployment.discard(GOOSE_UNIT)
             else:
@@ -311,7 +311,7 @@ def main():
             raise
         (backup / 'SUCCESS').write_text('Deployment completed\n')
         if with_goose:
-            print('GOOSE installed: /home/zlg/goose/goose_middle; PKI and existing service enablement preserved.', flush=True)
+            print('GOOSE installed: /home/zlg/goose_middle; PKI and existing service enablement preserved.', flush=True)
             if new_goose_service:
                 print('New GOOSE service left inactive/disabled. Import PKI and apply it before explicitly enabling startup.', flush=True)
         print('Deployment complete. Verify real Modbus TLS/GOOSE connectivity; backup: ' + str(backup), flush=True)

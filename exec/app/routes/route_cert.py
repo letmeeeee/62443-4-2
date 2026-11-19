@@ -345,8 +345,11 @@ def shared_ca_status():
     from script.pki_common import read_config, certificates, fingerprint, validate_roots
 
     settings = read_config(config.INI_PATH)
-    data = validate_roots(settings['ca_file'].read_bytes())
-    fingerprints = [fingerprint(cert) for cert in certificates(data)]
+    from utils.pki_read_cache import cached_pki_read
+    def collect():
+        data = validate_roots(settings['ca_file'].read_bytes())
+        return [fingerprint(cert) for cert in certificates(data)]
+    fingerprints = cached_pki_read('shared-ca-fingerprints', collect)
     _cert_log('共享 CA 校验通过', certificate_count=len(fingerprints))
     return _cert_success('shared CA trust', dict(mode=settings['mode'], fingerprints=fingerprints))
 
@@ -476,7 +479,8 @@ def get_crls():
 
     settings = pki.read_config(config.INI_PATH)
     try:
-        entries = crl_store.inventory(settings)
+        from utils.pki_read_cache import cached_pki_read
+        entries = cached_pki_read('crl-inventory', lambda: crl_store.inventory(settings))
     except ValueError as error:
         raise CertificateScriptError(str(error)) from error
     return _cert_success('Certificate revocation lists',
@@ -511,7 +515,9 @@ def import_crls():
 @_pki_errors
 def https_identity_status():
     """GET：通过 HTTPS 证书脚本检查当前 CA 身份状态。"""
-    return _cert_success('HTTPS CA identity status', _https_pki(['status']))
+    from utils.pki_read_cache import cached_pki_read
+    return _cert_success('HTTPS CA identity status',
+                         cached_pki_read('https-identity-status', lambda: _https_pki(['status'])))
 
 
 @g3_bp.route('/api/cert/identity', methods=['GET'])
@@ -520,7 +526,8 @@ def https_identity_status():
 def get_certificate_identity():
     """GET ?role=master|slave：查询对应角色的公开证书信息。"""
     role = _cert_validate_role(request.args.get('role'))
-    certificate = _cert_run_script(['show', '--role', role])
+    from utils.pki_read_cache import cached_pki_read
+    certificate = cached_pki_read(('identity', role), lambda: _cert_run_script(['show', '--role', role]))
     return _cert_success('CA identity information', dict(role=role, certificate=certificate))
 
 
@@ -730,9 +737,20 @@ def _goose_service_apply(service):
         raise ValueError('invalid GOOSE_SERVICE')
     _cert_log('应用 GOOSE PKI，重启独立服务', service=unit)
     for action in (['restart', unit], ['is-active', '--quiet', unit]):
-        result = subprocess.run(['systemctl', '--no-ask-password', *action],
-                                capture_output=True, timeout=120, check=False)
+        try:
+            result = subprocess.run(['systemctl', '--no-ask-password', *action],
+                                    capture_output=True, timeout=120, check=False)
+        except (OSError, subprocess.SubprocessError) as error:
+            _cert_log('GOOSE 服务命令执行失败', level='ERROR', service=unit,
+                      action=action[0], error_type=type(error).__name__)
+            raise
         if result.returncode:
+            stderr = getattr(result, 'stderr', b'') or b''
+            if isinstance(stderr, bytes):
+                stderr = stderr.decode('utf-8', errors='replace')
+            _cert_log('GOOSE 服务命令返回失败', level='ERROR', service=unit,
+                      action=action[0], returncode=result.returncode, stderr=stderr[:1024],
+                      hint='Check systemctl status and journalctl -u ' + unit)
             raise OSError('GOOSE service application failed')
 
 
@@ -773,6 +791,7 @@ def goose_pki_status():
 @_pki_errors
 def goose_pki_apply():
     data = _cert_get_json()
+    g.audit_target = 'GOOSE PKI:apply'
     state = _custom_call(_goose_pki().apply, data.get('batch_id'), _goose_service_apply)
     if isinstance(state, tuple):
         return state

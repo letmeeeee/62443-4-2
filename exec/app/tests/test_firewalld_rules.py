@@ -47,6 +47,8 @@ def test_runtime_rules_include_ports_and_preserve_conditions(security_app, monke
     login(client, 'admin')
     response = client.get('/api/security/network-rules')
     assert response.status_code == 200
+    assert client.get('/api/security/network-rules').json == response.json
+    assert len(calls) == 3  # Repeated refresh does not spawn another command set.
     data = response.json
     assert data['rulesAvailable'] is True and data['rulesUnavailableReason'] is None
     assert data['writable'] is False and data['source'] == 'iproute2-firewalld'

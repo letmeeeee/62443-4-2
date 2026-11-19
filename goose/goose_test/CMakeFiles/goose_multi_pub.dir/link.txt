@@ -1,0 +1,1 @@
+/usr/bin/aarch64-linux-gnu-gcc    CMakeFiles/goose_multi_pub.dir/goose_multi_pub.c.o  -o goose_multi_pub  ../libiec61850/build/src/libiec61850.a /home/wx/WorkStation/ItemCode/62443-4-2/goose/libiec61850/build/hal/libhal.a -lpthread -lrt 

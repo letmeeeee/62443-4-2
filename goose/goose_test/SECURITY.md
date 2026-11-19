@@ -135,7 +135,20 @@ cmake --build /tmp/goose-middle-native --target goose_middle -j4
 并按原启停状态恢复。部署不改动 GOOSE PKI 或日志；详见仓库 `deploy/README.md`。
 本地仅生成升级包不会修改运行设备。
 进程需要 raw socket / SO_BINDTODEVICE 权限；运行用户须与 PKI 导入文件属主一致。
-示例以 root 运行，二进制路径为 `/home/zlg/goose/goose_middle`，部署时按实际服务调整。
+示例以 root 运行，二进制路径为 `/home/zlg/goose_middle`，工作目录为 `/home/zlg`。
+手动安装服务（先将模板上传到设备当前目录）：
+
+```bash
+sudo install -m 0644 goose_middle.service /etc/systemd/system/goose_middle.service
+sudo chmod 0755 /home/zlg/goose_middle
+sudo systemctl daemon-reload
+sudo systemctl enable --now goose_middle.service
+sudo systemctl status goose_middle.service --no-pager -l
+```
+
+启动前需完成四类 GOOSE PKI 材料的导入；材料缺失时程序拒绝启动。服务自动创建
+`/mnt/nvme/goose_log`，同时保留 journal 日志。若替换了正在运行的服务配置，使用
+`sudo systemctl restart goose_middle.service` 加载新配置。
 后端新增路由需要重启后端进程生效。不要同时启动旧的明文 GOOSE 桥接程序。
 
 日志默认 `/mnt/nvme/goose_log/YYYY-MM-DD.log`，格式与 DPrint 一致：
@@ -153,6 +166,10 @@ cmake --build /tmp/goose-middle-native --target goose_middle -j4
 回退代码时需先停止 GOOSE 入口，保留 PKI 代次以供人工检查；不得在线自动回退为明文。
 
 ## 验证
+
+真实网卡发布端模拟器：根目录 `goose_publisher.py`，支持 GSEC1 双向认证、加密 GOOSE
+发送及重放/篡改/明文负例。证书准备、PC 与设备 net2 拓扑和操作命令见
+[发布端模拟联调说明](../../tools/goose_publisher/README.md)。默认 8 个整数匹配当前桥接数据集。
 
 ```bash
 GOOSE_TEST_LIBIEC=/tmp/goose-lib-native/src/libiec61850.so PYTHONPATH=/path/to/repo/exec/app \

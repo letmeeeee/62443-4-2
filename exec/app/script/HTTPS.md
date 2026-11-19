@@ -65,4 +65,6 @@ sudo systemctl start g3-cert-renew.service
 
 现有 443 代理及 9000 精确查询转发保持原路径。80 端口未被其他服务占用时添加 HTTPS 重定向。脚本日志仍在 `/var/log/ems/https/https-YYYY-MM-DD.log`；续签失败还会出现在 systemd journal。客户端需信任外部 CA，不关闭证书验证。
 
+升级上传 `/api/upgrade/file` 单独设置 `client_max_body_size 512m`，上限为整个请求体（包含文件和 multipart 元数据）的 512 MiB；文件需略小于此值。其它路径沿用原有请求体限制。旧版生成配置未设置该项时，通常会触发 Nginx 默认 1 MiB 限制并返回 413。更新脚本后，在设备重新执行 `sudo bash /home/zlg/app/script/enable_https.sh --install-service`，刷新安装副本、生成配置并应用；只修改生成的 Nginx 配置会被下次运行脚本覆盖。可用 `sudo nginx -T` 检查实际生效的路径配置，用 Nginx 错误日志中的 `client intended to send too large body` 确认拦截来源。
+
 不自动恢复旧自签证书。上线前必须完成三类 CSR 的外部签发与证书/CA 导入，再切换新程序并按维护流程验收。TEE 持久存储、CA 吊销服务和实际设备重启验证仍需平台验收。

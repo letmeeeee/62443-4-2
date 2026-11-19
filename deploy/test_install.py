@@ -101,7 +101,7 @@ class InstallerTests(unittest.TestCase):
                 if args[:2] == ['systemctl', 'show']:
                     output = 'not-found\n' if new_goose and args[2] == installer.GOOSE_SERVICE else 'loaded\n'
                     if '--property=ExecStart' in args:
-                        output = ('/home/zlg/goose/goose_middle' if args[2] == installer.GOOSE_SERVICE else
+                        output = ('/home/zlg/goose_middle' if args[2] == installer.GOOSE_SERVICE else
                                   '/home/zlg/tems' if args[2] == 'tems.service' else '/home/zlg/myenv/bin/python3 /home/zlg/app/main.py')
                     if '--property=WorkingDirectory' in args:
                         output = '/home/zlg/app'

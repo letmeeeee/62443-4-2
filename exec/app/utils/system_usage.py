@@ -1,5 +1,11 @@
 """Linux host CPU utilization without additional dependencies."""
 import time
+import threading
+
+
+_cpu_lock = threading.Lock()
+_cpu_sample = None
+_cpu_sampled_at = 0.0
 
 
 def _read_cpu_times():
@@ -16,6 +22,19 @@ def _read_cpu_times():
 
 
 def cpu_usage():
+    """Share one 0.2-second sample across resource queries for one second."""
+    global _cpu_sample, _cpu_sampled_at
+    with _cpu_lock:
+        now = time.monotonic()
+        if _cpu_sample is not None and 0 <= now - _cpu_sampled_at < 1.0:
+            return dict(_cpu_sample)
+        sample = _measure_cpu_usage()
+        _cpu_sample = sample
+        _cpu_sampled_at = time.monotonic()
+        return dict(sample)
+
+
+def _measure_cpu_usage():
     """Measure aggregate CPU busy time over a short sampling interval."""
     total_before, idle_before = _read_cpu_times()
     started = time.monotonic()

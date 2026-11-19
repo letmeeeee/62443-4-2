@@ -339,17 +339,17 @@ def test_old_http_accepts_general_and_omitted_mode(custom_http):
     client = app.test_client()
     credentials = login(client, 'admin').json
     headers = {'X-CSRF-Token': credentials['csrf_token']}
-    for role, mode in [('master', None), ('slave', 'general')]:
+    for role, mode in [('master', None), ('slave', 'general'), ('master', 'trina')]:
         data = dict(role=role, name='old-' + role, ip=['127.0.0.1'])
         if mode:
             data['pki_mode'] = mode
         response = client.post('/api/cert/csr', json=data, headers=headers)
         assert response.status_code == 200
-        assert client.get('/api/cert/check', query_string=dict(role=role, pki_mode='trina')).status_code == 400
+        assert client.get('/api/cert/check', query_string=dict(role=role, pki_mode='custom')).status_code == 400
     assert client.get('/api/cert/mode?pki_mode=general').status_code == 200
     assert client.get('/api/cert/mode').status_code == 200
     assert client.post('/api/cert/ca/import', headers=headers,
-                       data={'pki_mode': 'trina'}).status_code == 400
+                       data={'pki_mode': 'custom'}).status_code == 400
 
 
 def test_security_aliases_accept_general_without_affecting_legacy_calls(custom_http, authority, device, tmp_path, monkeypatch):
@@ -369,13 +369,14 @@ def test_security_aliases_accept_general_without_affecting_legacy_calls(custom_h
         'chain': (io.BytesIO(authority['intermediate'].read_bytes()), 'chain.pem'),
     })
     assert response.status_code == 200
-    for body in ({'role': 'master'}, {'role': 'master', 'pki_mode': 'general'}):
+    for body in ({'role': 'master'}, {'role': 'master', 'pki_mode': 'general'},
+                 {'role': 'master', 'pki_mode': 'trina'}):
         response = client.post('/api/security/certificates/verify', json=body, headers=headers)
         assert response.status_code == 200 and response.json['valid']
     assert client.post('/api/security/certificates/verify', headers=headers,
-                       json=dict(role='master', pki_mode='trina')).status_code == 400
+                       json=dict(role='master', pki_mode='custom')).status_code == 400
     assert client.post('/api/security/certificates/import', headers=headers,
-                       data=dict(role='master', pki_mode='trina')).status_code == 400
+                       data=dict(role='master', pki_mode='custom')).status_code == 400
 
 
 def test_staged_batch_detects_another_batch_install(manager, material):
@@ -617,3 +618,55 @@ def test_new_custom_endpoint_accepts_only_trina_mode(custom_http):
                            data=dict(pki_mode='trina', role='master', clear='true'))
     assert response.status_code == 200
     assert response.json['data']['pki_mode'] == 'trina'
+
+
+def test_public_inventory_poll_reuses_openssl_and_private_self_tests(custom_http, manager, material, monkeypatch):
+    from routes import route_security
+    from time import perf_counter
+    app, _, _ = custom_http
+    identifier = stage(manager, material('master'), 'master')
+    stage(manager, material('https'), 'https', identifier)
+    manager.apply(identifier, lambda service: None)
+    openssl_calls = []
+    checks = []
+    original_run = pki.run
+    original_check = route_security._certificate_private_key_check
+    def counted_run(*args, **kwargs):
+        openssl_calls.append(args[0])
+        return original_run(*args, **kwargs)
+    def counted_check(item):
+        checks.append(item['role'])
+        return original_check(item)
+    monkeypatch.setattr(pki, 'run', counted_run)
+    monkeypatch.setattr(route_security, '_certificate_private_key_check', counted_check)
+    with app.app_context():
+        started = perf_counter()
+        first = route_security._checked_certificate_inventory()
+        cold_ms = (perf_counter() - started) * 1000
+        count = len(openssl_calls)
+        checked = len(checks)
+        started = perf_counter()
+        second = route_security._checked_certificate_inventory()
+        warm_ms = (perf_counter() - started) * 1000
+        assert first == second
+        assert count > 0 and len(openssl_calls) == count
+        assert checked > 0 and len(checks) == checked
+        print('PKI inventory: cold_ms=%.1f warm_ms=%.1f cold_openssl=%d warm_openssl=0' %
+              (cold_ms, warm_ms, count))
+
+
+def test_explicit_checks_always_execute_even_with_read_cache(custom_http, manager, material, monkeypatch):
+    app, routes, _ = custom_http
+    identifier = stage(manager, material('master'), 'master')
+    manager.apply(identifier, lambda service: None)
+    calls = []
+    original = routes._cert_run_script
+    def counted(command):
+        calls.append(command[0])
+        return original(command)
+    monkeypatch.setattr(routes, '_cert_run_script', counted)
+    client = app.test_client()
+    login(client, 'admin')
+    for _ in range(2):
+        assert client.get('/api/cert/check', query_string=dict(role='master')).status_code == 200
+    assert calls == ['check', 'check']

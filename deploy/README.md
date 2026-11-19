@@ -44,7 +44,7 @@ python3 deploy/deploy.py --host root@192.168.2.136
 
 | 组件 | 构建产物 | 设备安装位置 |
 | --- | --- | --- |
-| GOOSE 安全桥接 | `goose/goose_test/build-deploy/goose_middle` | `/home/zlg/goose/goose_middle` |
+| GOOSE 安全桥接 | `goose/goose_test/build-deploy/goose_middle` | `/home/zlg/goose_middle` |
 | GOOSE 服务模板 | `goose/goose_test/deploy/goose_middle.service` | 首次安装到 `/etc/systemd/system/goose_middle.service` |
 | Modbus 身份工具 | `logger/build-deploy/modbus_tee_identity` | `/home/zlg/app/bin/modbus_tee_identity` |
 
