@@ -5,7 +5,7 @@ root_path = Path(__file__).parent.parent
 sys.path.insert(0, str(root_path))
 from flask import request, jsonify, Flask
 from werkzeug.utils import secure_filename
-from config import FIXED_DEVICE_ID, READ_INPUT_REGISTER, UPGRADE_STATE_MAP, HTTPS_ENABLE
+from config import FIXED_DEVICE_ID, READ_INPUT_REGISTER, UPGRADE_STATE_MAP
 from config import STATUS_DIR, STATE_ERROR, remote_client_lock, HOST_IP
 from utils.utils import DPrint, now_str
 import constent.common as common
@@ -13,8 +13,8 @@ import utils.method as method
 from flask import Blueprint
 from flask_socketio import SocketIO
 import os, json
-from utils.auth import init_auth, authenticate_session
-from script.session_config import configure_session
+import stat
+from flask_cors import CORS
 
 upgrade = Blueprint("upgrade", __name__)
 
@@ -27,7 +27,8 @@ def _parse_status_request():
             'task_name': str,
             'firmware': str,
             'target': str,
-            'device_ids': list
+            'device_ids': list,
+            'invalid_ips': list
         }
 
     如果参数错误:
@@ -100,14 +101,25 @@ def _parse_status_request():
     # 4. 解析设备信息
     # ============================================================
     device_ids = []
+    invalid_ips = []
 
     # ------------------------------------------------------------
     # 4.1 deviceIP
     # ------------------------------------------------------------
     if any(device_ip_args):
         device_ids = method.parse_device_ids_from_ips(
-            device_ip_args
+            device_ip_args, invalid_ips=invalid_ips,
         )
+        if invalid_ips:
+            DPrint(f"[STATUS] 未找到对应 PCS 或 LC 设备: {', '.join(invalid_ips)}")
+        if not device_ids and invalid_ips:
+            message = f"未找到对应 PCS 或 LC 设备: {', '.join(invalid_ips)}"
+            return jsonify({
+                'taskName': task_name,
+                'status': STATE_ERROR,
+                'error': message,
+                'msg': message,
+            }), 400
 
         DPrint(
             f"[STATUS] deviceIP解析: "
@@ -200,7 +212,8 @@ def _parse_status_request():
         'task_name': task_name,
         'firmware': firmware,
         'target': target,
-        'device_ids': device_ids
+        'device_ids': device_ids,
+        'invalid_ips': invalid_ips,
     }, None
 
 def _get_pcs_upgrade_status(task_name, device_ids):
@@ -305,13 +318,31 @@ def _get_lc_upgrade_status(task_name):
 
     status_path = STATUS_DIR / f'{task_name}.json'
 
-    # ============================================================
-    # 状态文件不存在
-    # ============================================================
-    if not status_path.is_file():
+    # 记录作出判断的同一次 stat 结果，避免再次检查掩盖瞬时异常。
+    diagnostic_context = (
+        f"taskName={task_name!r}, path={str(status_path)!r}, "
+        f"pid={os.getpid()}, uid={os.geteuid()}, source={__file__!r}"
+    )
+    try:
+        file_stat = status_path.stat()
+        is_regular = stat.S_ISREG(file_stat.st_mode)
         DPrint(
-            f"[STATUS] 升级任务不存在或尚未创建: "
-            f"{task_name}"
+            f"[STATUS] LC 状态文件检查: {diagnostic_context}, "
+            f"mode={oct(file_stat.st_mode)}, is_file={is_regular}"
+        )
+    except (OSError, ValueError) as exc:
+        is_regular = False
+        DPrint(
+            f"[STATUS] LC 状态文件检查失败: {diagnostic_context}, "
+            f"stat_error={exc!r}"
+        )
+
+    # ============================================================
+    # 状态文件不可用，保留原有 404 响应格式
+    # ============================================================
+    if not is_regular:
+        DPrint(
+            f"[STATUS] LC 状态文件不可用，返回 404: {diagnostic_context}"
         )
 
         return None, None, None, jsonify({
@@ -359,7 +390,7 @@ def status_get():
         request_data, error_code = _parse_status_request()
 
         if error_code is not None:
-            return request_data
+            return request_data, error_code
 
         task_name = request_data['task_name']
         target = request_data['target']
@@ -397,6 +428,12 @@ def status_get():
         # ========================================================
         if error_response is not None:
             return error_response, error_status
+
+        # 有效设备查询结果保留，无效 IP 分别追加错误结果，三个数组保持对应。
+        for device_ip in request_data['invalid_ips']:
+            processes.append(0)
+            states.append(STATE_ERROR)
+            messages.append(f"未找到对应 PCS 或 LC 设备: {device_ip}，已跳过")
 
         # ========================================================
         # 4. 统一返回
@@ -554,9 +591,6 @@ def create_app():
     DPrint(f"静态前端目录: {static_folder_path}")
     DPrint(f"index.html 是否存在: {os.path.exists(os.path.join(static_folder_path, 'index.html'))}")
     app = Flask(__name__, static_folder=static_folder_path, static_url_path="/")
-    # 与主应用共享持久化密钥和数据库会话，认证不依赖 8000 服务存活。
-    configure_session(app)
-    init_auth(app)
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def serve_spa(path):
@@ -567,26 +601,15 @@ def create_app():
     return app
 
 app = create_app()
-socketio = SocketIO(app)
+CORS(app) 
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 def main():
-    if HTTPS_ENABLE:
-        # 仅监听回环地址，由 Nginx 提供 HTTPS 入口。
-        socketio.run(app, host='127.0.0.1', port=9000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
-        DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 服务器 (127.0.0.1:9000)")
-    else:
-        socketio.run(app, host='0.0.0.0', port=9000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
-        DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 服务器 (0.0.0.0:9000)")
+    DPrint(f"[{now_str()}] [MAIN] 启动 Flask SocketIO 升级监听程序 (0.0.0.0:9000)")
+    socketio.run(app, host='0.0.0.0', port=9000, debug=False, use_reloader=False, allow_unsafe_werkzeug=True)
 
 @socketio.on('connect')
-def on_connect(auth=None):
-    try:
-        token = auth.get("session_token", "") if isinstance(auth, dict) else ""
-        if not authenticate_session(token):
-            return False
-    except Exception:
-        app.logger.exception("SocketIO authentication failed")
-        return False
+def on_connect():
     DPrint(f"[{now_str()}] [SocketIO] 新客户端连接: {request.remote_addr}")
 
 if __name__ == '__main__':

@@ -14,7 +14,17 @@ set -E                       # 让 ERR 在函数里也生效
 export PATH="/home/zlg/myenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 JOB_ID_FILE="/home/zlg/upgrade/job_id"
 REL_VERSION_FILE="/home/zlg/upgrade/release_version"
+# 启动时读取，防止后续清理升级目录删除该文件。
+PACKAGE_SHA256=""
+if [ -f "/home/zlg/upgrade/package_sha256" ]; then
+  PACKAGE_SHA256="$(tr -d '\n' < /home/zlg/upgrade/package_sha256)"
+fi
 BASE_DIR="/home/zlg"
+# 在覆盖/回退 app 前保留数据库工具代码，避免新旧 app 切换导致工具缺失。
+PACKAGE_DB_TOOL=""
+if [ -f "$BASE_DIR/app/script/manage_upgrade_db.py" ]; then
+  PACKAGE_DB_TOOL="$(cat "$BASE_DIR/app/script/manage_upgrade_db.py")"
+fi
 UPGRADE_STATUS_DIR="/home/zlg/upgrade/status/"
 # 自动识别升级入口：优先 LC 子目录，否则用根 upgrade/
 if [ -d "/home/zlg/upgrade/LC" ]; then
@@ -66,6 +76,8 @@ fi
 log(){ echo "[$(date '+%F %T')] $*"; }
 mkdir -p "$UPGRADE_STATUS_DIR"
 JSON_OUTPUT_FILE="${UPGRADE_STATUS_DIR%/}/${JOB_ID}.json"
+FINALIZED=false
+UPGRADE_HAD_ERROR=0
 # _post_json() {
 #   local payload="$1"
 #   if command -v curl >/dev/null 2>&1; then
@@ -94,7 +106,7 @@ _post_json() {
   mkdir -p "$UPGRADE_STATUS_DIR" 2>/dev/null || true
 
   # 直接将payload写入本地JSON文件，覆盖原有内容
-  if ! printf '%s\n' "$payload" > "$JSON_OUTPUT_FILE" 2>"$LOG_DIR/status_write_err.log"; then
+  if ! printf '%s\n' "$payload" > "${JSON_OUTPUT_FILE}.tmp.$$" 2>"$LOG_DIR/status_write_err.log"; then
     write_status=1
     err_msg="$(cat "$LOG_DIR/status_write_err.log" 2>/dev/null || echo 'unknown write error')"
     log "[status-write] 写入失败: $JSON_OUTPUT_FILE, reason=$err_msg"
@@ -102,6 +114,7 @@ _post_json() {
     return 1
   fi
 
+  mv -f "${JSON_OUTPUT_FILE}.tmp.$$" "$JSON_OUTPUT_FILE" || return 1
   rm -f "$LOG_DIR/status_write_err.log" 2>/dev/null || true
   return 0
 }
@@ -113,8 +126,8 @@ send_status() {
   local progress="$1"; shift
   local msg="${*:-}"
   local payload
-  payload=$(printf '{"job":"%s","state":%d,"progress":%d,"msg":"%s"}' \
-            "$JOB_ID" "$st" "$progress" "$(echo "$msg" | sed 's/"/\\"/g')")
+  payload=$(printf '{"job":"%s","state":%d,"progress":%d,"msg":"%s","finalized":%s}' \
+            "$JOB_ID" "$st" "$progress" "$(echo "$msg" | sed 's/"/\\"/g')" "$FINALIZED")
   if ! _post_json "$payload"; then
     log "[status] job=$JOB_ID state=$st progress=$progress msg=$msg (write failed)"
   else
@@ -145,12 +158,13 @@ declare -a ITEM_ORDER=()
 # record_result <显示名> <ok|fail|skip|rollback> <备注>
 record_result() {
   local _key="$1" _st="$2" _note="$3"
+  case "$_st" in fail|rollback) UPGRADE_HAD_ERROR=1 ;; esac
   ITEM_RESULTS["$_key"]="${_st}|${_note}"
   ITEM_ORDER+=("$_key")
 }
 
 # 未捕获错误：仅记日志与状态，不中断后续流程
-trap 'send_status -1 0 "unexpected error on line $LINENO"' ERR
+trap 'UPGRADE_HAD_ERROR=1; send_status 1 0 "unexpected error on line $LINENO" >&2' ERR
 
 # ========= 工具函数 =========
 
@@ -253,6 +267,103 @@ do_rollback() {
   fi
 }
 
+# ZIP必须全部解压准备成功后，才允许替换任何正在使用的程序。
+# 使用独立临时目录，避免上次残留目录或解压失败产生的空目录被安装。
+declare -a PREPARED_DIRS=()
+cleanup_prepared() {
+  local prepared
+  for prepared in "${PREPARED_DIRS[@]}"; do
+    if ! "$RM" -rf -- "$prepared"; then
+      log "[警告] 解压临时目录清理失败: $prepared" >&2
+    fi
+  done
+}
+trap cleanup_prepared EXIT
+
+prepare_zip() {
+  local archive="$1" label="$2" output_var="$3"
+  local prepared resolved
+  if ! prepared=$(mktemp -d "$UPGRADE_DIR/.prepared_${label}.XXXXXX"); then
+    log "[错误] $label 创建解压临时目录失败"
+    return 1
+  fi
+  PREPARED_DIRS+=("$prepared")
+  if ! resolved=$(python3 - "$archive" "$prepared" <<'ZIP_PY'
+import stat
+import sys
+import zipfile
+from pathlib import Path, PurePosixPath
+
+archive, destination = sys.argv[1], Path(sys.argv[2])
+try:
+    with zipfile.ZipFile(archive) as package:
+        members = package.infolist()
+        if not any(not member.is_dir() for member in members):
+            raise ValueError("ZIP为空或只包含空目录")
+        for member in members:
+            path = PurePosixPath(member.filename)
+            if path.is_absolute() or '..' in path.parts or not path.parts:
+                raise ValueError("ZIP包含非法路径: %s" % member.filename)
+            if stat.S_ISLNK(member.external_attr >> 16):
+                raise ValueError("ZIP包含符号链接: %s" % member.filename)
+        # extractall会校验解压内容的CRC；失败只影响临时目录。
+        package.extractall(destination)
+    children = list(destination.iterdir())
+    selected = children[0] if len(children) == 1 and children[0].is_dir() else destination
+    if not any(item.is_file() for item in selected.rglob('*')):
+        raise ValueError("ZIP没有可安装的文件")
+    print(selected)
+except Exception as exc:
+    print("ZIP校验/解压失败 %s: %s" % (archive, exc), file=sys.stderr)
+    sys.exit(1)
+ZIP_PY
+  ); then
+    log "[错误] $label ZIP校验或解压失败，未替换任何程序"
+    return 1
+  fi
+  printf -v "$output_var" '%s' "$resolved"
+  log "[预检] $label 已校验并解压到: $resolved"
+}
+
+# 先完整复制到与目标同级的临时目录；复制/备份失败时保留原目录。
+replace_directory() {
+  local source="$1" live="$2" backup="$3"
+  local staged="${live}.new_${BACKUP_TS}" previous="${live}.previous_${BACKUP_TS}"
+  if [ -e "$staged" ] || [ -e "$previous" ]; then
+    log "[错误] 替换临时目录已存在: $staged / $previous"
+    return 1
+  fi
+  if ! "$CP" -a -- "$source" "$staged"; then
+    log "[错误] 新目录复制失败，保留原程序: $live"
+    "$RM" -rf -- "$staged"
+    return 1
+  fi
+  if [ -e "$live" ]; then
+    if ! mkdir -p "$(dirname "$backup")" || ! "$CP" -a -- "$live" "$backup"; then
+      log "[错误] 备份失败，保留原程序: $live"
+      "$RM" -rf -- "$staged"
+      return 1
+    fi
+    if ! "$MV" -T -- "$live" "$previous"; then
+      log "[错误] 原目录切换失败: $live"
+      "$RM" -rf -- "$staged"
+      return 1
+    fi
+  fi
+  if ! "$MV" -T -- "$staged" "$live"; then
+    log "[错误] 新目录切换失败: $live"
+    if [ -e "$previous" ]; then
+      if ! "$MV" -T -- "$previous" "$live"; then
+        log "[严重] 原目录恢复失败，原文件保留在: $previous"
+      fi
+    fi
+    "$RM" -rf -- "$staged"
+    return 1
+  fi
+  "$RM" -rf -- "$previous"
+  log "[完成] 已替换 $live；备份在: $backup"
+}
+
 # ========= 动态计算 total（仅统计实际存在的升级项） =========
 declare -a FILENAMES=("tems" "lc_data")
 declare -A SERVICES=(
@@ -267,11 +378,9 @@ LC_INI_BACKUP="$BACKUP_DIR/$LC_INI_NAME"
 LC_INI_STAGED="${LC_INI_OLD}.new_${BACKUP_TS}"
 DIST_ZIP="$UPGRADE_DIR/dist.zip"
 DIST_OLD="$BASE_DIR/dist"
-DIST_NEW="$UPGRADE_DIR/dist"   # 解压后实际路径，下方会按需修正
 DIST_BACKUP="$BACKUP_DIR/dist"
 APP_ZIP="$UPGRADE_DIR/app.zip"
 APP_OLD="$BASE_DIR/app"
-APP_NEW="$UPGRADE_DIR/app"    # 解压后实际路径，下方会按需修正
 APP_BACKUP="$BACKUP_DIR/app"
 
 # 动态统计实际存在的升级项，避免进度偏移
@@ -290,6 +399,21 @@ done_count=0
 
 # ========= 开始升级 =========
 send_status 1 0 "start"
+
+# 先准备所有ZIP。失败时保留升级内容、原程序及既有备份，便于排查/重试。
+_resolved_app_new=""
+_resolved_dist_new=""
+for _component in app dist; do
+  _archive="$UPGRADE_DIR/${_component}.zip"
+  if [ -f "$_archive" ]; then
+    if ! prepare_zip "$_archive" "$_component" "_resolved_${_component}_new"; then
+      record_result "$_component" "fail" "ZIP预检失败，未执行程序替换"
+      FINALIZED=true
+      send_status 2 0 "${_component}_zip_validation_failed"
+      exit 1
+    fi
+  fi
+done
 
 # -------- 逐项升级后端二进制 --------
 for name in "${FILENAMES[@]}"; do
@@ -387,35 +511,7 @@ if [ -f "$APP_ZIP" ]; then
   echo "--------------------"
   log "[处理] 后端压缩包 app.zip"
 
-  # 解析顶层结构，确定解压后的实际路径
-  # 注意：APP_NEW 需在本块内重新赋值，避免影响变量初始值
-  _resolved_app_new=""
-  TOP_ITEMS=$(unzip -Z1 "$APP_ZIP" | awk -F/ '{print $1}' | sort -u)
-  COUNT=$(echo "$TOP_ITEMS" | wc -l)
-
-  if [ "$COUNT" -eq 1 ]; then
-    TOP=$(echo "$TOP_ITEMS")
-    if unzip -Z1 "$APP_ZIP" | grep -q "^${TOP}/"; then
-      # 顶层是目录
-      unzip -o "$APP_ZIP" -d "$UPGRADE_DIR" >/dev/null
-      if [ "$TOP" = "app" ]; then
-        _resolved_app_new="$UPGRADE_DIR/app"
-      else
-        _resolved_app_new="$UPGRADE_DIR/$TOP"
-      fi
-    else
-      # 顶层是单文件，解压到 app/ 下
-      mkdir -p "$UPGRADE_DIR/app"
-      unzip -o "$APP_ZIP" -d "$UPGRADE_DIR/app" >/dev/null
-      _resolved_app_new="$UPGRADE_DIR/app"
-    fi
-  else
-    # 多个顶层项
-    mkdir -p "$UPGRADE_DIR/app"
-    unzip -o "$APP_ZIP" -d "$UPGRADE_DIR/app" >/dev/null
-    _resolved_app_new="$UPGRADE_DIR/app"
-  fi
-
+  # 使用全局预检已校验并解压的目录。
   log "[解压] APP_NEW 解析结果: $_resolved_app_new"
 
   if [ -z "$_resolved_app_new" ] || [ ! -d "$_resolved_app_new" ]; then
@@ -424,23 +520,9 @@ if [ -f "$APP_ZIP" ]; then
     FAILED_SVCS+=("${SERVICES[app]}")
     record_result "app (${SERVICES[app]})" "fail" "zip 结构无法识别，需人工处理"
   else
-    if [ -d "$APP_OLD" ]; then
-      log "[步骤1] 备份 app: $APP_OLD -> $APP_BACKUP"
-      mkdir -p "$(dirname "$APP_BACKUP")"
-      # 用拷贝而非 mv：$STATUS_SVC 始终在运行，它的代码目录就是 $APP_OLD。
-      # 若先 mv 走再拷新版本，两步之间 $APP_OLD 不存在，该进程的任何懒加载
-      # import 都会失败。整个替换期间必须保证 $APP_OLD 始终可访问。
-      $CP -a "$APP_OLD" "$APP_BACKUP"
-    else
-      log "[注意] 旧 app 不存在：$APP_OLD"
-    fi
-
-    log "[步骤2] 替换 app: $_resolved_app_new -> $APP_OLD"
-    $RM -rf "$APP_OLD"
-    $CP -a "$_resolved_app_new" "$APP_OLD"
-    log "[完成] app 替换完成；备份在: $APP_BACKUP"
-
-    if svc_restart "${SERVICES[app]}"; then
+    if ! replace_directory "$_resolved_app_new" "$APP_OLD" "$APP_BACKUP"; then
+      record_result "app (${SERVICES[app]})" "fail" "目录复制、备份或切换失败"
+    elif svc_restart "${SERVICES[app]}"; then
       log "[成功] ${SERVICES[app]} 重启成功"
       done_count=$((done_count+1))
       progress=$(( done_count * 100 / total ))
@@ -464,30 +546,7 @@ if [ -f "$DIST_ZIP" ]; then
   echo "--------------------"
   log "[处理] 前端压缩包 dist.zip"
 
-  _resolved_dist_new=""
-  TOP_ITEMS=$(unzip -Z1 "$DIST_ZIP" | awk -F/ '{print $1}' | sort -u)
-  COUNT=$(echo "$TOP_ITEMS" | wc -l)
-
-  if [ "$COUNT" -eq 1 ]; then
-    TOP=$(echo "$TOP_ITEMS")
-    if unzip -Z1 "$DIST_ZIP" | grep -q "^${TOP}/"; then
-      unzip -o "$DIST_ZIP" -d "$UPGRADE_DIR" >/dev/null
-      if [ "$TOP" = "dist" ]; then
-        _resolved_dist_new="$UPGRADE_DIR/dist"
-      else
-        _resolved_dist_new="$UPGRADE_DIR/$TOP"
-      fi
-    else
-      mkdir -p "$UPGRADE_DIR/dist"
-      unzip -o "$DIST_ZIP" -d "$UPGRADE_DIR/dist" >/dev/null
-      _resolved_dist_new="$UPGRADE_DIR/dist"
-    fi
-  else
-    mkdir -p "$UPGRADE_DIR/dist"
-    unzip -o "$DIST_ZIP" -d "$UPGRADE_DIR/dist" >/dev/null
-    _resolved_dist_new="$UPGRADE_DIR/dist"
-  fi
-
+  # 使用全局预检已校验并解压的目录。
   log "[解压] DIST_NEW 解析结果: $_resolved_dist_new"
 
   if [ -z "$_resolved_dist_new" ] || [ ! -d "$_resolved_dist_new" ]; then
@@ -495,23 +554,14 @@ if [ -f "$DIST_ZIP" ]; then
     send_status -1 0 "dist_zip_structure_error"
     record_result "dist" "fail" "zip 结构无法识别，需人工处理"
   else
-    if [ -d "$DIST_OLD" ]; then
-      log "[步骤1] 备份 dist: $DIST_OLD -> $DIST_BACKUP"
-      mkdir -p "$(dirname "$DIST_BACKUP")"
-      # 同 app：$STATUS_SVC 要持续提供前端页面，$DIST_OLD 不能出现空窗
-      $CP -a "$DIST_OLD" "$DIST_BACKUP"
+    if replace_directory "$_resolved_dist_new" "$DIST_OLD" "$DIST_BACKUP"; then
+      done_count=$((done_count+1))
+      progress=$(( done_count * 100 / total ))
+      send_status 1 "$progress" "dist_done"
+      record_result "dist" "ok" "前端文件替换完成"
     else
-      log "[注意] 旧 dist 不存在：$DIST_OLD"
+      record_result "dist" "fail" "目录复制、备份或切换失败"
     fi
-
-    log "[步骤2] 替换 dist: $_resolved_dist_new -> $DIST_OLD"
-    $RM -rf "$DIST_OLD"
-    $CP -a "$_resolved_dist_new" "$DIST_OLD"
-    log "[完成] dist 替换完成；备份在: $DIST_BACKUP"
-
-    done_count=$((done_count+1))
-    progress=$(( done_count * 100 / total ))
-    send_status 1 "$progress" "dist_done"
   fi
 else
   record_result "dist" "skip" "无 dist.zip，已跳过"
@@ -529,6 +579,8 @@ if [ -d "$UPGRADE_DIR" ] && [ -n "$($LS -A "$UPGRADE_DIR" 2>/dev/null)" ]; then
       ! -name 'PCS_*.zip' \
       ! -name 'status' \
       ! -name 'LC' \
+      ! -name 'packages' \
+      ! -name 'rollback' \
       -exec rm -rf {} +
   else
     log "[清理] 清空升级目录内容: $UPGRADE_DIR/*"
@@ -553,27 +605,6 @@ if [ -d "$BACKUP_ROOT" ]; then
   else
     log "[保留策略] 当前备份数 $_snap_count，无需清理"
   fi
-fi
-
-# ========= 最终状态汇总上报 =========
-echo "--------------------"
-if [ "${#FAILED_SVCS[@]}" -eq 0 ]; then
-  log "[结果] 所有升级项执行成功"
-  send_status 3 100 "all_done"
-else
-  _failed_list=$(IFS=','; echo "${FAILED_SVCS[*]}")
-  log "[结果] 以下服务升级/回滚失败，请人工介入: $_failed_list"
-  send_status 2 100 "failed:$_failed_list"
-fi
-
-# ========= 切换升级状态查询服务到新代码 =========
-# 必须放在终态上报之后：反过来写终态的就是新进程了。
-if svc_restart "$STATUS_SVC"; then
-  log "[成功] $STATUS_SVC 已重启并加载新版本"
-else
-  log "[严重] $STATUS_SVC 重启失败，升级状态查询接口不可用，请人工介入"
-  # 汇总区在下方，这里追加只是为了语义完整，不会再被打印出来
-  FAILED_SVCS+=("$STATUS_SVC")
 fi
 
 # ========= 升级结果汇总 =========
@@ -602,42 +633,17 @@ echo "$_sep"
 printf "  %-${_col_w}s %-12s %s\n" "升级项" "结果" "备注"
 echo "  $_div"
 
-result_ok="ok"
-rollback_ok="ok"
-declare -a fail_list=()
 # 按执行顺序逐项输出——结果全部来自升级过程中实时写入的 ITEM_RESULTS
 for _key in "${ITEM_ORDER[@]}"; do
   _val="${ITEM_RESULTS[$_key]}"
   _st="${_val%%|*}"
   _note="${_val#*|}"
   _print_row "$_key" "$_st" "$_note"
-  if [ "$_st" = "fail" ]; then
-    result_ok="fail"
-  fi
 done
 
-# 失败时回退所有未回退的程序
-if [ "$result_ok" = "fail" ]; then
-  for _key in "${ITEM_ORDER[@]}"; do
-    _val="${ITEM_RESULTS[$_key]}"
-    _st="${_val%%|*}"
-    if [ "$_st" = "ok" ]; then
-      service="${SERVICES[$_key]:-}"
-      [ -z "$service" ] && continue
-      if svc_restart "$service"; then
-        log "[回滚成功] $service 服务已恢复"
-      else
-        log "[严重] 回滚后 $service 仍无法启动，请人工介入"
-        rollback_ok="fail"
-        fail_list+=("$service")
-      fi
-    fi
-  done
-  if [ "$rollback_ok" != "fail" ]; then
-    echo "本次升级失败,已全部回退至升级前版本"
-  else
-    echo "本次升级失败，且以下服务回退失败，请人工介入：${fail_list[*]}"
-  fi
+# 每个程序的真实回退结果已在对应处理分支记录；不能仅重启就宣称全部回退。
+if [ "$UPGRADE_HAD_ERROR" -ne 0 ]; then
+  log "[结果] 本次升级存在失败，请核对各项目结果；已成功的项目可能已生效"
 fi
 
 echo "  $_div"
@@ -648,3 +654,25 @@ echo "$_sep"
 echo ""
 
 echo "===================== 升级结束 $_end_time ====================="
+
+# 只在所有项目及回退处理结束后更新当前包并发布终态。
+FINALIZED=true
+if [ "$UPGRADE_HAD_ERROR" -eq 0 ] && [ "${#FAILED_SVCS[@]}" -eq 0 ] && [ "$total" -gt 0 ]; then
+  if [ -n "$PACKAGE_SHA256" ]; then
+    if [ -z "$PACKAGE_DB_TOOL" ] || ! python3 -c "$PACKAGE_DB_TOOL" --set-current "$PACKAGE_SHA256"; then
+      log "[错误] 升级完成，但当前包标记更新失败，请重试 --set-current $PACKAGE_SHA256"
+    fi
+  else
+    # 旧 file 入口没有可信包摘要，清除旧标记。
+    if [ -z "$PACKAGE_DB_TOOL" ] || ! python3 -c "$PACKAGE_DB_TOOL" --clear-current; then
+      log "[错误] 当前包标记清除失败，请重试 --clear-current"
+    fi
+  fi
+  send_status 3 100 "all_done"
+else
+  send_status 2 100 "upgrade_failed_or_rolled_back"
+fi
+# 终态先落盘，再重启9000查询服务。
+if ! svc_restart "$STATUS_SVC"; then
+  log "[严重] $STATUS_SVC 重启失败，请恢复查询服务"
+fi

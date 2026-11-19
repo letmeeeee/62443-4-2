@@ -1,5 +1,7 @@
 # Ignore build directories at any level.
 build*/
+logger/build*/
+goose/goose_test/build*/
 
 # Device-local secrets, credentials and encrypted backups.
 exec/instance/
