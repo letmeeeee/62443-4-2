@@ -28,11 +28,11 @@
         <label>确认 CA 保护口令<input name="password_confirm" type="password" minlength="12" required autocomplete="new-password"></label>
       </div><button class="primary">生成 CA 私钥与根证书</button></form>
     </section>
-    <section><h2>生成设备身份</h2><p>每次签发生成独立的设备私钥及 CSR。GOOSE 使用 P-256；RSA 可用于 TLS 服务器或客户端身份。</p>
+    <section><h2>生成设备身份</h2><p>每次签发生成独立的设备私钥及 CSR。HTTPS 请选择“HTTPS / TLS 服务器”，并填写浏览器访问设备时使用的 IP 或 DNS SAN。GOOSE 固定使用 P-256；HTTPS / TLS 支持 P-256 或 RSA。</p>
       <form id="device-form"><div class="grid">
         <label>设备编号<input name="device_id" value="LC400-001" required maxlength="64"></label>
         <label>设备 CN<input name="cn" value="LC400-001-goose" required maxlength="64"></label>
-        <label>用途<select name="profile"><option value="goose">GOOSE</option><option value="tls_server">TLS 服务器</option><option value="tls_client">TLS 客户端</option></select></label>
+        <label>用途<select name="profile"><option value="goose">GOOSE</option><option value="tls_server">HTTPS / TLS 服务器</option><option value="tls_client">TLS 客户端</option></select></label>
         <label>设备算法<select name="algorithm"><option>P-256</option><option>RSA</option></select></label>
         <label>RSA 位数<select name="rsa_bits"><option>2048</option><option selected>3072</option><option>4096</option></select></label>
         <label>有效天数<input name="days" type="number" value="365" min="1" max="825" required></label>

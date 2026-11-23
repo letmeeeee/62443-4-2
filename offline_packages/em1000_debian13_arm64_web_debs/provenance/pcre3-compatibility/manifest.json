@@ -1,0 +1,14 @@
+{
+  "package": "libpcre3",
+  "version": "2:8.39-15",
+  "architecture": "arm64",
+  "filename": "libpcre3_8.39-15_arm64.deb",
+  "size_bytes": 313352,
+  "sha256": "ffff38112e92b032688c0efdc19673686feb2aff8b85f65f54d9f2f6b55992d9",
+  "upstream_url": "https://deb.debian.org/debian/pool/main/p/pcre3/libpcre3_8.39-15_arm64.deb",
+  "depends": "libc6 (>= 2.34)",
+  "pre_depends": "",
+  "provides": "",
+  "origin": "Debian 12 bookworm compatibility library for existing PCRE1 binaries on Debian 13; no bookworm repository is enabled",
+  "verification_source": "https://packages.debian.org/bookworm/arm64/libpcre3/download"
+}

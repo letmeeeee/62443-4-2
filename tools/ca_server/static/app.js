@@ -2,6 +2,7 @@
 let csrf = '', offset = 0, total = 0, exportId = '', busy = false;
 let pendingIssue = null;
 const $ = selector => document.querySelector(selector);
+const profileLabels = {goose:'GOOSE', tls_server:'HTTPS / TLS 服务器', tls_client:'TLS 客户端'};
 function notice(message, error = false) { $('#notice').textContent = message; $('#notice').classList.toggle('error', error); }
 async function api(path, options = {}, downloadName = null) {
   const response = await fetch(path, {credentials:'same-origin', ...options,
@@ -72,7 +73,7 @@ async function devices() {
     const identity = document.createElement('td'); identity.textContent = item.device_id;
     const cn = document.createElement('small'); cn.textContent = item.cn; identity.append(cn); tr.append(identity);
     const expired = new Date(item.expires_at).getTime() <= Date.now();
-    for (const value of [item.profile+' / '+item.algorithm+(item.rsa_bits ? ' '+item.rsa_bits : ''), new Date(item.expires_at).toLocaleString(), item.revoked_at ? '已吊销' : expired ? '已过期' : '有效']) {
+    for (const value of [(profileLabels[item.profile] || item.profile)+' / '+item.algorithm+(item.rsa_bits ? ' '+item.rsa_bits : ''), new Date(item.expires_at).toLocaleString(), item.revoked_at ? '已吊销' : expired ? '已过期' : '有效']) {
       const td = document.createElement('td'); td.textContent = value; tr.append(td);
     }
     const actions = document.createElement('td');

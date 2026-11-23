@@ -1,0 +1,11 @@
+{
+  "package_count": 46,
+  "architecture_arm64_or_all": "passed",
+  "official_repository_signatures": "verified by APT",
+  "sha256_against_official_signed_indexes": "passed",
+  "package_data_and_control_archives": "passed",
+  "offline_apt_dependency_resolution_empty_dpkg_status": "passed",
+  "offline_apt_package_file_access": "passed",
+  "installer_shell_syntax": "passed",
+  "device_installation": "not performed"
+}

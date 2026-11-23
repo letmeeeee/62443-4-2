@@ -1,0 +1,38 @@
+NOTE: This is only a simulation!
+      apt-get needs root privileges for real execution.
+      Keep also in mind that locking is deactivated,
+      so don't depend on the relevance to the real current situation!
+Reading package lists...
+Building dependency tree...
+Correcting dependencies... Done
+The following additional packages will be installed:
+  curl libavif16 libcurl4t64 libgeoip1t64 libheif1 libimagequant0 libldap2
+Suggested packages:
+  geoip-bin libheif-plugin-ffmpegdec libheif-plugin-jpegdec
+  libheif-plugin-jpegenc libheif-plugin-j2kdec libheif-plugin-j2kenc
+  libheif-plugin-kvazaar libheif-plugin-rav1e libheif-plugin-svtenc
+Recommended packages:
+  bash-completion ca-certificates geoip-database libheif-plugin-x265
+  libheif-plugin-aomenc libldap-common
+The following packages will be REMOVED:
+  libcurl4
+The following NEW packages will be installed:
+  libavif16 libcurl4t64 libgeoip1t64 libheif1 libimagequant0 libldap2
+The following packages will be upgraded:
+  curl
+1 upgraded, 6 newly installed, 1 to remove and 0 not upgraded.
+Inst libldap2 (2.6.10+dfsg-1 localhost [arm64]) [libnginx-mod-http-geoip:arm64 libcurl4:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Inst curl [7.68.0-1ubuntu2.25] (8.14.1-2+deb13u7 localhost [arm64]) [libnginx-mod-http-geoip:arm64 libcurl4:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Remv libcurl4 [7.68.0-1ubuntu2.25] [libnginx-mod-http-geoip:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Inst libcurl4t64 (8.14.1-2+deb13u7 localhost [arm64]) [libnginx-mod-http-geoip:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Inst libavif16 (1.2.1-1.2 localhost [arm64]) [libnginx-mod-http-geoip:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Inst libgeoip1t64 (1.6.12-11.2~deb13u1 localhost [arm64]) [libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 ]
+Inst libheif1 (1.23.6-2~deb13u1 localhost [arm64]) [libgd3:arm64 ]
+Inst libimagequant0 (2.18.0-1+b2 localhost [arm64])
+Conf libldap2 (2.6.10+dfsg-1 localhost [arm64])
+Conf curl (8.14.1-2+deb13u7 localhost [arm64])
+Conf libcurl4t64 (8.14.1-2+deb13u7 localhost [arm64])
+Conf libavif16 (1.2.1-1.2 localhost [arm64])
+Conf libgeoip1t64 (1.6.12-11.2~deb13u1 localhost [arm64])
+Conf libheif1 (1.23.6-2~deb13u1 localhost [arm64])
+Conf libimagequant0 (2.18.0-1+b2 localhost [arm64])

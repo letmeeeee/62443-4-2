@@ -1,59 +1,38 @@
-# 认证与启动配置
+# 认证、账号与请求错误
 
-## 请求链路
+## 实际链路
 
-`main.create_app()`：创建 Flask → `configure_session(app)` → `init_auth(app)` → 注册业务蓝图。
+`main.create_app()` 调用 `configure_session()`（内部还调用 `configure_security()`）、`init_auth()`、`init_security_http()`，再注册蓝图。按当前代码核对顺序及公开路由。before_request 返回响应会提前结束请求，路由开头没日志可能是认证、CSRF 或准入拦截，不是路由未注册。
 
-`init_auth()` 创建 MySQL `login_sessions` 表，调用 `init_developer_accounts(app)`，并注册：
+MySQL 会话 sid 以摘要保存，HTTP 使用 Authorization: Bearer，不能用 Cookie 自动携带代替；CSRF token 与登录会话关联。认证、授权、账号锁定、首次改密限制、频率与容量准入分别检查。登录成功并不代表所有接口可访问。
 
-- `before_request/check_session()`：公开页面、静态资源和登录入口按代码豁免；OPTIONS 返回预检响应，不执行业务。其他已注册接口必须通过 Session 检查。新增接口默认受保护。
-- `after_request/prevent_auth_caching()`：业务响应设置 `Cache-Control: no-store`，不删除 Cookie、不退出登录。
+- `GET /permission/session` 查询会话；`POST /permission/login` 建立会话并返回 CSRF token；`POST /permission/logout` 撤销会话。
+- 写请求通常需要同源检查或有效 `X-CSRF-Token`，脚本需同时携带 Bearer token。以 `auth.py` 的 `_same_origin()` 和豁免条件为准；不要把所有 POST 或所有接口一概而论。
+- `AUTH_SESSION_SECONDS` 默认 1800 是会话寿命；`AUTH_IDLE_SECONDS` 默认 900 是另一项空闲超时。不要沿用旧文档“只有固定超时、不记录活动”的结论。
+- 同账号可多会话，当前浏览器重新登录不代表其他会话撤销。改密会撤销目标会话；Socket.IO 当前有会话断连回调，修改时同时核对事件认证及撤销链路。
+- `DISABLE_DEVELOPER_ACCOUNTS` 和 `DEVELOPER_ACCOUNTS` 是部署策略，默认名单含 trinastorage；另有 security_store 的账号状态，不能说项目完全不支持 enabled。
 
-在 before_request 中返回 None 才是继续处理；返回响应则终止后续业务调用。`authenticate_session()` 返回的 True/False 是内部判断结果，不能混同为 Flask 响应。
+## 改密与耗时
 
-登录前置验证成功后 `establish_session()` 撤销当前浏览器的旧会话，生成随机 sid/CSRF token，事务清理过期记录并插入会话，再写 `session["sid"]`。Flask 将其封装为签名 Cookie `lc_session`；它不是 JWT，也不把密码放入 Cookie。
+本人修改入口 `POST /permission/update`：`username`、`old_password`、`password`（新密码）。本人改密验证旧密码，成功清除首次登录标志并撤销会话；管理员修改他人密码按重置处理。
 
-MySQL 表结构：sid（SHA-256 摘要，主键）、username、credential（密码哈希和盐的摘要）、expires_at（Unix 秒）、csrf_token。使用 SQLAlchemy Core 和 `config.engine.begin()`，会话与账号共用现有连接池。启动执行 CREATE TABLE IF NOT EXISTS，需要相应建表权限；数据库失败不得放行受保护业务。
+`security_store.PASSWORD_POLICY` 当前 PBKDF2-HMAC-SHA256、600000 次迭代，最少 12、最多 128 字符，大小写、数字和特殊字符，不包含用户名。`_history()` 当前截取 5 项：当前密码加最多 4 个历史密码。`PASSWORD_REUSED` 表示与其中之一匹配，不代表旧密码验证失败。
 
-后续请求通过 sid 摘要查询会话，检查有效期，加载当前用户及最新权限，检查账号存在、配置禁用状态、密码凭据变化，最后设置 `g.current_user` 和 `g.csrf_token`。
+设备上每次哈希可能耗时数秒，历史比较有多次哈希；不要凭日志推断具体比较次数。核对是否在共享锁/数据库事务里执行耗时计算。若移到锁外，写入前需重新校验凭据及历史版本，避免并发改密绕过策略。不要直接降低迭代数或取消历史限制来修 CPU 问题。
 
-- 未认证或会话失效：401 / SESSION_INVALID。
-- 请求认证存储异常：503；登录/退出等其他路径以实际代码为准，不笼统承诺全部返回 503。
-- 默认固定有效期 1800 秒，不随请求自动续期；不要描述为“空闲超时”。
-- 改密、删除、改名使旧会话失效；退出撤销服务端记录，复制的旧 Cookie 不能重放。
-- 重新登录只轮换当前浏览器会话，其他浏览器会话不自动撤销。
+## 启动配置
 
-## 前端契约与来源检查
+`SESSION_CONFIG_FILE` 指定 Session JSON；默认 `Path(session_config.py).resolve().parents[2]/instance/session_config.json`，仓库对应 `exec/instance/`。不要凭 app 路径猜父目录。文件包含持久签名密钥、Cookie Secure、会话寿命及开发账号策略；读取前后均校验，损坏时不得自动重建密钥。`FLASK_SECRET_KEY`、`AUTH_SESSION_SECONDS`、`SESSION_COOKIE_SECURE` 有独立环境覆盖，具体类型看加载器。修改需重启进程。
 
-- POST `/permission/login`：保留登录信息并返回 csrf_token，通过响应 Cookie 建立登录态。
-- GET `/permission/session`：返回用户名、最新权限和 csrf_token。
-- POST `/permission/logout`：撤销当前会话。
-- 同源浏览器自动携带 Cookie；不能用 localStorage 中的登录标记替代后端认证。
-- POST 等非 GET/HEAD 请求需通过来源检查或 X-CSRF-Token 校验；脚本调用要同时携带 Cookie 和有效 CSRF token。登录请求有单独的跨源检查。
-- 当前 `_same_origin()` 检查 Origin/Referer 或 Sec-Fetch-Site；Cookie Secure 配置影响预期协议。不要随意信任客户端伪造的代理头来绕过检查。
-- OPTIONS 的 Allow 响应不是跨域授权，也不是登录成功。
-- Socket.IO 在连接时校验；现存连接不会仅因 HTTP 退出即时断开。新增业务事件需考虑事件执行时会话是否仍有效。
+安全中心另由 `SECURITY_CONFIG_FILE` 指向 JSON；详见运行参考。两者不是同一个文件。不要打印整份 Session 文件或进程环境以获取路径。
 
-## 持久启动配置
+## 错误定位
 
-截至核对时，`session_config.py` 使用 `Path(__file__).resolve().parents[2] / "instance" / "session_config.json"`，解析为 **exec/instance/session_config.json**。历史对话使用 parents[1]，对应 exec/app/instance；不要照抄旧路径。默认路径变化时还要检查 `.gitignore` 是否覆盖新位置，避免真实密钥被提交。
+统一归一化位于 `security_audit.init_security_http()` 的 after_request；错误响应可能删去原始数据，仅保留 code、通用 message、trace_id 等。不能仅凭前端泛化 message 断定根因。
 
-配置可通过 SESSION_CONFIG_FILE 指定其他路径。配置内容：
+- 401：先查会话、寿命、空闲和凭据变化。
+- 403：查权限、来源/CSRF、锁定和强制改密等具体 reason。
+- 登录 503 `SERVICE_UNAVAILABLE`：查全局 admission/认证存储日志；证书临期本身不能推出登录被限制。
+- `RESOURCE_NOT_FOUND`：route_security 的 FileNotFoundError 也映射此码，并不必然是路由不存在。
 
-| Key | 默认/含义 |
-| --- | --- |
-| FLASK_SECRET_KEY | 首次自动生成 64 字符随机密钥；后续保持稳定 |
-| SESSION_COOKIE_SECURE | true；HTTP 调试设 false |
-| AUTH_SESSION_SECONDS | 1800，正整数 |
-| DISABLE_DEVELOPER_ACCOUNTS | true |
-| DEVELOPER_ACCOUNTS | ["trinastorage"] |
-
-文件锁 `.json.lock` 协调多个进程初始化，实际锁状态由 flock 管理，文件存在不意味着锁被占用。写配置采用临时文件、fsync 和原子替换。新建目录 0700、配置文件 0600；损坏配置不应通过重建密钥掩盖。
-
-已有配置缺少禁用字段时按默认名单生效。Session 三个环境变量可覆盖文件值，已有文件不会被覆盖值重写；读取旧文件时先校验旧文件。设置映射到 Flask 配置后生效，修改文件需重启。多实例共享密钥、数据库和禁用策略。
-
-`init_developer_accounts()` 维护规范化名单并在启动时撤销名单内账号旧会话；`load_user()` 派生 disabled，登录也检查名单。登录使用数据库实际用户名，避免大小写别名绕过。没有新增用户表 disabled 字段。重新启用后仍需重新登录，不恢复撤销记录。
-
-## 尚不能据此推断的能力
-
-已有用户表以 username 为主键，尚非不可变独立用户 ID。原有密码算法、密码过期强制限制、各接口角色授权和日志完整性需另查代码。不要将本次 Session 改动描述成完成所有认证安全要求。
+测试入口：`test_auth_session.py`、`test_security_center.py`、`test_session_config.py`、`test_main_auth.py`（以当前 tests 文件为准）。不连接生产 MySQL；替身不能证明真实数据库锁行为或设备性能。

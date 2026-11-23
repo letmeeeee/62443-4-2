@@ -1,0 +1,252 @@
+NOTE: This is only a simulation!
+      apt-get needs root privileges for real execution.
+      Keep also in mind that locking is deactivated,
+      so don't depend on the relevance to the real current situation!
+Reading package lists...
+Building dependency tree...
+The following additional packages will be installed:
+  debconf fontconfig-config fonts-dejavu-core fonts-dejavu-mono gcc-14-base
+  iproute2 libabsl20240722 libaom3 libavif16 libbpf1 libbrotli1 libbz2-1.0
+  libc6 libcap2 libcap2-bin libcom-err2 libcrypt1 libdav1d7 libdb5.3t64
+  libde265-0 libdeflate0 libelf1t64 libexpat1 libffi8 libfontconfig1
+  libfreetype6 libgav1-1 libgcc-s1 libgcrypt20 libgeoip1t64 libgmp10
+  libgnutls30t64 libgomp1 libgpg-error0 libgssapi-krb5-2 libheif-plugin-dav1d
+  libheif-plugin-libde265 libheif1 libhogweed6t64 libidn2-0 libimagequant0
+  libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap2 liblerc4
+  liblzma5 libmnl0 libnettle8t64 libnghttp2-14 libnghttp3-9
+  libnginx-mod-http-geoip libnginx-mod-stream-geoip libp11-kit0 libpcre2-8-0
+  libpng16-16t64 libpsl5t64 librav1e0.7 librtmp1 libsasl2-2
+  libsasl2-modules-db libselinux1 libsharpyuv0 libssh2-1t64 libssl3t64
+  libstdc++6 libsvtav1enc2 libtasn1-6 libtirpc-common libtirpc3t64
+  libunistring5 libx11-6 libx11-data libxau6 libxcb1 libxdmcp6 libxml2
+  libxtables12 libyuv0 libzstd1 openssl-provider-legacy zlib1g
+Suggested packages:
+  debconf-doc debconf-kde-helper debconf-utils libgtk3-perl libnet-ldap-perl
+  libterm-readline-gnu-perl perl whiptail | dialog python3:any glibc-doc
+  libc-l10n locales libnss-nis libnss-nisplus rng-tools libgd-tools geoip-bin
+  gnutls-bin krb5-doc krb5-user libheif-plugin-ffmpegdec
+  libheif-plugin-jpegdec libheif-plugin-jpegenc libheif-plugin-j2kdec
+  libheif-plugin-j2kenc libheif-plugin-kvazaar libheif-plugin-rav1e
+  libheif-plugin-svtenc fcgiwrap nginx-doc ssl-cert
+Recommended packages:
+  bash-completion apt | apt-utils debconf-i18n libpam-cap ca-certificates
+  geoip-database libgpg-error-l10n libheif-plugin-x265 libheif-plugin-aomenc
+  krb5-locales libldap-common publicsuffix libsasl2-modules
+The following NEW packages will be installed:
+  curl debconf fontconfig-config fonts-dejavu-core fonts-dejavu-mono
+  gcc-14-base iproute2 libabsl20240722 libaom3 libavif16 libbpf1 libbrotli1
+  libbz2-1.0 libc6 libcap2 libcap2-bin libcom-err2 libcrypt1 libcurl4t64
+  libdav1d7 libdb5.3t64 libde265-0 libdeflate0 libelf1t64 libexpat1 libffi8
+  libfontconfig1 libfreetype6 libgav1-1 libgcc-s1 libgcrypt20 libgd3
+  libgeoip1t64 libgmp10 libgnutls30t64 libgomp1 libgpg-error0 libgssapi-krb5-2
+  libheif-plugin-dav1d libheif-plugin-libde265 libheif1 libhogweed6t64
+  libidn2-0 libimagequant0 libjbig0 libjpeg62-turbo libk5crypto3 libkeyutils1
+  libkrb5-3 libkrb5support0 libldap2 liblerc4 liblzma5 libmnl0 libnettle8t64
+  libnghttp2-14 libnghttp3-9 libnginx-mod-http-geoip
+  libnginx-mod-http-image-filter libnginx-mod-http-xslt-filter
+  libnginx-mod-mail libnginx-mod-stream libnginx-mod-stream-geoip libp11-kit0
+  libpcre2-8-0 libpng16-16t64 libpsl5t64 librav1e0.7 librtmp1 libsasl2-2
+  libsasl2-modules-db libselinux1 libsharpyuv0 libssh2-1t64 libssl3t64
+  libstdc++6 libsvtav1enc2 libtasn1-6 libtiff6 libtirpc-common libtirpc3t64
+  libunistring5 libwebp7 libx11-6 libx11-data libxau6 libxcb1 libxdmcp6
+  libxml2 libxpm4 libxslt1.1 libxtables12 libyuv0 libzstd1 nginx nginx-common
+  nginx-core openssl-provider-legacy zlib1g
+0 upgraded, 99 newly installed, 0 to remove and 0 not upgraded.
+Inst gcc-14-base (14.2.0-19 Debian:13.7/stable [arm64])
+Inst libgcc-s1 (14.2.0-19 Debian:13.7/stable [arm64]) []
+Inst libc6 (2.41-12+deb13u4 Debian:13.7/stable [arm64])
+Conf gcc-14-base (14.2.0-19 Debian:13.7/stable [arm64])
+Conf libgcc-s1 (14.2.0-19 Debian:13.7/stable [arm64])
+Conf libc6 (2.41-12+deb13u4 Debian:13.7/stable [arm64])
+Inst libexpat1 (2.9.0-1~deb13u1 Debian-Security:13/stable-security [arm64])
+Inst debconf (1.5.91 Debian:13.7/stable [all])
+Inst libzstd1 (1.5.7+dfsg-1 Debian:13.7/stable [arm64])
+Inst zlib1g (1:1.3.dfsg+really1.3.1-1+deb13u1 Debian-Security:13/stable-security [arm64])
+Inst libelf1t64 (0.192-4 Debian:13.7/stable [arm64])
+Inst libbpf1 (1:1.5.0-3 Debian:13.7/stable [arm64])
+Inst libcap2 (1:2.75-10+deb13u1+b3 Debian:13.7/stable [arm64])
+Inst libdb5.3t64 (5.3.28+dfsg2-9 Debian:13.7/stable [arm64])
+Inst libmnl0 (1.0.5-3 Debian:13.7/stable [arm64])
+Inst libpcre2-8-0 (10.46-1~deb13u3 Debian-Security:13/stable-security [arm64])
+Inst libselinux1 (3.8.1-1 Debian:13.7/stable [arm64])
+Inst libkrb5support0 (1.21.3-5+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libcom-err2 (1.47.2-3+b12 Debian:13.7/stable [arm64])
+Inst libk5crypto3 (1.21.3-5+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libkeyutils1 (1.6.3-6 Debian:13.7/stable [arm64])
+Inst openssl-provider-legacy (3.5.7-1~deb13u3 Debian-Security:13/stable-security [arm64]) []
+Inst libssl3t64 (3.5.7-1~deb13u3 Debian-Security:13/stable-security [arm64])
+Inst libkrb5-3 (1.21.3-5+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libgssapi-krb5-2 (1.21.3-5+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libtirpc-common (1.3.6+ds-1 Debian:13.7/stable [all])
+Inst libtirpc3t64 (1.3.6+ds-1 Debian:13.7/stable [arm64])
+Inst libxtables12 (1.8.11-2 Debian:13.7/stable [arm64])
+Inst libcap2-bin (1:2.75-10+deb13u1+b3 Debian:13.7/stable [arm64])
+Inst iproute2 (6.15.0-1 Debian:13.7/stable [arm64])
+Inst libbrotli1 (1.1.0-2+deb13u1 Debian-Security:13/stable-security [arm64])
+Inst libunistring5 (1.3-2 Debian:13.7/stable [arm64])
+Inst libidn2-0 (2.3.8-2 Debian:13.7/stable [arm64])
+Inst libsasl2-modules-db (2.1.28+dfsg1-9 Debian:13.7/stable [arm64])
+Inst libsasl2-2 (2.1.28+dfsg1-9 Debian:13.7/stable [arm64])
+Inst libldap2 (2.6.10+dfsg-1 Debian:13.7/stable [arm64])
+Inst libnghttp2-14 (1.64.0-1.1+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libnghttp3-9 (1.8.0-1 Debian:13.7/stable [arm64])
+Inst libpsl5t64 (0.21.2-1.1+b1 Debian:13.7/stable [arm64])
+Inst libgmp10 (2:6.3.0+dfsg-3 Debian:13.7/stable [arm64])
+Inst libnettle8t64 (3.10.1-1 Debian:13.7/stable [arm64])
+Inst libhogweed6t64 (3.10.1-1 Debian:13.7/stable [arm64])
+Inst libffi8 (3.4.8-2 Debian:13.7/stable [arm64])
+Inst libp11-kit0 (0.25.5-3 Debian:13.7/stable [arm64])
+Inst libtasn1-6 (4.20.0-2+deb13u1 Debian:13.7/stable [arm64])
+Inst libgnutls30t64 (3.8.9-3+deb13u4 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst librtmp1 (2.4+20151223.gitfa8646d.1-2+b5 Debian:13.7/stable [arm64])
+Inst libssh2-1t64 (1.11.1-1+deb13u2 Debian:13.7/stable [arm64])
+Inst libcurl4t64 (8.14.1-2+deb13u7 Debian-Security:13/stable-security [arm64])
+Inst curl (8.14.1-2+deb13u7 Debian-Security:13/stable-security [arm64])
+Inst fonts-dejavu-mono (2.37-8 Debian:13.7/stable [all])
+Inst fonts-dejavu-core (2.37-8 Debian:13.7/stable [all])
+Inst fontconfig-config (2.15.0-2.3 Debian:13.7/stable [arm64])
+Inst libstdc++6 (14.2.0-19 Debian:13.7/stable [arm64])
+Inst libabsl20240722 (20240722.0-4 Debian:13.7/stable [arm64])
+Inst libaom3 (3.12.1-1+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libdav1d7 (1.5.1-1 Debian:13.7/stable [arm64])
+Inst libgav1-1 (0.19.0-3+b1 Debian:13.7/stable [arm64])
+Inst librav1e0.7 (0.7.1-9+b2 Debian:13.7/stable [arm64])
+Inst libsvtav1enc2 (2.3.0+dfsg-1 Debian:13.7/stable [arm64])
+Inst libjpeg62-turbo (1:2.1.5-4 Debian:13.7/stable [arm64])
+Inst libyuv0 (0.0.1904.20250204-1 Debian:13.7/stable [arm64])
+Inst libavif16 (1.2.1-1.2 Debian:13.7/stable [arm64])
+Inst libbz2-1.0 (1.0.8-6 Debian:13.7/stable [arm64])
+Inst libcrypt1 (1:4.4.38-1 Debian:13.7/stable [arm64])
+Inst libde265-0 (1.0.15-1+deb13u2 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libdeflate0 (1.23-2 Debian:13.7/stable [arm64])
+Inst libpng16-16t64 (1.6.48-1+deb13u6 Debian-Security:13/stable-security [arm64])
+Inst libfreetype6 (2.13.3+dfsg-1+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libfontconfig1 (2.15.0-2.3 Debian:13.7/stable [arm64])
+Inst libgpg-error0 (1.51-4 Debian:13.7/stable [arm64])
+Inst libgcrypt20 (1.11.0-7+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libsharpyuv0 (1.5.0-0.1 Debian:13.7/stable [arm64])
+Inst libheif-plugin-libde265 (1.23.6-2~deb13u1 Debian-Security:13/stable-security [arm64]) []
+Inst libheif-plugin-dav1d (1.23.6-2~deb13u1 Debian-Security:13/stable-security [arm64]) []
+Inst libheif1 (1.23.6-2~deb13u1 Debian-Security:13/stable-security [arm64])
+Inst libgomp1 (14.2.0-19 Debian:13.7/stable [arm64])
+Inst libimagequant0 (2.18.0-1+b2 Debian:13.7/stable [arm64])
+Inst libjbig0 (2.1-6.1+b2 Debian:13.7/stable [arm64])
+Inst liblerc4 (4.0.0+ds-5 Debian:13.7/stable [arm64])
+Inst liblzma5 (5.8.1-1+deb13u2 Debian-Security:13/stable-security [arm64])
+Inst libwebp7 (1.5.0-0.1 Debian:13.7/stable [arm64])
+Inst libtiff6 (4.7.0-3+deb13u3 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libxau6 (1:1.0.11-1 Debian:13.7/stable [arm64])
+Inst libxdmcp6 (1:1.1.5-1 Debian:13.7/stable [arm64])
+Inst libxcb1 (1.17.0-2+b1 Debian:13.7/stable [arm64])
+Inst libx11-data (2:1.8.12-1 Debian:13.7/stable [all])
+Inst libx11-6 (2:1.8.12-1 Debian:13.7/stable [arm64])
+Inst libxpm4 (1:3.5.17-1+deb13u1 Debian:13.7/stable [arm64])
+Inst libgd3 (2.3.3-14~deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Inst libgeoip1t64 (1.6.12-11.2~deb13u1 Debian:13.7/stable [arm64])
+Inst nginx-common (1.26.3-3+deb13u11 Debian-Security:13/stable-security [all])
+Inst nginx (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Inst libnginx-mod-http-geoip (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Inst libnginx-mod-http-image-filter (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Inst libxml2 (2.12.7+dfsg+really2.9.14-2.1+deb13u3 Debian:13.7/stable [arm64])
+Inst libxslt1.1 (1.1.35-1.2+deb13u3 Debian:13.7/stable [arm64])
+Inst libnginx-mod-http-xslt-filter (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Inst libnginx-mod-mail (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Inst libnginx-mod-stream (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Inst libnginx-mod-stream-geoip (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Inst nginx-core (1.26.3-3+deb13u11 Debian-Security:13/stable-security [all])
+Conf libexpat1 (2.9.0-1~deb13u1 Debian-Security:13/stable-security [arm64])
+Conf debconf (1.5.91 Debian:13.7/stable [all])
+Conf libzstd1 (1.5.7+dfsg-1 Debian:13.7/stable [arm64])
+Conf zlib1g (1:1.3.dfsg+really1.3.1-1+deb13u1 Debian-Security:13/stable-security [arm64])
+Conf libelf1t64 (0.192-4 Debian:13.7/stable [arm64])
+Conf libbpf1 (1:1.5.0-3 Debian:13.7/stable [arm64])
+Conf libcap2 (1:2.75-10+deb13u1+b3 Debian:13.7/stable [arm64])
+Conf libdb5.3t64 (5.3.28+dfsg2-9 Debian:13.7/stable [arm64])
+Conf libmnl0 (1.0.5-3 Debian:13.7/stable [arm64])
+Conf libpcre2-8-0 (10.46-1~deb13u3 Debian-Security:13/stable-security [arm64])
+Conf libselinux1 (3.8.1-1 Debian:13.7/stable [arm64])
+Conf libkrb5support0 (1.21.3-5+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libcom-err2 (1.47.2-3+b12 Debian:13.7/stable [arm64])
+Conf libk5crypto3 (1.21.3-5+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libkeyutils1 (1.6.3-6 Debian:13.7/stable [arm64])
+Conf openssl-provider-legacy (3.5.7-1~deb13u3 Debian-Security:13/stable-security [arm64])
+Conf libssl3t64 (3.5.7-1~deb13u3 Debian-Security:13/stable-security [arm64])
+Conf libkrb5-3 (1.21.3-5+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libgssapi-krb5-2 (1.21.3-5+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libtirpc-common (1.3.6+ds-1 Debian:13.7/stable [all])
+Conf libtirpc3t64 (1.3.6+ds-1 Debian:13.7/stable [arm64])
+Conf libxtables12 (1.8.11-2 Debian:13.7/stable [arm64])
+Conf libcap2-bin (1:2.75-10+deb13u1+b3 Debian:13.7/stable [arm64])
+Conf iproute2 (6.15.0-1 Debian:13.7/stable [arm64])
+Conf libbrotli1 (1.1.0-2+deb13u1 Debian-Security:13/stable-security [arm64])
+Conf libunistring5 (1.3-2 Debian:13.7/stable [arm64])
+Conf libidn2-0 (2.3.8-2 Debian:13.7/stable [arm64])
+Conf libsasl2-modules-db (2.1.28+dfsg1-9 Debian:13.7/stable [arm64])
+Conf libsasl2-2 (2.1.28+dfsg1-9 Debian:13.7/stable [arm64])
+Conf libldap2 (2.6.10+dfsg-1 Debian:13.7/stable [arm64])
+Conf libnghttp2-14 (1.64.0-1.1+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libnghttp3-9 (1.8.0-1 Debian:13.7/stable [arm64])
+Conf libpsl5t64 (0.21.2-1.1+b1 Debian:13.7/stable [arm64])
+Conf libgmp10 (2:6.3.0+dfsg-3 Debian:13.7/stable [arm64])
+Conf libnettle8t64 (3.10.1-1 Debian:13.7/stable [arm64])
+Conf libhogweed6t64 (3.10.1-1 Debian:13.7/stable [arm64])
+Conf libffi8 (3.4.8-2 Debian:13.7/stable [arm64])
+Conf libp11-kit0 (0.25.5-3 Debian:13.7/stable [arm64])
+Conf libtasn1-6 (4.20.0-2+deb13u1 Debian:13.7/stable [arm64])
+Conf libgnutls30t64 (3.8.9-3+deb13u4 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf librtmp1 (2.4+20151223.gitfa8646d.1-2+b5 Debian:13.7/stable [arm64])
+Conf libssh2-1t64 (1.11.1-1+deb13u2 Debian:13.7/stable [arm64])
+Conf libcurl4t64 (8.14.1-2+deb13u7 Debian-Security:13/stable-security [arm64])
+Conf curl (8.14.1-2+deb13u7 Debian-Security:13/stable-security [arm64])
+Conf fonts-dejavu-mono (2.37-8 Debian:13.7/stable [all])
+Conf fonts-dejavu-core (2.37-8 Debian:13.7/stable [all])
+Conf fontconfig-config (2.15.0-2.3 Debian:13.7/stable [arm64])
+Conf libstdc++6 (14.2.0-19 Debian:13.7/stable [arm64])
+Conf libabsl20240722 (20240722.0-4 Debian:13.7/stable [arm64])
+Conf libaom3 (3.12.1-1+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libdav1d7 (1.5.1-1 Debian:13.7/stable [arm64])
+Conf libgav1-1 (0.19.0-3+b1 Debian:13.7/stable [arm64])
+Conf librav1e0.7 (0.7.1-9+b2 Debian:13.7/stable [arm64])
+Conf libsvtav1enc2 (2.3.0+dfsg-1 Debian:13.7/stable [arm64])
+Conf libjpeg62-turbo (1:2.1.5-4 Debian:13.7/stable [arm64])
+Conf libyuv0 (0.0.1904.20250204-1 Debian:13.7/stable [arm64])
+Conf libavif16 (1.2.1-1.2 Debian:13.7/stable [arm64])
+Conf libbz2-1.0 (1.0.8-6 Debian:13.7/stable [arm64])
+Conf libcrypt1 (1:4.4.38-1 Debian:13.7/stable [arm64])
+Conf libde265-0 (1.0.15-1+deb13u2 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libdeflate0 (1.23-2 Debian:13.7/stable [arm64])
+Conf libpng16-16t64 (1.6.48-1+deb13u6 Debian-Security:13/stable-security [arm64])
+Conf libfreetype6 (2.13.3+dfsg-1+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libfontconfig1 (2.15.0-2.3 Debian:13.7/stable [arm64])
+Conf libgpg-error0 (1.51-4 Debian:13.7/stable [arm64])
+Conf libgcrypt20 (1.11.0-7+deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libsharpyuv0 (1.5.0-0.1 Debian:13.7/stable [arm64])
+Conf libheif-plugin-libde265 (1.23.6-2~deb13u1 Debian-Security:13/stable-security [arm64])
+Conf libheif-plugin-dav1d (1.23.6-2~deb13u1 Debian-Security:13/stable-security [arm64])
+Conf libheif1 (1.23.6-2~deb13u1 Debian-Security:13/stable-security [arm64])
+Conf libgomp1 (14.2.0-19 Debian:13.7/stable [arm64])
+Conf libimagequant0 (2.18.0-1+b2 Debian:13.7/stable [arm64])
+Conf libjbig0 (2.1-6.1+b2 Debian:13.7/stable [arm64])
+Conf liblerc4 (4.0.0+ds-5 Debian:13.7/stable [arm64])
+Conf liblzma5 (5.8.1-1+deb13u2 Debian-Security:13/stable-security [arm64])
+Conf libwebp7 (1.5.0-0.1 Debian:13.7/stable [arm64])
+Conf libtiff6 (4.7.0-3+deb13u3 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libxau6 (1:1.0.11-1 Debian:13.7/stable [arm64])
+Conf libxdmcp6 (1:1.1.5-1 Debian:13.7/stable [arm64])
+Conf libxcb1 (1.17.0-2+b1 Debian:13.7/stable [arm64])
+Conf libx11-data (2:1.8.12-1 Debian:13.7/stable [all])
+Conf libx11-6 (2:1.8.12-1 Debian:13.7/stable [arm64])
+Conf libxpm4 (1:3.5.17-1+deb13u1 Debian:13.7/stable [arm64])
+Conf libgd3 (2.3.3-14~deb13u1 Debian:13.7/stable, Debian-Security:13/stable-security [arm64])
+Conf libgeoip1t64 (1.6.12-11.2~deb13u1 Debian:13.7/stable [arm64])
+Conf nginx-common (1.26.3-3+deb13u11 Debian-Security:13/stable-security [all])
+Conf nginx (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Conf libnginx-mod-http-geoip (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Conf libnginx-mod-http-image-filter (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Conf libxml2 (2.12.7+dfsg+really2.9.14-2.1+deb13u3 Debian:13.7/stable [arm64])
+Conf libxslt1.1 (1.1.35-1.2+deb13u3 Debian:13.7/stable [arm64])
+Conf libnginx-mod-http-xslt-filter (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Conf libnginx-mod-mail (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Conf libnginx-mod-stream (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Conf libnginx-mod-stream-geoip (1.26.3-3+deb13u11 Debian-Security:13/stable-security [arm64])
+Conf nginx-core (1.26.3-3+deb13u11 Debian-Security:13/stable-security [all])

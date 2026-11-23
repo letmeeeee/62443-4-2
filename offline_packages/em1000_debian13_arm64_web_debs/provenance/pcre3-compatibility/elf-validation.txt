@@ -1,0 +1,53 @@
+ELF 头：
+  Magic：   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  类别:                              ELF64
+  数据:                              2 补码，小端序 (little endian)
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI 版本:                          0
+  类型:                              DYN (共享目标文件)
+  系统架构:                          AArch64
+  版本:                              0x1
+  入口点地址：               0x0
+  程序头起点：          64 (bytes into file)
+  Start of section headers:          459080 (bytes into file)
+  标志：             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         7
+  Size of section headers:           64 (bytes)
+  Number of section headers:         25
+  Section header string table index: 24
+
+Dynamic section at offset 0x6fc10 contains 28 entries:
+  标记        类型                         名称/值
+ 0x0000000000000001 (NEEDED)             共享库：[libc.so.6]
+ 0x0000000000000001 (NEEDED)             共享库：[ld-linux-aarch64.so.1]
+ 0x000000000000000e (SONAME)             Library soname: [libpcre.so.3]
+ 0x000000000000000c (INIT)               0x1548
+ 0x000000000000000d (FINI)               0x4cd2c
+ 0x0000000000000019 (INIT_ARRAY)         0x7faf0
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x7faf8
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x1f0
+ 0x0000000000000005 (STRTAB)             0x8b8
+ 0x0000000000000006 (SYMTAB)             0x2e8
+ 0x000000000000000a (STRSZ)              959 (bytes)
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x7fe10
+ 0x0000000000000002 (PLTRELSZ)           720 (bytes)
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000017 (JMPREL)             0x1278
+ 0x0000000000000007 (RELA)               0xd38
+ 0x0000000000000008 (RELASZ)             1344 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000000000001e (FLAGS)              BIND_NOW
+ 0x000000006ffffffb (FLAGS_1)            标志： NOW
+ 0x000000006ffffffe (VERNEED)            0xcf8
+ 0x000000006fffffff (VERNEEDNUM)         2
+ 0x000000006ffffff0 (VERSYM)             0xc78
+ 0x000000006ffffff9 (RELACOUNT)          43
+ 0x0000000000000000 (NULL)               0x0
+
+PASS: required common PCRE1 entry points exported

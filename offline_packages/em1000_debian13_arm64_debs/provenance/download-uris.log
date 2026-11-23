@@ -1,0 +1,77 @@
+正在读取软件包列表...
+正在分析软件包的依赖关系树...
+将会同时安装下列软件：
+  ca-certificates debconf dpkg gcc-14-base libacl1 libbz2-1.0 libc6
+  libdb5.3t64 libexpat1 libffi8 libgcc-s1 liblzma5 libmd0 libncursesw6
+  libpcre2-8-0 libpython3-stdlib libreadline8t64 libselinux1 libsqlite3-0
+  libssl3t64 libtinfo6 libuuid1 libzstd1 media-types netbase openssl
+  openssl-provider-legacy python3-minimal python3-packaging
+  python3-setuptools-whl python3-wheel readline-common tar tzdata zlib1g
+建议安装：
+  debconf-doc debconf-kde-helper debconf-utils libgtk3-perl libnet-ldap-perl
+  libterm-readline-gnu-perl perl whiptail | dialog apt debsig-verify glibc-doc
+  libc-l10n locales libnss-nis libnss-nisplus uuid-runtime python3-doc
+  python3-tk python3-setuptools python3.13-doc binutils binfmt-support
+  readline-doc bzip2 ncompress xz-utils tar-scripts tar-doc
+推荐安装：
+  apt | apt-utils debconf-i18n libidn2-0 libgpm2 build-essential python3-dev
+  libjs-sphinxdoc ssh-client
+下列【新】软件包将被安装：
+  ca-certificates debconf dpkg gcc-14-base libacl1 libbz2-1.0 libc6
+  libdb5.3t64 libexpat1 libffi8 libgcc-s1 liblzma5 libmd0 libncursesw6
+  libpcre2-8-0 libpython3-stdlib libpython3.13 libpython3.13-minimal
+  libpython3.13-stdlib libreadline8t64 libselinux1 libsqlite3-0 libssl3t64
+  libtinfo6 libuuid1 libzstd1 media-types netbase openssl
+  openssl-provider-legacy python3 python3-minimal python3-packaging
+  python3-pip python3-pip-whl python3-setuptools-whl python3-venv
+  python3-wheel python3.13 python3.13-minimal python3.13-venv readline-common
+  sshpass tar tzdata zlib1g
+升级了 0 个软件包，新安装了 46 个软件包，要卸载 0 个软件包，有 0 个软件包未被升级。
+需要下载 25.4 MB 的归档。
+解压缩后会消耗 103 MB 的额外空间。
+'https://security.debian.org/debian-security/pool/updates/main/x/xz-utils/liblzma5_5.8.1-1+deb13u2_arm64.deb' liblzma5_5.8.1-1+deb13u2_arm64.deb 302984 
+'https://security.debian.org/debian-security/pool/updates/main/p/pcre2/libpcre2-8-0_10.46-1~deb13u3_arm64.deb' libpcre2-8-0_10.46-1~deb13u3_arm64.deb 262648 
+'https://security.debian.org/debian-security/pool/updates/main/z/zlib/zlib1g_1.3.dfsg+really1.3.1-1+deb13u1_arm64.deb' zlib1g_1%3a1.3.dfsg+really1.3.1-1+deb13u1_arm64.deb 85028 
+'https://security.debian.org/debian-security/pool/updates/main/e/expat/libexpat1_2.9.0-1~deb13u1_arm64.deb' libexpat1_2.9.0-1~deb13u1_arm64.deb 113920 
+'https://security.debian.org/debian-security/pool/updates/main/o/openssl/openssl-provider-legacy_3.5.7-1~deb13u3_arm64.deb' openssl-provider-legacy_3.5.7-1~deb13u3_arm64.deb 313896 
+'https://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl3t64_3.5.7-1~deb13u3_arm64.deb' libssl3t64_3.5.7-1~deb13u3_arm64.deb 2770200 
+'https://security.debian.org/debian-security/pool/updates/main/o/openssl/openssl_3.5.7-1~deb13u3_arm64.deb' openssl_3.5.7-1~deb13u3_arm64.deb 1472692 
+'https://security.debian.org/debian-security/pool/updates/main/c/ca-certificates/ca-certificates_20250419+deb13u1_all.deb' ca-certificates_20250419+deb13u1_all.deb 160720 
+'https://deb.debian.org/debian/pool/main/g/gcc-14/gcc-14-base_14.2.0-19_arm64.deb' gcc-14-base_14.2.0-19_arm64.deb 49444 MD5Sum:997abac31f8022d31dcda6d27ab7aa1e
+'https://deb.debian.org/debian/pool/main/g/glibc/libc6_2.41-12+deb13u4_arm64.deb' libc6_2.41-12+deb13u4_arm64.deb 2483572 MD5Sum:52dfbf15cfc7959c048a3a01d8742c48
+'https://deb.debian.org/debian/pool/main/g/gcc-14/libgcc-s1_14.2.0-19_arm64.deb' libgcc-s1_14.2.0-19_arm64.deb 54104 MD5Sum:473debe834d7b77ff74483d6f3fdbd76
+'https://deb.debian.org/debian/pool/main/b/bzip2/libbz2-1.0_1.0.8-6_arm64.deb' libbz2-1.0_1.0.8-6_arm64.deb 37772 MD5Sum:86ba0d08aa1c87b5ee5dc455b72b5c8d
+'https://deb.debian.org/debian/pool/main/libm/libmd/libmd0_1.1.0-2+b1_arm64.deb' libmd0_1.1.0-2+b1_arm64.deb 33664 MD5Sum:dff2532846e38b6debcf9b0d6927c826
+'https://deb.debian.org/debian/pool/main/libs/libselinux/libselinux1_3.8.1-1_arm64.deb' libselinux1_3.8.1-1_arm64.deb 79352 MD5Sum:1d49e99295c51fafc01829ddb97b433b
+'https://deb.debian.org/debian/pool/main/libz/libzstd/libzstd1_1.5.7+dfsg-1_arm64.deb' libzstd1_1.5.7+dfsg-1_arm64.deb 266052 MD5Sum:439dda611ba0b0d0465d5f2a373c43fe
+'https://deb.debian.org/debian/pool/main/a/acl/libacl1_2.3.2-2+b1_arm64.deb' libacl1_2.3.2-2+b1_arm64.deb 32216 MD5Sum:cda23fa6ffee4760f7d58f926761f079
+'https://deb.debian.org/debian/pool/main/t/tar/tar_1.35+dfsg-3.1_arm64.deb' tar_1.35+dfsg-3.1_arm64.deb 802008 MD5Sum:091a5abbd79aa35881226017eb01f545
+'https://deb.debian.org/debian/pool/main/d/dpkg/dpkg_1.22.22_arm64.deb' dpkg_1.22.22_arm64.deb 1521436 MD5Sum:09b02099c61772a7d65133be22743b38
+'https://deb.debian.org/debian/pool/main/p/python3.13/libpython3.13-minimal_3.13.5-2+deb13u5_arm64.deb' libpython3.13-minimal_3.13.5-2+deb13u5_arm64.deb 856328 MD5Sum:a60db4f55e55c751e4d2ddec189e4f56
+'https://deb.debian.org/debian/pool/main/p/python3.13/python3.13-minimal_3.13.5-2+deb13u5_arm64.deb' python3.13-minimal_3.13.5-2+deb13u5_arm64.deb 2008016 MD5Sum:a824432e84f3048184e80b28af6894a9
+'https://deb.debian.org/debian/pool/main/p/python3-defaults/python3-minimal_3.13.5-1_arm64.deb' python3-minimal_3.13.5-1_arm64.deb 27244 MD5Sum:5194772fa15e63a02ab686eb293e17ca
+'https://deb.debian.org/debian/pool/main/m/media-types/media-types_13.0.0_all.deb' media-types_13.0.0_all.deb 29336 MD5Sum:3d78beccf2775d0b95c2fbd174ab20d8
+'https://deb.debian.org/debian/pool/main/n/netbase/netbase_6.5_all.deb' netbase_6.5_all.deb 12436 MD5Sum:fd96ad393ce05e5bb055165dd214150d
+'https://deb.debian.org/debian/pool/main/d/debconf/debconf_1.5.91_all.deb' debconf_1.5.91_all.deb 121088 MD5Sum:19f464db8fc065dfbca92198ee28f058
+'https://deb.debian.org/debian/pool/main/t/tzdata/tzdata_2026f-0+deb13u1_all.deb' tzdata_2026f-0+deb13u1_all.deb 267528 
+'https://deb.debian.org/debian/pool/main/d/db5.3/libdb5.3t64_5.3.28+dfsg2-9_arm64.deb' libdb5.3t64_5.3.28+dfsg2-9_arm64.deb 629132 MD5Sum:4c79814db6ccb0d94f83060154a085e9
+'https://deb.debian.org/debian/pool/main/libf/libffi/libffi8_3.4.8-2_arm64.deb' libffi8_3.4.8-2_arm64.deb 21260 MD5Sum:0fac770fbf58db8b83f301e6aa4c1bd6
+'https://deb.debian.org/debian/pool/main/n/ncurses/libtinfo6_6.5+20250216-2_arm64.deb' libtinfo6_6.5+20250216-2_arm64.deb 341360 MD5Sum:8e8ca4096d7cef688cde8918acef9e2f
+'https://deb.debian.org/debian/pool/main/n/ncurses/libncursesw6_6.5+20250216-2_arm64.deb' libncursesw6_6.5+20250216-2_arm64.deb 124048 MD5Sum:528305c632e338ae56351cf03c26f084
+'https://deb.debian.org/debian/pool/main/r/readline/readline-common_8.2-6_all.deb' readline-common_8.2-6_all.deb 69360 MD5Sum:699adc544b8b12ad493f3b410ad4e4af
+'https://deb.debian.org/debian/pool/main/r/readline/libreadline8t64_8.2-6_arm64.deb' libreadline8t64_8.2-6_arm64.deb 159264 MD5Sum:df1d10d47539255b80a222110f6f0bca
+'https://deb.debian.org/debian/pool/main/s/sqlite3/libsqlite3-0_3.46.1-7+deb13u2_arm64.deb' libsqlite3-0_3.46.1-7+deb13u2_arm64.deb 854152 MD5Sum:ecfc1fee1bc8fac7597096704e64568b
+'https://deb.debian.org/debian/pool/main/u/util-linux/libuuid1_2.41.5-0+deb13u1_arm64.deb' libuuid1_2.41.5-0+deb13u1_arm64.deb 37648 MD5Sum:d85d29c5db45b24322dbae0c85bfb4ca
+'https://deb.debian.org/debian/pool/main/p/python3.13/libpython3.13-stdlib_3.13.5-2+deb13u5_arm64.deb' libpython3.13-stdlib_3.13.5-2+deb13u5_arm64.deb 1894712 MD5Sum:620dae3b5b2e73c5e8c789b340d20b5e
+'https://deb.debian.org/debian/pool/main/p/python3.13/python3.13_3.13.5-2+deb13u5_arm64.deb' python3.13_3.13.5-2+deb13u5_arm64.deb 757492 MD5Sum:dbbe4600f7ef8c19a9efc2a7805b9d20
+'https://deb.debian.org/debian/pool/main/p/python3-defaults/libpython3-stdlib_3.13.5-1_arm64.deb' libpython3-stdlib_3.13.5-1_arm64.deb 10180 MD5Sum:37bda3e635c0316f2ab6826013f45c41
+'https://deb.debian.org/debian/pool/main/p/python3-defaults/python3_3.13.5-1_arm64.deb' python3_3.13.5-1_arm64.deb 28244 MD5Sum:e0dc793adc765e706ee1f5eb029c7197
+'https://deb.debian.org/debian/pool/main/p/python3.13/libpython3.13_3.13.5-2+deb13u5_arm64.deb' libpython3.13_3.13.5-2+deb13u5_arm64.deb 1977160 MD5Sum:d4c59c53de5c43633b718502797f27fb
+'https://deb.debian.org/debian/pool/main/p/python-packaging/python3-packaging_25.0-1_all.deb' python3-packaging_25.0-1_all.deb 56568 MD5Sum:c2613ed1eb06bc2cbffaa5729f3e2306
+'https://deb.debian.org/debian/pool/main/w/wheel/python3-wheel_0.46.1-2_all.deb' python3-wheel_0.46.1-2_all.deb 21672 MD5Sum:4ce05ec511db1f20d47046ad91d67ccf
+'https://deb.debian.org/debian/pool/main/p/python-pip/python3-pip_25.1.1+dfsg-1_all.deb' python3-pip_25.1.1+dfsg-1_all.deb 1456608 MD5Sum:01ff59d7dc7e2eb59f6be07476667041
+'https://deb.debian.org/debian/pool/main/p/python-pip/python3-pip-whl_25.1.1+dfsg-1_all.deb' python3-pip-whl_25.1.1+dfsg-1_all.deb 1507328 MD5Sum:d83373bc7f86434172e785b4037bff8c
+'https://deb.debian.org/debian/pool/main/s/setuptools/python3-setuptools-whl_78.1.1-0.1_all.deb' python3-setuptools-whl_78.1.1-0.1_all.deb 1268108 MD5Sum:e934bc86bda1f654ec0ea5424888cbf5
+'https://deb.debian.org/debian/pool/main/p/python3.13/python3.13-venv_3.13.5-2+deb13u5_arm64.deb' python3.13-venv_3.13.5-2+deb13u5_arm64.deb 5476 MD5Sum:5f15f4d48d7ec12cd3f63e4117f4a9e2
+'https://deb.debian.org/debian/pool/main/p/python3-defaults/python3-venv_3.13.5-1_arm64.deb' python3-venv_3.13.5-1_arm64.deb 1180 MD5Sum:e770df9d79c378a41aebdb344cbeb500
+'https://deb.debian.org/debian/pool/main/s/sshpass/sshpass_1.10-0.1+b1_arm64.deb' sshpass_1.10-0.1+b1_arm64.deb 12876 MD5Sum:69faf0fe4acf475a29afa6b806c7cf7e

@@ -1,0 +1,1059 @@
+Package: ca-certificates
+Version: 20250419+deb13u1
+Architecture: all
+Maintainer: Julien Cristau <jcristau@debian.org>
+Installed-Size: 387
+Depends: openssl (>= 1.1.1), debconf (>= 0.5) | debconf-2.0
+Enhances: openssl
+Breaks: ca-certificates-java (<< 20121112+nmu1)
+Section: misc
+Priority: standard
+Multi-Arch: foreign
+Description: Common CA certificates
+ Contains the certificate authorities shipped with Mozilla's browser to allow
+ SSL-based applications to check for the authenticity of SSL connections.
+ .
+ Please note that Debian can neither confirm nor deny whether the
+ certificate authorities whose certificates are included in this package
+ have in any way been audited for trustworthiness or RFC 3647 compliance.
+ Full responsibility to assess them belongs to the local system
+ administrator.
+Filename: debs/ca-certificates_20250419+deb13u1_all.deb
+Size: 160720
+SHA256: c10585ac22c7f617a73d394eea29ba71d0356f350ae973b19043d1b017f80f54
+
+Package: debconf
+Version: 1.5.91
+Architecture: all
+Maintainer: Debconf Developers <debconf-devel@lists.alioth.debian.org>
+Installed-Size: 497
+Recommends: apt (>= 2.9.11~) | apt-utils, debconf-i18n
+Suggests: debconf-doc, debconf-kde-helper, debconf-utils, libgtk3-perl, libnet-ldap-perl, libterm-readline-gnu-perl, perl, whiptail | dialog
+Conflicts: debconf-tiny, whiptail-utf8 (<= 0.50.17-13)
+Replaces: debconf-tiny
+Provides: debconf-2.0
+Section: admin
+Priority: important
+Multi-Arch: foreign
+Description: Debian configuration management system
+ Debconf is a configuration management system for debian packages. Packages
+ use Debconf to ask questions when they are installed.
+Filename: debs/debconf_1.5.91_all.deb
+Size: 121088
+SHA256: 1ddc7e6c5925f748eefb7ca811d98e049f18c158bb21fbc7e122262ce6011e49
+
+Package: dpkg
+Version: 1.22.22
+Architecture: arm64
+Essential: yes
+Maintainer: Dpkg Developers <debian-dpkg@lists.debian.org>
+Installed-Size: 6906
+Pre-Depends: libbz2-1.0, libc6 (>= 2.38), liblzma5 (>= 5.4.0), libmd0 (>= 0.0.0), libselinux1 (>= 3.1~), libzstd1 (>= 1.5.5), zlib1g (>= 1:1.1.4)
+Depends: tar (>= 1.28-1)
+Suggests: apt, debsig-verify
+Breaks: libapt-pkg5.0 (<< 1.7~b), lsb-base (<< 10.2019031300)
+Section: admin
+Priority: required
+Multi-Arch: foreign
+Homepage: https://wiki.debian.org/Teams/Dpkg
+Description: Debian package management system
+ This package provides the low-level infrastructure for handling the
+ installation and removal of Debian software packages.
+ .
+ For Debian package development tools, install dpkg-dev.
+Filename: debs/dpkg_1.22.22_arm64.deb
+Size: 1521436
+SHA256: 1142468e57f69e13d174f517dff739508c61ee97d81c182c120cd6b281d8cdfa
+
+Package: gcc-14-base
+Source: gcc-14
+Version: 14.2.0-19
+Architecture: arm64
+Maintainer: Debian GCC Maintainers <debian-gcc@lists.debian.org>
+Installed-Size: 112
+Breaks: gnat (<< 7)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: http://gcc.gnu.org/
+Description: GCC, the GNU Compiler Collection (base package)
+ This package contains files common to all languages and libraries
+ contained in the GNU Compiler Collection (GCC).
+Filename: debs/gcc-14-base_14.2.0-19_arm64.deb
+Size: 49444
+SHA256: 34ee90679b018c0e64234747a4c4c0ae6b7f63541115037465a8627c2dfbc594
+
+Package: libacl1
+Source: acl (2.3.2-2)
+Version: 2.3.2-2+b1
+Architecture: arm64
+Maintainer: Guillem Jover <guillem@debian.org>
+Installed-Size: 102
+Depends: libc6 (>= 2.38)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://savannah.nongnu.org/projects/acl/
+Description: access control list - shared library
+ This package contains the shared library containing the POSIX 1003.1e
+ draft standard 17 functions for manipulating access control lists.
+Filename: debs/libacl1_2.3.2-2+b1_arm64.deb
+Size: 32216
+SHA256: 10b2399169e42e6d8db55944116cb2ed61caab997cf700acb83de0b0668e5721
+
+Package: libbz2-1.0
+Source: bzip2
+Version: 1.0.8-6
+Architecture: arm64
+Maintainer: Anibal Monsalve Salazar <anibal@debian.org>
+Installed-Size: 92
+Depends: libc6 (>= 2.17)
+Section: libs
+Priority: important
+Multi-Arch: same
+Homepage: https://sourceware.org/bzip2/
+Description: high-quality block-sorting file compressor library - runtime
+ This package contains libbzip2 which is used by the bzip2 compressor.
+ .
+ bzip2 is a freely available, patent free, data compressor.
+ .
+ bzip2 compresses files using the Burrows-Wheeler block-sorting text
+ compression algorithm, and Huffman coding.  Compression is generally
+ considerably better than that achieved by more conventional
+ LZ77/LZ78-based compressors, and approaches the performance of the PPM
+ family of statistical compressors.
+ .
+ The archive file format of bzip2 (.bz2) is incompatible with that of its
+ predecessor, bzip (.bz).
+Filename: debs/libbz2-1.0_1.0.8-6_arm64.deb
+Size: 37772
+SHA256: 3537fe4fc577a60c8a9568873cd577db7ebc135eb8bb1825f18caf8972d9d2f2
+
+Package: libc6
+Source: glibc
+Version: 2.41-12+deb13u4
+Architecture: arm64
+Maintainer: GNU Libc Maintainers <debian-glibc@lists.debian.org>
+Installed-Size: 23769
+Depends: libgcc-s1
+Recommends: libidn2-0 (>= 2.0.5~)
+Suggests: glibc-doc, debconf | debconf-2.0, libc-l10n, locales, libnss-nis, libnss-nisplus
+Breaks: base-files (<< 13.3~), chrony (<< 4.2-3~), dhcpcd (<< 1:10.1.0-7~), fakechroot (<< 2.19-3.5), firefox (<< 91~), firefox-esr (<< 91~), gnumach-image-1.8-486 (<< 2:1.8+git20210923~), gnumach-image-1.8-486-dbg (<< 2:1.8+git20210923~), gnumach-image-1.8-xen-486 (<< 2:1.8+git20210923~), gnumach-image-1.8-xen-486-dbg (<< 2:1.8+git20210923~), hurd (<< 1:0.9.git20220301-2), libamdhip64-5 (<< 5.7.1-5+b1), libhiprtc-builtins5 (<< 5.7.1-5+b1), librccl1 (<< 5.4.3-3+b1), libswupdate0.1 (<< 2024.12.1+dfsg-1+b3), locales (<< 2.41), locales-all (<< 2.41), lua-swupdate (<< 2024.12.1+dfsg-1+b3), nscd (<< 2.41), pd-scaf (<< 1:0.14.1+darcs20180201-6+b4), postgresql-15-pllua (<< 1:2.0.12-4), postgresql-17-pllua (<< 1:2.0.12-3+b2), python3-iptables (<< 1.0.0-2), python3-mrgingham (<< 1.25-1), python3-onnxruntime (<< 1.20.1+dfsg-2~), sysvinit (<< 3.09-2~), sysvinit-core (<< 3.09-2~), tinydns (<< 1:1.05-14), uwsgi-plugin-pypy3 (<< 0.0.2+b1), valgrind (<< 1:3.19.0-1~)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://www.gnu.org/software/libc/libc.html
+Description: GNU C Library: Shared libraries
+ Contains the standard libraries that are used by nearly all programs on
+ the system. This package includes shared versions of the standard C library
+ and the standard math library, as well as many others.
+Filename: debs/libc6_2.41-12+deb13u4_arm64.deb
+Size: 2483572
+SHA256: 8784eda966b189c777a384dac5ce009e8fc9b52d006926c5a013e7fa8aa688cc
+
+Package: libdb5.3t64
+Source: db5.3
+Version: 5.3.28+dfsg2-9
+Architecture: arm64
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Installed-Size: 1775
+Depends: libc6 (>= 2.38)
+Breaks: libdb5.3 (<< 5.3.28+dfsg2-9)
+Replaces: libdb5.3
+Provides: libdb5.3 (= 5.3.28+dfsg2-9)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html
+Description: Berkeley v5.3 Database Libraries [runtime]
+ This is the runtime package for programs that use the v5.3 Berkeley
+ database library.
+Filename: debs/libdb5.3t64_5.3.28+dfsg2-9_arm64.deb
+Size: 629132
+SHA256: bfef56508d69fd3f940668f6abd0a466a362cabf63c4cc1c787cc58d28f6e92f
+
+Package: libexpat1
+Source: expat
+Version: 2.9.0-1~deb13u1
+Architecture: arm64
+Maintainer: Laszlo Boszormenyi (GCS) <gcs@debian.org>
+Installed-Size: 451
+Pre-Depends: libc6 (>= 2.36)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://libexpat.github.io/
+Description: XML parsing C library - runtime library
+ This package contains the runtime, shared library of expat, the C
+ library for parsing XML. Expat is a stream-oriented parser in
+ which an application registers handlers for things the parser
+ might find in the XML document (like start tags).
+Filename: debs/libexpat1_2.9.0-1~deb13u1_arm64.deb
+Size: 113920
+SHA256: d9e1c50fcdad079fe16d77f1578adcc763be1bf7f2da7fa8adca7010b0c84c83
+
+Package: libffi8
+Source: libffi
+Version: 3.4.8-2
+Architecture: arm64
+Maintainer: Debian GCC Maintainers <debian-gcc@lists.debian.org>
+Installed-Size: 92
+Depends: libc6 (>= 2.34)
+Breaks: libffi8ubuntu1 (<< 3.4.2-1)
+Replaces: libffi8ubuntu1 (<< 3.4.2-1)
+Provides: libffi8ubuntu1 (= 3.4.8-2)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://sourceware.org/libffi/
+Description: Foreign Function Interface library runtime
+ A foreign function interface is the popular name for the interface that
+ allows code written in one language to call code written in another
+ language.
+Filename: debs/libffi8_3.4.8-2_arm64.deb
+Size: 21260
+SHA256: d84a783b818f2386627604e64b793eb4ac5bb9ea1ba321a194a1c9c82fe09a01
+
+Package: libgcc-s1
+Source: gcc-14
+Version: 14.2.0-19
+Architecture: arm64
+Protected: yes
+Maintainer: Debian GCC Maintainers <debian-gcc@lists.debian.org>
+Installed-Size: 148
+Depends: gcc-14-base (= 14.2.0-19), libc6 (>= 2.35)
+Breaks: libgcc-7-dev (<< 7.5.0-4), libgcc-8-dev (<< 8.3.0-27), libgcc-9-dev (<< 9.2.1-26)
+Replaces: libgcc1 (<< 1:10)
+Provides: libgcc1 (= 1:14.2.0-19)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: http://gcc.gnu.org/
+Description: GCC support library
+ Shared version of the support library, a library of internal subroutines
+ that GCC uses to overcome shortcomings of particular machines, or
+ special needs for some languages.
+Important: yes
+Filename: debs/libgcc-s1_14.2.0-19_arm64.deb
+Size: 54104
+SHA256: 1108bc87879833d6d9a145f22a4a15cddb34e065b4b5f4b97bee586adbac2851
+
+Package: liblzma5
+Source: xz-utils
+Version: 5.8.1-1+deb13u2
+Architecture: arm64
+Maintainer: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Installed-Size: 435
+Depends: libc6 (>= 2.34)
+Breaks: liblzma2 (<< 5.1.1alpha+20110809-3~)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://tukaani.org/xz/
+Description: XZ-format compression library
+ XZ is the successor to the Lempel-Ziv/Markov-chain Algorithm
+ compression format, which provides memory-hungry but powerful
+ compression (often better than bzip2) and fast, easy decompression.
+ .
+ The native format of liblzma is XZ; it also supports raw (headerless)
+ streams and the older LZMA format used by lzma. (For 7-Zip's related
+ format, use the p7zip package instead.)
+Filename: debs/liblzma5_5.8.1-1+deb13u2_arm64.deb
+Size: 302984
+SHA256: 88f3aa499dc30edf01b9209ab40f11e37edfbecef971f84f4721de1874ed4827
+
+Package: libmd0
+Source: libmd (1.1.0-2)
+Version: 1.1.0-2+b1
+Architecture: arm64
+Maintainer: Guillem Jover <guillem@debian.org>
+Installed-Size: 102
+Depends: libc6 (>= 2.33)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://www.hadrons.org/software/libmd/
+Description: message digest functions from BSD systems - shared library
+ The libmd library provides various message digest ("hash") functions,
+ as found on various BSDs on a library with the same name and with a
+ compatible API.
+Filename: debs/libmd0_1.1.0-2+b1_arm64.deb
+Size: 33664
+SHA256: 772e86842fd3fa1816a0cfee4833a73996aaa550461491543b886b9c8f999052
+
+Package: libncursesw6
+Source: ncurses
+Version: 6.5+20250216-2
+Architecture: arm64
+Maintainer: Ncurses Maintainers <ncurses@packages.debian.org>
+Installed-Size: 568
+Depends: libtinfo6 (= 6.5+20250216-2), libc6 (>= 2.34)
+Recommends: libgpm2
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://invisible-island.net/ncurses/
+Description: shared libraries for terminal handling (wide character support)
+ The ncurses library routines are a terminal-independent method of
+ updating character screens with reasonable optimization.
+ .
+ This package contains the shared libraries necessary to run programs
+ compiled with ncursesw, which includes support for wide characters.
+Filename: debs/libncursesw6_6.5+20250216-2_arm64.deb
+Size: 124048
+SHA256: 72121aeb08be2d915da321ddfae74f62a0764286f336279b2c2609ba07496d6d
+
+Package: libpcre2-8-0
+Source: pcre2
+Version: 10.46-1~deb13u3
+Architecture: arm64
+Maintainer: Matthew Vernon <matthew@debian.org>
+Installed-Size: 722
+Depends: libc6 (>= 2.34)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://github.com/PCRE2Project/pcre2
+Description: New Perl Compatible Regular Expression Library- 8 bit runtime files
+ This is PCRE2, the new implementation of PCRE, a library of functions
+ to support regular expressions whose syntax and semantics are as
+ close as possible to those of the Perl 5 language. New projects
+ should use this library in preference to the older library,
+ confusingly called pcre3 in Debian.
+ .
+ This package contains the 8 bit runtime library, which operates on
+ ASCII and UTF-8 input.
+Filename: debs/libpcre2-8-0_10.46-1~deb13u3_arm64.deb
+Size: 262648
+SHA256: 1a02b7129990690ea095fd35d7ace6853742923d158019e1fb4ef27efd2c51a7
+
+Package: libpython3-stdlib
+Source: python3-defaults
+Version: 3.13.5-1
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 28
+Depends: libpython3.13-stdlib (>= 3.13.5-1~)
+Section: python
+Priority: optional
+Multi-Arch: same
+Homepage: https://www.python.org/
+Description: interactive high-level object-oriented language (default python3 version)
+ This package contains the majority of the standard library for the Python
+ language (default python3 version).
+ .
+ This package is a dependency package, which depends on Debian's default
+ Python 3 version's standard library (currently v3.13).
+Filename: debs/libpython3-stdlib_3.13.5-1_arm64.deb
+Size: 10180
+SHA256: 0e5b09b3c90f34399a357c32e1be08a3f31b39d3c615464f00354b309f82e732
+
+Package: libpython3.13-minimal
+Source: python3.13
+Version: 3.13.5-2+deb13u5
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 5468
+Depends: libc6 (>= 2.17), libssl3t64 (>= 3.4.0)
+Recommends: libpython3.13-stdlib
+Conflicts: binfmt-support (<< 1.1.2)
+Breaks: libpython3.13-stdlib (<< 3.13.1-3~)
+Replaces: libpython3.13-stdlib (<< 3.13.1-3~)
+Section: python
+Priority: optional
+Multi-Arch: same
+Description: Minimal subset of the Python language (version 3.13)
+ This package contains some essential modules. It is normally not
+ used on it's own, but as a dependency of python3.13-minimal.
+Filename: debs/libpython3.13-minimal_3.13.5-2+deb13u5_arm64.deb
+Size: 856328
+SHA256: 3655ef258b19142cf6fe38ef89731d5c630b2cf3309632494a720b28c1cfcd85
+
+Package: libpython3.13-stdlib
+Source: python3.13
+Version: 3.13.5-2+deb13u5
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 10511
+Depends: libpython3.13-minimal (= 3.13.5-2+deb13u5), media-types | mime-support, netbase, tzdata, libbz2-1.0, libc6 (>= 2.38), libdb5.3t64, libffi8 (>= 3.4), liblzma5 (>= 5.1.1alpha+20120614), libncursesw6 (>= 6.1), libreadline8t64 (>= 7.0~beta), libsqlite3-0 (>= 3.36.0), libtinfo6 (>= 6), libuuid1 (>= 2.20.1)
+Section: python
+Priority: optional
+Multi-Arch: same
+Description: Interactive high-level object-oriented language (standard library, version 3.13)
+ Python is a high-level, interactive, object-oriented language. Its 3.13 version
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+ .
+ This package contains Python 3.13's standard library. It is normally not
+ used on its own, but as a dependency of python3.13.
+Filename: debs/libpython3.13-stdlib_3.13.5-2+deb13u5_arm64.deb
+Size: 1894712
+SHA256: d1178d24e4d143cc6c577d9dc0f26dd982efccc2e600d25ce86361f168a22be0
+
+Package: libpython3.13
+Source: python3.13
+Version: 3.13.5-2+deb13u5
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 7433
+Depends: libpython3.13-stdlib (= 3.13.5-2+deb13u5), libc6 (>= 2.38), libexpat1 (>= 2.6.0), zlib1g (>= 1:1.2.0)
+Replaces: libpython3.13
+Section: libs
+Priority: optional
+Multi-Arch: same
+Description: Shared Python runtime library (version 3.13)
+ Python is a high-level, interactive, object-oriented language. Its 3.13 version
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+ .
+ This package contains the shared runtime library, normally not needed
+ for programs using the statically linked interpreter.
+Filename: debs/libpython3.13_3.13.5-2+deb13u5_arm64.deb
+Size: 1977160
+SHA256: d79db845c37478273d6d9097daafc568199e1475742e18678c5d0781a7293074
+
+Package: libreadline8t64
+Source: readline
+Version: 8.2-6
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 557
+Depends: readline-common, libc6 (>= 2.38), libtinfo6 (>= 6)
+Breaks: libreadline8 (<< 8.2-6)
+Replaces: libreadline8
+Provides: libreadline8 (= 8.2-6)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://tiswww.case.edu/php/chet/readline/rltop.html
+Description: GNU readline and history libraries, run-time libraries
+ The GNU readline library aids in the consistency of user interface
+ across discrete programs that need to provide a command line
+ interface.
+ .
+ The GNU history library provides a consistent user interface for
+ recalling lines of previously typed input.
+Filename: debs/libreadline8t64_8.2-6_arm64.deb
+Size: 159264
+SHA256: f78ff432b2a627bc04f7eef0e6e2696501c9e06feca748a5b741d5e594429033
+
+Package: libselinux1
+Source: libselinux
+Version: 3.8.1-1
+Architecture: arm64
+Maintainer: Debian SELinux maintainers <selinux-devel@lists.alioth.debian.org>
+Installed-Size: 289
+Depends: libc6 (>= 2.38), libpcre2-8-0 (>= 10.22)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://github.com/SELinuxProject
+Description: SELinux runtime shared libraries
+ This package provides the shared libraries for Security-enhanced
+ Linux that provides interfaces (e.g. library functions for the
+ SELinux kernel APIs like getcon(), other support functions like
+ getseuserbyname()) to SELinux-aware applications. Security-enhanced
+ Linux is a patch of the Linux kernel and a number of utilities with
+ enhanced security functionality designed to add mandatory access
+ controls to Linux.  The Security-enhanced Linux kernel contains new
+ architectural components originally developed to improve the security
+ of the Flask operating system. These architectural components provide
+ general support for the enforcement of many kinds of mandatory access
+ control policies, including those based on the concepts of Type
+ Enforcement, Role-based Access Control, and Multi-level Security.
+ .
+ libselinux1 provides an API for SELinux applications to get and set
+ process and file security contexts and to obtain security policy
+ decisions.  Required for any applications that use the SELinux
+ API. libselinux may use the shared libsepol to manipulate the binary
+ policy if necessary (e.g. to downgrade the policy format to an older
+ version supported by the kernel) when loading policy.
+Filename: debs/libselinux1_3.8.1-1_arm64.deb
+Size: 79352
+SHA256: fc13da4c7783b8f4361d92ef1045931f298d1b0ac78ed1a85c2232615f49fc6f
+
+Package: libsqlite3-0
+Source: sqlite3
+Version: 3.46.1-7+deb13u2
+Architecture: arm64
+Maintainer: Laszlo Boszormenyi (GCS) <gcs@debian.org>
+Installed-Size: 1854
+Depends: libc6 (>= 2.38)
+Breaks: crowdsec (<< 1.4), python-migrate (<< 0.11.0-4~), python3-migrate (<< 0.11.0-4~)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://www.sqlite.org/
+Description: SQLite 3 shared library
+ SQLite is a C library that implements an SQL database engine.
+ Programs that link with the SQLite library can have SQL database
+ access without running a separate RDBMS process.
+Filename: debs/libsqlite3-0_3.46.1-7+deb13u2_arm64.deb
+Size: 854152
+SHA256: 5b09efca71cb7a16d67f5453af3989ae1a84fe6b68c6dd3913de527cb0ca23aa
+
+Package: libssl3t64
+Source: openssl
+Version: 3.5.7-1~deb13u3
+Architecture: arm64
+Maintainer: Debian OpenSSL Team <pkg-openssl-devel@alioth-lists.debian.net>
+Installed-Size: 8019
+Depends: libc6 (>= 2.38), libzstd1 (>= 1.5.5), zlib1g (>= 1:1.1.4), openssl-provider-legacy
+Breaks: freeradius (<< 3.2.7+dfsg-1+deb13u1), libssl3 (<< 3.5.7-1~deb13u3), openssh-client (<< 1:9.4p1), openssh-server (<< 1:9.4p1), python3-m2crypto (<< 0.38.0-4)
+Replaces: libssl3
+Provides: libssl3 (= 3.5.7-1~deb13u3)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://openssl-library.org
+Description: Secure Sockets Layer toolkit - shared libraries
+ This package is part of the OpenSSL project's implementation of the SSL
+ and TLS cryptographic protocols for secure communication over the
+ Internet.
+ .
+ It provides the libssl and libcrypto shared libraries.
+Filename: debs/libssl3t64_3.5.7-1~deb13u3_arm64.deb
+Size: 2770200
+SHA256: d0681293a160392186c6ef85a165e40603d1628a099936137d24d391bd591f97
+
+Package: libtinfo6
+Source: ncurses
+Version: 6.5+20250216-2
+Architecture: arm64
+Maintainer: Ncurses Maintainers <ncurses@packages.debian.org>
+Installed-Size: 673
+Depends: libc6 (>= 2.34)
+Breaks: tmux (<< 3.3a-4)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://invisible-island.net/ncurses/
+Description: shared low-level terminfo library for terminal handling
+ The ncurses library routines are a terminal-independent method of
+ updating character screens with reasonable optimization.
+ .
+ This package contains the shared low-level terminfo library.
+Filename: debs/libtinfo6_6.5+20250216-2_arm64.deb
+Size: 341360
+SHA256: 2a747f7fff3c2347c357387a7133df997410f07ba1b1df1a1461a97bd7fbc2fc
+
+Package: libuuid1
+Source: util-linux
+Version: 2.41.5-0+deb13u1
+Architecture: arm64
+Maintainer: Chris Hofstaedtler <zeha@debian.org>
+Installed-Size: 126
+Depends: libc6 (>= 2.38)
+Suggests: uuid-runtime
+Breaks: libuuid1t64 (<< 2.41.5-0+deb13u1)
+Replaces: libuuid1t64
+Provides: libuuid1t64 (= 2.41.5-0+deb13u1)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://github.com/util-linux/util-linux
+Description: Universally Unique ID library
+ The libuuid library generates and parses 128-bit Universally Unique
+ IDs (UUIDs). A UUID is an identifier that is unique within the space
+ of all such identifiers across both space and time. It can be used for
+ multiple purposes, from tagging objects with an extremely short lifetime
+ to reliably identifying very persistent objects across a network.
+ .
+ See RFC 4122 for more information.
+Filename: debs/libuuid1_2.41.5-0+deb13u1_arm64.deb
+Size: 37648
+SHA256: 448ad6b190184dbff24508ef2eda88bd737a5ffc0f9750eb779fcf9885292bea
+
+Package: libzstd1
+Source: libzstd
+Version: 1.5.7+dfsg-1
+Architecture: arm64
+Maintainer: RPM packaging team <team+pkg-rpm@tracker.debian.org>
+Installed-Size: 748
+Depends: libc6 (>= 2.34)
+Section: libs
+Priority: optional
+Multi-Arch: same
+Homepage: https://github.com/facebook/zstd
+Description: fast lossless compression algorithm
+ Zstd, short for Zstandard, is a fast lossless compression algorithm, targeting
+ real-time compression scenarios at zlib-level compression ratio.
+ .
+ This package contains the shared library.
+Filename: debs/libzstd1_1.5.7+dfsg-1_arm64.deb
+Size: 266052
+SHA256: 924540bd59fdbfa77a0604360efdaca54411a43daf11c7e002a3c64791b67448
+
+Package: media-types
+Version: 13.0.0
+Architecture: all
+Maintainer: Mime-Support Packagers <team+debian-mimesupport-packagers@tracker.debian.org>
+Installed-Size: 98
+Breaks: mime-support (<< 3.65)
+Replaces: mime-support (<< 3.65)
+Section: net
+Priority: standard
+Multi-Arch: foreign
+Description: List of standard media types and their usual file extension
+ This package installs the configuration file /etc/mime.types, that lists
+ standard media types (originally known as "MIME" types) and their usual file
+ extension.  This provides a simple way for programs to have a first guess at a
+ file's content.  On standard Debian desktop systems, one will also find more
+ sophisticated tools, for instance provided by the "file" and "xdg-utils"
+ packages.
+ .
+ The /etc/mime.types file is compiled by hand using mostly information provided
+ by the Internet Assigned Numbers Authority (IANA).
+Filename: debs/media-types_13.0.0_all.deb
+Size: 29336
+SHA256: 0788e4b0b72db1bcf74a19cb24c3511e7770ad0b341f0f30e361701c3072f53e
+
+Package: netbase
+Version: 6.5
+Architecture: all
+Maintainer: Marco d'Itri <md@linux.it>
+Installed-Size: 35
+Breaks: ebtables (<< 2.0.11-2)
+Replaces: ebtables (<< 2.0.11-2)
+Section: admin
+Priority: important
+Multi-Arch: foreign
+Description: Basic TCP/IP networking system
+ This package provides the necessary infrastructure for basic TCP/IP based
+ networking.
+ .
+ In particular, it supplies common name-to-number mappings in /etc/services,
+ /etc/rpc, /etc/protocols and /etc/ethertypes.
+Filename: debs/netbase_6.5_all.deb
+Size: 12436
+SHA256: 76bafa92947ebd37b0a6f9ec6570412041f56edebc1c66d323731216d318471e
+
+Package: openssl-provider-legacy
+Source: openssl
+Version: 3.5.7-1~deb13u3
+Architecture: arm64
+Maintainer: Debian OpenSSL Team <pkg-openssl-devel@alioth-lists.debian.net>
+Installed-Size: 416
+Depends: libc6 (>= 2.17), libssl3t64 (>= 3.0.3)
+Breaks: libssl3 (<< 3.3.1-5), libssl3t64 (<< 3.3.1-5)
+Replaces: libssl3 (<< 3.3.1-5), libssl3t64 (<< 3.3.1-5)
+Section: utils
+Priority: optional
+Multi-Arch: foreign
+Homepage: https://openssl-library.org
+Description: Secure Sockets Layer toolkit - cryptographic utility
+ This package is part of the OpenSSL project's implementation of the SSL
+ and TLS cryptographic protocols for secure communication over the
+ Internet.
+ .
+ This package contains the legacy provider. The OpenSSL legacy provider
+ supplies OpenSSL implementations of algorithms that have been deemed legacy.
+ Such algorithms have commonly fallen out of use, have been deemed insecure by
+ the cryptography community, or something similar.
+ For details see OSSL_PROVIDER-legacy man page.
+Filename: debs/openssl-provider-legacy_3.5.7-1~deb13u3_arm64.deb
+Size: 313896
+SHA256: dae4ab96be3a1fc8fd490bbeb3938ecd102d360555d4af8ee2728b42ce9f1059
+
+Package: openssl
+Version: 3.5.7-1~deb13u3
+Architecture: arm64
+Maintainer: Debian OpenSSL Team <pkg-openssl-devel@alioth-lists.debian.net>
+Installed-Size: 2554
+Depends: libc6 (>= 2.34), libssl3t64 (>= 3.5.0)
+Suggests: ca-certificates
+Section: utils
+Priority: optional
+Multi-Arch: foreign
+Homepage: https://openssl-library.org
+Description: Secure Sockets Layer toolkit - cryptographic utility
+ This package is part of the OpenSSL project's implementation of the SSL
+ and TLS cryptographic protocols for secure communication over the
+ Internet.
+ .
+ It contains the general-purpose command line binary /usr/bin/openssl,
+ useful for cryptographic operations such as:
+  * creating RSA, DH, and DSA key parameters;
+  * creating X.509 certificates, CSRs, and CRLs;
+  * calculating message digests;
+  * encrypting and decrypting with ciphers;
+  * testing SSL/TLS clients and servers;
+  * handling S/MIME signed or encrypted mail.
+Filename: debs/openssl_3.5.7-1~deb13u3_arm64.deb
+Size: 1472692
+SHA256: 68f226057a7a1c1f23e2ffde0075ea16e27e646d829c8d3c63414c49b839c258
+
+Package: python3-minimal
+Source: python3-defaults
+Version: 3.13.5-1
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 112
+Pre-Depends: python3.13-minimal (>= 3.13.5-1~)
+Depends: dpkg (>= 1.13.20)
+Section: python
+Priority: optional
+Multi-Arch: allowed
+Homepage: https://www.python.org/
+Description: minimal subset of the Python language (default python3 version)
+ This package contains the interpreter and some essential modules.  It's used
+ in the boot process for some basic tasks.
+ See /usr/share/doc/python3.13-minimal/README.Debian for a list of the modules
+ contained in this package.
+Cnf-Visible-Pkgname: python3
+Filename: debs/python3-minimal_3.13.5-1_arm64.deb
+Size: 27244
+SHA256: b1dff61d3e68c83c747b03399356ba707d491bcaf6e495b575d46be3143cdec8
+
+Package: python3-packaging
+Source: python-packaging
+Version: 25.0-1
+Architecture: all
+Maintainer: Debian Python Team <team+python@tracker.debian.org>
+Installed-Size: 257
+Depends: python3:any
+Section: python
+Priority: optional
+Homepage: https://github.com/pypa/packaging
+Description: core utilities for python3 packages
+ These core utilities currently consist of:
+  - Version Handling (PEP 440)
+  - Dependency Specification (PEP 440)
+Filename: debs/python3-packaging_25.0-1_all.deb
+Size: 56568
+SHA256: d70c8469f6e9c6105e1ebcd3ebdc963f11dadbeddd89d2d1a2a3cb1c97d2ecbc
+
+Package: python3-pip-whl
+Source: python-pip
+Version: 25.1.1+dfsg-1
+Architecture: all
+Maintainer: Debian Python Team <team+python@tracker.debian.org>
+Installed-Size: 1531
+Depends: ca-certificates
+Breaks: python-pip-whl (<< 21.3.1+dfsg-2~)
+Replaces: python-pip-whl (<< 21.3.1+dfsg-2~)
+Section: python
+Priority: optional
+Multi-Arch: foreign
+Homepage: https://pip.pypa.io/en/stable/
+Description: Python package installer (pip wheel)
+ pip is the Python package installer.  It integrates with virtualenv, doesn't
+ do partial installs, can save package state for replaying, can install from
+ non-egg sources, and can install from version control repositories.
+ .
+ This is the support package for the PEP 427 wheel version of the package,
+ required for using pip inside a virtual environment.
+Filename: debs/python3-pip-whl_25.1.1+dfsg-1_all.deb
+Size: 1507328
+SHA256: e65351935aa4af2b10ae2abb5744f5059e9abad51aea6cd0cb825702010763f7
+
+Package: python3-pip
+Source: python-pip
+Version: 25.1.1+dfsg-1
+Architecture: all
+Maintainer: Debian Python Team <team+python@tracker.debian.org>
+Installed-Size: 10166
+Depends: ca-certificates, python3-wheel, python3:any
+Recommends: build-essential, python3-dev (>= 3.2), libjs-sphinxdoc (>= 8.1)
+Breaks: python-pip
+Replaces: python-pip
+Provides: pip
+Section: python
+Priority: optional
+Homepage: https://pip.pypa.io/en/stable/
+Description: Python package installer
+ pip is the Python package installer.  It integrates with virtualenv, doesn't
+ do partial installs, can save package state for replaying, can install from
+ non-egg sources, and can install from version control repositories.
+ .
+ This is the Python 3 version of the package.
+Filename: debs/python3-pip_25.1.1+dfsg-1_all.deb
+Size: 1456608
+SHA256: 065695050e5fe10f162201a5bbe8759837427c76c95b5fe57b0701bcd6070c56
+
+Package: python3-setuptools-whl
+Source: setuptools
+Version: 78.1.1-0.1
+Architecture: all
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 1324
+Breaks: python-pip-whl (<< 21.3.1+dfsg-2~)
+Replaces: python-pip-whl (<< 21.3.1+dfsg-2~)
+Section: python
+Priority: optional
+Homepage: https://pypi.python.org/pypi/setuptools
+Description: Python Distutils Enhancements (wheel package)
+ Extensions to the python-distutils for large or complex distributions.
+ .
+ This is the support package for the PEP 427 wheel version of the package,
+ required for using setuptools inside a virtual environment.
+Filename: debs/python3-setuptools-whl_78.1.1-0.1_all.deb
+Size: 1268108
+SHA256: 0caf134e73ab90ffeaa5ce2529d73ea7d48078b2a9251ed9d1b7b514a61e9483
+
+Package: python3-venv
+Source: python3-defaults
+Version: 3.13.5-1
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 6
+Depends: python3.13-venv (>= 3.13.5-1~), python3 (= 3.13.5-1)
+Section: python
+Priority: optional
+Multi-Arch: allowed
+Homepage: https://www.python.org/
+Description: venv module for python3 (default python3 version)
+ This package contains the venv module for the Python language (default python3
+ version).
+ .
+ The venv module provides support for creating lightweight "virtual
+ environments" with their own site directories, optionally isolated from system
+ site directories. Each virtual environment has its own Python binary (which
+ matches the version of the binary that was used to create this environment)
+ and can have its own independent set of installed Python packages in its site
+ directories.
+ .
+ This package is a dependency package, which depends on Debian's default
+ Python 3 version's venv module (currently v3.13).
+Filename: debs/python3-venv_3.13.5-1_arm64.deb
+Size: 1180
+SHA256: 08d23753825316cbffb69011c9cda39a6cc4adc4d51ea808c8d68d9981573dda
+
+Package: python3-wheel
+Source: wheel
+Version: 0.46.1-2
+Architecture: all
+Maintainer: Debian Python Team <team+python@tracker.debian.org>
+Installed-Size: 91
+Depends: python3-packaging (>= 24), python3:any
+Suggests: python3-setuptools
+Section: python
+Priority: optional
+Homepage: https://github.com/pypa/wheel
+Description: built-package format for Python
+ A wheel is a ZIP-format archive with a specially formatted filename and the
+ `.whl` extension.  It is designed to contain all the files for a PEP 376
+ compatible install in a way that is very close to the on-disk format.
+ .
+ The wheel project provides a `bdist_wheel` command for setuptools.  Wheel
+ files can be installed with `pip`.
+ .
+ This is the Python 3 compatible package.
+Filename: debs/python3-wheel_0.46.1-2_all.deb
+Size: 21672
+SHA256: 17b788ad15f8231e5058ed386cd6841d42b31937075b56caf4cf63263910e992
+
+Package: python3.13-minimal
+Source: python3.13
+Version: 3.13.5-2+deb13u5
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 6613
+Pre-Depends: libc6 (>= 2.38)
+Depends: libpython3.13-minimal (= 3.13.5-2+deb13u5), libexpat1 (>= 2.6.0), zlib1g (>= 1:1.2.0)
+Recommends: python3.13
+Suggests: binfmt-support
+Conflicts: binfmt-support (<< 1.1.2)
+Section: python
+Priority: optional
+Multi-Arch: allowed
+Description: Minimal subset of the Python language (version 3.13)
+ This package contains the interpreter and some essential modules.  It can
+ be used in the boot process for some basic tasks.
+ See /usr/share/doc/python3.13-minimal/README.Debian for a list of the modules
+ contained in this package.
+Cnf-Visible-Pkgname: python3.13
+Filename: debs/python3.13-minimal_3.13.5-2+deb13u5_arm64.deb
+Size: 2008016
+SHA256: 95237a3ad99bf9366308e16f7c79449c9371c4cff9c883772fb7c254652467eb
+
+Package: python3.13-venv
+Source: python3.13
+Version: 3.13.5-2+deb13u5
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 27
+Depends: python3.13 (= 3.13.5-2+deb13u5), python3-pip-whl (>= 22.2), python3-setuptools-whl (>= 70.1)
+Breaks: python3-pip (<< 1.5.6-4)
+Section: python
+Priority: optional
+Multi-Arch: allowed
+Description: Interactive high-level object-oriented language (pyvenv binary, version 3.13)
+ Python is a high-level, interactive, object-oriented language. Its 3.13 version
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+ .
+ This package contains the pyvenv-3.13 binary.
+Filename: debs/python3.13-venv_3.13.5-2+deb13u5_arm64.deb
+Size: 5476
+SHA256: bc37518ea1eb198d635be16ba234239263b66daf823f3a5cb02316805b88beba
+
+Package: python3.13
+Version: 3.13.5-2+deb13u5
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 830
+Depends: python3.13-minimal (= 3.13.5-2+deb13u5), libpython3.13-stdlib (= 3.13.5-2+deb13u5), media-types | mime-support, tzdata
+Recommends: ca-certificates
+Suggests: python3.13-venv, python3.13-doc, binutils
+Breaks: python3-all (<< 3.6.5~rc1-1), python3-dev (<< 3.6.5~rc1-1), python3-venv (<< 3.6.5-2)
+Section: python
+Priority: optional
+Multi-Arch: allowed
+Description: Interactive high-level object-oriented language (version 3.13)
+ Python is a high-level, interactive, object-oriented language. Its 3.13 version
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+Filename: debs/python3.13_3.13.5-2+deb13u5_arm64.deb
+Size: 757492
+SHA256: 3d027394c6afd08a2663c3da588824aa9ee0c54e3c2b4382bb9f644584bc99a1
+
+Package: python3
+Source: python3-defaults
+Version: 3.13.5-1
+Architecture: arm64
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 83
+Pre-Depends: python3-minimal (= 3.13.5-1)
+Depends: python3.13 (>= 3.13.5-1~), libpython3-stdlib (= 3.13.5-1)
+Suggests: python3-doc (>= 3.13.5-1), python3-tk (>= 3.13.5-1~), python3-venv (>= 3.13.5-1)
+Conflicts: python3-distutils
+Replaces: python3-minimal (<< 3.1.2-2)
+Provides: python3-profiler, python3-supported-max (= 3.13), python3-supported-min (= 3.13)
+Section: python
+Priority: optional
+Multi-Arch: allowed
+Homepage: https://www.python.org/
+Description: interactive high-level object-oriented language (default python3 version)
+ Python, the high-level, interactive object oriented language,
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+ .
+ This package is a dependency package, which depends on Debian's default
+ Python 3 version (currently v3.13).
+Filename: debs/python3_3.13.5-1_arm64.deb
+Size: 28244
+SHA256: 8d5be256bf3bb4f07afce1aa86f0595c6939e1a6c2ea939bdcb7b36351cbe021
+
+Package: readline-common
+Source: readline
+Version: 8.2-6
+Architecture: all
+Maintainer: Matthias Klose <doko@debian.org>
+Installed-Size: 89
+Suggests: readline-doc
+Conflicts: libreadline-common, libreadline5 (<< 5.0-11)
+Replaces: libreadline-common, libreadline4 (<< 4.3-16), libreadline5 (<< 5.0-11)
+Section: utils
+Priority: optional
+Multi-Arch: foreign
+Homepage: https://tiswww.case.edu/php/chet/readline/rltop.html
+Description: GNU readline and history libraries, common files
+ The GNU readline library aids in the consistency of user interface
+ across discrete programs that need to provide a command line
+ interface.
+ .
+ The GNU history library provides a consistent user interface for
+ recalling lines of previously typed input.
+Filename: debs/readline-common_8.2-6_all.deb
+Size: 69360
+SHA256: f77e8aa0bf0de618f11cb0b21658a4ed60f177d63b3cf26d7fc3706b6d0eaaa9
+
+Package: sshpass
+Source: sshpass (1.10-0.1)
+Version: 1.10-0.1+b1
+Architecture: arm64
+Maintainer: Shachar Shemesh <shachar@debian.org>
+Installed-Size: 85
+Depends: libc6 (>= 2.38)
+Recommends: ssh-client
+Section: utils
+Priority: optional
+Homepage: https://sourceforge.net/projects/sshpass
+Description: Non-interactive ssh password authentication
+ SSH's (secure shell) most common authentication mode is called "interactive
+ keyboard password authentication", so called both because it is typically
+ done via keyboard, and because openssh takes active measures to make sure
+ that the password is, indeed, typed interactively by the keyboard. Sometimes,
+ however, it is necessary to fool ssh into accepting an interactive password
+ non-interactively. This is where sshpass comes in.
+ .
+ SECURITY NOTE: There is a reason openssh insists that passwords be typed
+ interactively. Passwords are harder to store securely and to pass around
+ securely between programs. If you have not looked into solving your needs
+ using SSH's "public key authentication", perhaps in conjunction with the ssh
+ agent (RTFM ssh-add), please do so before being tempted into using this
+ package.
+Filename: debs/sshpass_1.10-0.1+b1_arm64.deb
+Size: 12876
+SHA256: b9e7e2e9ef68f33ddcd3e1c6882e15de3309c2512263c5f3ad8ba2bcfd00ec59
+
+Package: tar
+Version: 1.35+dfsg-3.1
+Architecture: arm64
+Essential: yes
+Maintainer: Janos Lenart <ocsi@debian.org>
+Installed-Size: 3105
+Pre-Depends: libacl1 (>= 2.2.23), libc6 (>= 2.38), libselinux1 (>= 3.1~)
+Suggests: bzip2, ncompress, xz-utils, tar-scripts, tar-doc
+Conflicts: cpio (<= 2.4.2-38)
+Breaks: dpkg-dev (<< 1.14.26)
+Replaces: cpio (<< 2.4.2-39)
+Section: utils
+Priority: required
+Multi-Arch: foreign
+Homepage: https://www.gnu.org/software/tar/
+Description: GNU version of the tar archiving utility
+ Tar is a program for packaging a set of files as a single archive in tar
+ format.  The function it performs is conceptually similar to cpio, and to
+ things like PKZIP in the DOS world.  It is heavily used by the Debian package
+ management system, and is useful for performing system backups and exchanging
+ sets of files with others.
+Filename: debs/tar_1.35+dfsg-3.1_arm64.deb
+Size: 802008
+SHA256: c460a8294202ca3802b7c703b0bd70dd8bda1f2fc8785839595cf9d5e060d71b
+
+Package: tzdata
+Version: 2026f-0+deb13u1
+Architecture: all
+Maintainer: GNU Libc Maintainers <debian-glibc@lists.debian.org>
+Installed-Size: 1360
+Depends: debconf (>= 0.5) | debconf-2.0
+Breaks: tzdata-legacy (= 2023c-8), tzdata-legacy (= 2023c-9)
+Replaces: tzdata-legacy (= 2023c-8), tzdata-legacy (= 2023c-9)
+Provides: tzdata-trixie
+Section: localization
+Priority: required
+Multi-Arch: foreign
+Homepage: https://www.iana.org/time-zones
+Description: time zone and daylight-saving time data
+ This package contains data required for the implementation of
+ standard local time for many representative locations around the
+ globe. It is updated periodically to reflect changes made by
+ political bodies to time zone boundaries, UTC offsets, and
+ daylight-saving rules.
+Filename: debs/tzdata_2026f-0+deb13u1_all.deb
+Size: 267528
+SHA256: 2c1c561091402883430d0d47c57a3c0aa00b44afc8a6239265065a87211a5c11
+
+Package: zlib1g
+Source: zlib
+Version: 1:1.3.dfsg+really1.3.1-1+deb13u1
+Architecture: arm64
+Maintainer: Mark Brown <broonie@debian.org>
+Installed-Size: 180
+Depends: libc6 (>= 2.17)
+Conflicts: zlib1 (<= 1:1.0.4-7)
+Breaks: libxml2 (<< 2.7.6.dfsg-2), texlive-binaries (<< 2023.20230311.66589-8)
+Provides: libz1
+Section: libs
+Priority: required
+Multi-Arch: same
+Homepage: http://zlib.net/
+Description: compression library - runtime
+ zlib is a library implementing the deflate compression method found
+ in gzip and PKZIP.  This package includes the shared library.
+Filename: debs/zlib1g_1_1.3.dfsg+really1.3.1-1+deb13u1_arm64.deb
+Size: 85028
+SHA256: 0e41b3d7ad8ad7fcd36dd4d61ca91a70018478fc4af652e044f4be770784ddff
+

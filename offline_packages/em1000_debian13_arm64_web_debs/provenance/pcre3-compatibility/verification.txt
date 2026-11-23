@@ -1,0 +1,9 @@
+Compatibility exception: Debian 12 bookworm libpcre3 for PCRE1 consumers on Debian 13.
+Debian 13 native Nginx continues to use libpcre2-8-0; both libraries coexist.
+Official HTTPS metadata: https://packages.debian.org/bookworm/arm64/libpcre3/download
+SHA256: ffff38112e92b032688c0efdc19673686feb2aff8b85f65f54d9f2f6b55992d9
+Exact size: 313352 bytes
+Version: 2:8.39-15; Architecture: arm64; Depends: libc6 (>= 2.34)
+Target glibc: 2.41, which satisfies the package dependency.
+Verification of this compatibility package uses the official Debian HTTPS-published SHA256.
+No bookworm repository is enabled on the device.

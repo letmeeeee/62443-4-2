@@ -1,0 +1,79 @@
+正在读取软件包列表...
+正在分析软件包的依赖关系树...
+将会同时安装下列软件：
+  ca-certificates debconf dpkg gcc-14-base libacl1 libbz2-1.0 libc6
+  libdb5.3t64 libexpat1 libffi8 libgcc-s1 liblzma5 libmd0 libncursesw6
+  libpcre2-8-0 libpython3-stdlib libreadline8t64 libselinux1 libsqlite3-0
+  libssl3t64 libtinfo6 libuuid1 libzstd1 media-types netbase openssl
+  openssl-provider-legacy python3-minimal python3-packaging
+  python3-setuptools-whl python3-wheel readline-common tar tzdata zlib1g
+建议安装：
+  debconf-doc debconf-kde-helper debconf-utils libgtk3-perl libnet-ldap-perl
+  libterm-readline-gnu-perl perl whiptail | dialog apt debsig-verify glibc-doc
+  libc-l10n locales libnss-nis libnss-nisplus uuid-runtime python3-doc
+  python3-tk python3-setuptools python3.13-doc binutils binfmt-support
+  readline-doc bzip2 ncompress xz-utils tar-scripts tar-doc
+推荐安装：
+  apt | apt-utils debconf-i18n libidn2-0 libgpm2 build-essential python3-dev
+  libjs-sphinxdoc ssh-client
+下列【新】软件包将被安装：
+  ca-certificates debconf dpkg gcc-14-base libacl1 libbz2-1.0 libc6
+  libdb5.3t64 libexpat1 libffi8 libgcc-s1 liblzma5 libmd0 libncursesw6
+  libpcre2-8-0 libpython3-stdlib libpython3.13 libpython3.13-minimal
+  libpython3.13-stdlib libreadline8t64 libselinux1 libsqlite3-0 libssl3t64
+  libtinfo6 libuuid1 libzstd1 media-types netbase openssl
+  openssl-provider-legacy python3 python3-minimal python3-packaging
+  python3-pip python3-pip-whl python3-setuptools-whl python3-venv
+  python3-wheel python3.13 python3.13-minimal python3.13-venv readline-common
+  sshpass tar tzdata zlib1g
+升级了 0 个软件包，新安装了 46 个软件包，要卸载 0 个软件包，有 0 个软件包未被升级。
+需要下载 25.4 MB 的归档。
+解压缩后会消耗 103 MB 的额外空间。
+获取:1 https://deb.debian.org/debian trixie/main arm64 gcc-14-base arm64 14.2.0-19 [49.4 kB]
+获取:2 https://deb.debian.org/debian trixie/main arm64 libc6 arm64 2.41-12+deb13u4 [2484 kB]
+获取:3 https://security.debian.org/debian-security trixie-security/main arm64 liblzma5 arm64 5.8.1-1+deb13u2 [303 kB]
+获取:4 https://security.debian.org/debian-security trixie-security/main arm64 libpcre2-8-0 arm64 10.46-1~deb13u3 [263 kB]
+获取:5 https://security.debian.org/debian-security trixie-security/main arm64 zlib1g arm64 1:1.3.dfsg+really1.3.1-1+deb13u1 [85.0 kB]
+获取:6 https://security.debian.org/debian-security trixie-security/main arm64 libexpat1 arm64 2.9.0-1~deb13u1 [114 kB]
+获取:7 https://security.debian.org/debian-security trixie-security/main arm64 openssl-provider-legacy arm64 3.5.7-1~deb13u3 [314 kB]
+获取:8 https://security.debian.org/debian-security trixie-security/main arm64 libssl3t64 arm64 3.5.7-1~deb13u3 [2770 kB]
+获取:9 https://security.debian.org/debian-security trixie-security/main arm64 openssl arm64 3.5.7-1~deb13u3 [1473 kB]
+获取:10 https://security.debian.org/debian-security trixie-security/main arm64 ca-certificates all 20250419+deb13u1 [161 kB]
+获取:11 https://deb.debian.org/debian trixie/main arm64 libgcc-s1 arm64 14.2.0-19 [54.1 kB]
+获取:12 https://deb.debian.org/debian trixie/main arm64 libbz2-1.0 arm64 1.0.8-6 [37.8 kB]
+获取:13 https://deb.debian.org/debian trixie/main arm64 libmd0 arm64 1.1.0-2+b1 [33.7 kB]
+获取:14 https://deb.debian.org/debian trixie/main arm64 libselinux1 arm64 3.8.1-1 [79.4 kB]
+获取:15 https://deb.debian.org/debian trixie/main arm64 libzstd1 arm64 1.5.7+dfsg-1 [266 kB]
+获取:16 https://deb.debian.org/debian trixie/main arm64 libacl1 arm64 2.3.2-2+b1 [32.2 kB]
+获取:17 https://deb.debian.org/debian trixie/main arm64 tar arm64 1.35+dfsg-3.1 [802 kB]
+获取:18 https://deb.debian.org/debian trixie/main arm64 dpkg arm64 1.22.22 [1521 kB]
+获取:19 https://deb.debian.org/debian trixie/main arm64 libpython3.13-minimal arm64 3.13.5-2+deb13u5 [856 kB]
+获取:20 https://deb.debian.org/debian trixie/main arm64 python3.13-minimal arm64 3.13.5-2+deb13u5 [2008 kB]
+获取:21 https://deb.debian.org/debian trixie/main arm64 python3-minimal arm64 3.13.5-1 [27.2 kB]
+获取:22 https://deb.debian.org/debian trixie/main arm64 media-types all 13.0.0 [29.3 kB]
+获取:23 https://deb.debian.org/debian trixie/main arm64 netbase all 6.5 [12.4 kB]
+获取:24 https://deb.debian.org/debian trixie/main arm64 debconf all 1.5.91 [121 kB]
+获取:25 https://deb.debian.org/debian trixie-updates/main arm64 tzdata all 2026f-0+deb13u1 [268 kB]
+获取:26 https://deb.debian.org/debian trixie/main arm64 libdb5.3t64 arm64 5.3.28+dfsg2-9 [629 kB]
+获取:27 https://deb.debian.org/debian trixie/main arm64 libffi8 arm64 3.4.8-2 [21.3 kB]
+获取:28 https://deb.debian.org/debian trixie/main arm64 libtinfo6 arm64 6.5+20250216-2 [341 kB]
+获取:29 https://deb.debian.org/debian trixie/main arm64 libncursesw6 arm64 6.5+20250216-2 [124 kB]
+获取:30 https://deb.debian.org/debian trixie/main arm64 readline-common all 8.2-6 [69.4 kB]
+获取:31 https://deb.debian.org/debian trixie/main arm64 libreadline8t64 arm64 8.2-6 [159 kB]
+获取:32 https://deb.debian.org/debian trixie/main arm64 libsqlite3-0 arm64 3.46.1-7+deb13u2 [854 kB]
+获取:33 https://deb.debian.org/debian trixie/main arm64 libuuid1 arm64 2.41.5-0+deb13u1 [37.6 kB]
+获取:34 https://deb.debian.org/debian trixie/main arm64 libpython3.13-stdlib arm64 3.13.5-2+deb13u5 [1895 kB]
+获取:35 https://deb.debian.org/debian trixie/main arm64 python3.13 arm64 3.13.5-2+deb13u5 [757 kB]
+获取:36 https://deb.debian.org/debian trixie/main arm64 libpython3-stdlib arm64 3.13.5-1 [10.2 kB]
+获取:37 https://deb.debian.org/debian trixie/main arm64 python3 arm64 3.13.5-1 [28.2 kB]
+获取:38 https://deb.debian.org/debian trixie/main arm64 libpython3.13 arm64 3.13.5-2+deb13u5 [1977 kB]
+获取:39 https://deb.debian.org/debian trixie/main arm64 python3-packaging all 25.0-1 [56.6 kB]
+获取:40 https://deb.debian.org/debian trixie/main arm64 python3-wheel all 0.46.1-2 [21.7 kB]
+获取:41 https://deb.debian.org/debian trixie/main arm64 python3-pip all 25.1.1+dfsg-1 [1457 kB]
+获取:42 https://deb.debian.org/debian trixie/main arm64 python3-pip-whl all 25.1.1+dfsg-1 [1507 kB]
+获取:43 https://deb.debian.org/debian trixie/main arm64 python3-setuptools-whl all 78.1.1-0.1 [1268 kB]
+获取:44 https://deb.debian.org/debian trixie/main arm64 python3.13-venv arm64 3.13.5-2+deb13u5 [5476 B]
+获取:45 https://deb.debian.org/debian trixie/main arm64 python3-venv arm64 3.13.5-1 [1180 B]
+获取:46 https://deb.debian.org/debian trixie/main arm64 sshpass arm64 1.10-0.1+b1 [12.9 kB]
+已下载 25.4 MB，耗时 6分 35秒 (64.3 kB/s)
+于“仅下载”模式中下载完毕

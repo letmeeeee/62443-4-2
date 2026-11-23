@@ -1,0 +1,17 @@
+curl
+libcurl4t64
+libgd3
+libjbig0
+libjpeg62-turbo
+libnginx-mod-http-image-filter
+libnginx-mod-http-xslt-filter
+libnginx-mod-mail
+libnginx-mod-stream
+libtiff6
+libwebp7
+libxpm4
+libxslt1.1
+nginx-common
+nginx-core
+nginx
+libpcre3

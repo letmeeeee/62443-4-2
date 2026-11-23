@@ -1,0 +1,105 @@
+获取:1 file:/tmp/em1000-apt.zvpnSp ./ InRelease
+忽略:1 file:/tmp/em1000-apt.zvpnSp ./ InRelease
+获取:2 file:/tmp/em1000-apt.zvpnSp ./ Release
+忽略:2 file:/tmp/em1000-apt.zvpnSp ./ Release
+获取:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+忽略:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+获取:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+忽略:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+获取:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+忽略:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+获取:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+忽略:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+获取:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+忽略:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+获取:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+忽略:3 file:/tmp/em1000-apt.zvpnSp ./ Packages
+获取:3 file:/tmp/em1000-apt.zvpnSp ./ Packages [94.5 kB]
+正在读取软件包列表...
+NOTE: This is only a simulation!
+      apt-get needs root privileges for real execution.
+      Keep also in mind that locking is deactivated,
+      so don't depend on the relevance to the real current situation!
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Correcting dependencies... Done
+The following additional packages will be installed:
+  curl libavif16 libcurl4t64 libgeoip1t64 libheif1 libimagequant0 libldap2
+Suggested packages:
+  geoip-bin libheif-plugin-ffmpegdec libheif-plugin-jpegdec
+  libheif-plugin-jpegenc libheif-plugin-j2kdec libheif-plugin-j2kenc
+  libheif-plugin-kvazaar libheif-plugin-rav1e libheif-plugin-svtenc
+Recommended packages:
+  bash-completion ca-certificates geoip-database libheif-plugin-x265
+  libheif-plugin-aomenc libldap-common
+The following packages will be REMOVED:
+  libcurl4
+The following NEW packages will be installed:
+  libavif16 libcurl4t64 libgeoip1t64 libheif1 libimagequant0 libldap2
+The following packages will be upgraded:
+  curl
+1 upgraded, 6 newly installed, 1 to remove and 0 not upgraded.
+Inst libldap2 (2.6.10+dfsg-1 localhost [arm64]) [libnginx-mod-http-geoip:arm64 libcurl4:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Inst curl [7.68.0-1ubuntu2.25] (8.14.1-2+deb13u7 localhost [arm64]) [libnginx-mod-http-geoip:arm64 libcurl4:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Remv libcurl4 [7.68.0-1ubuntu2.25] [libnginx-mod-http-geoip:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Inst libcurl4t64 (8.14.1-2+deb13u7 localhost [arm64]) [libnginx-mod-http-geoip:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Inst libavif16 (1.2.1-1.2 localhost [arm64]) [libnginx-mod-http-geoip:arm64 libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 libnginx-mod-stream-geoip:arm64 ]
+Inst libgeoip1t64 (1.6.12-11.2~deb13u1 localhost [arm64]) [libgd3:arm64 libheif-plugin-libde265:arm64 libheif-plugin-dav1d:arm64 ]
+Inst libheif1 (1.23.6-2~deb13u1 localhost [arm64]) [libgd3:arm64 ]
+Inst libimagequant0 (2.18.0-1+b2 localhost [arm64])
+Conf libldap2 (2.6.10+dfsg-1 localhost [arm64])
+Conf curl (8.14.1-2+deb13u7 localhost [arm64])
+Conf libcurl4t64 (8.14.1-2+deb13u7 localhost [arm64])
+Conf libavif16 (1.2.1-1.2 localhost [arm64])
+Conf libgeoip1t64 (1.6.12-11.2~deb13u1 localhost [arm64])
+Conf libheif1 (1.23.6-2~deb13u1 localhost [arm64])
+Conf libimagequant0 (2.18.0-1+b2 localhost [arm64])
+INFO Allowed package transition: libcurl4 -> libcurl4t64
+NOTE: This is only a simulation!
+      apt-get needs root privileges for real execution.
+      Keep also in mind that locking is deactivated,
+      so don't depend on the relevance to the real current situation!
+Reading package lists...
+Building dependency tree...
+Reading state information...
+0 upgraded, 0 newly installed, 19 reinstalled, 0 to remove and 0 not upgraded.
+Inst curl [8.14.1-2+deb13u7] (8.14.1-2+deb13u7 localhost [arm64])
+Inst libcurl4t64 [8.14.1-2+deb13u7] (8.14.1-2+deb13u7 localhost [arm64])
+Inst libgd3 [2.3.3-14~deb13u1] (2.3.3-14~deb13u1 localhost [arm64])
+Inst libjbig0 [2.1-6.1+b2] (2.1-6.1+b2 localhost [arm64])
+Inst libjpeg62-turbo [1:2.1.5-4] (1:2.1.5-4 localhost [arm64])
+Inst libnginx-mod-http-geoip [1.26.3-3+deb13u11] (1.26.3-3+deb13u11 localhost [arm64])
+Inst libnginx-mod-http-image-filter [1.26.3-3+deb13u11] (1.26.3-3+deb13u11 localhost [arm64])
+Inst libnginx-mod-http-xslt-filter [1.26.3-3+deb13u11] (1.26.3-3+deb13u11 localhost [arm64])
+Inst libnginx-mod-mail [1.26.3-3+deb13u11] (1.26.3-3+deb13u11 localhost [arm64])
+Inst libnginx-mod-stream [1.26.3-3+deb13u11] (1.26.3-3+deb13u11 localhost [arm64])
+Inst libnginx-mod-stream-geoip [1.26.3-3+deb13u11] (1.26.3-3+deb13u11 localhost [arm64])
+Inst libpcre3 [2:8.39-15] (2:8.39-15 localhost [arm64])
+Inst libtiff6 [4.7.0-3+deb13u3] (4.7.0-3+deb13u3 localhost [arm64])
+Inst libwebp7 [1.5.0-0.1] (1.5.0-0.1 localhost [arm64])
+Inst libxpm4 [1:3.5.17-1+deb13u1] (1:3.5.17-1+deb13u1 localhost [arm64])
+Inst libxslt1.1 [1.1.35-1.2+deb13u3] (1.1.35-1.2+deb13u3 localhost [arm64])
+Inst nginx-common [1.26.3-3+deb13u11] (1.26.3-3+deb13u11 localhost [all])
+Inst nginx [1.26.3-3+deb13u11] (1.26.3-3+deb13u11 localhost [arm64])
+Inst nginx-core [1.26.3-3+deb13u11] (1.26.3-3+deb13u11 localhost [all])
+Conf curl (8.14.1-2+deb13u7 localhost [arm64])
+Conf libcurl4t64 (8.14.1-2+deb13u7 localhost [arm64])
+Conf libgd3 (2.3.3-14~deb13u1 localhost [arm64])
+Conf libjbig0 (2.1-6.1+b2 localhost [arm64])
+Conf libjpeg62-turbo (1:2.1.5-4 localhost [arm64])
+Conf libnginx-mod-http-geoip (1.26.3-3+deb13u11 localhost [arm64])
+Conf libnginx-mod-http-image-filter (1.26.3-3+deb13u11 localhost [arm64])
+Conf libnginx-mod-http-xslt-filter (1.26.3-3+deb13u11 localhost [arm64])
+Conf libnginx-mod-mail (1.26.3-3+deb13u11 localhost [arm64])
+Conf libnginx-mod-stream (1.26.3-3+deb13u11 localhost [arm64])
+Conf libnginx-mod-stream-geoip (1.26.3-3+deb13u11 localhost [arm64])
+Conf libpcre3 (2:8.39-15 localhost [arm64])
+Conf libtiff6 (4.7.0-3+deb13u3 localhost [arm64])
+Conf libwebp7 (1.5.0-0.1 localhost [arm64])
+Conf libxpm4 (1:3.5.17-1+deb13u1 localhost [arm64])
+Conf libxslt1.1 (1.1.35-1.2+deb13u3 localhost [arm64])
+Conf nginx-common (1.26.3-3+deb13u11 localhost [all])
+Conf nginx (1.26.3-3+deb13u11 localhost [arm64])
+Conf nginx-core (1.26.3-3+deb13u11 localhost [all])
+INFO Offline repair and installation plans validated; no packages changed

@@ -1,0 +1,13 @@
+获取:1 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ InRelease
+忽略:1 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ InRelease
+获取:2 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ Release
+忽略:2 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ Release
+获取:3 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ Packages
+忽略:3 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ Packages
+获取:3 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ Packages
+忽略:3 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ Packages
+获取:3 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ Packages
+忽略:3 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ Packages
+获取:3 file:/home/wx/WorkStation/ItemCode/62443-4-2/offline_packages/em1000_debian13_arm64_debs ./ Packages [12.5 kB]
+正在读取软件包列表...
+W: 无法读取 /tmp/em1000-debian13-apt/offline-verify/aptparts/ - DirectoryExists (2: 没有那个文件或目录)

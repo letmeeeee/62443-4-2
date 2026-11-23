@@ -1,49 +1,55 @@
 ---
 name: ems-flask-backend
-description: 维护 62443-4-2 仓库中的 EMS/Modbus Flask 后端，处理 Session 认证、开发账号禁用、权限与日志、HTTPS 部署及独立升级状态查询；用于此项目的开发、排错和代码讲解，不代替 IEC 标准认证评估。
+description: 用于 62443-4-2 项目的 EMS/Modbus Flask 后端开发维护，定位 bug、解析功能、增加或调整接口，覆盖认证权限、PKI/HTTPS、安全中心、资源监控与升级。以当前代码和设备运行证据为准，不代替 IEC 认证评估。
 ---
 
-# EMS Flask 后端项目技能
+# EMS 项目开发维护
 
-## 使用方式
+适用于包含 `exec/app/main.py`、`routes/route_permission.py` 和 `utils/auth.py` 的 62443-4-2 仓库。仓库副本可搬迁，先确定根目录。本文于 2026-11-19 核对；代码优先于本文和历史对话。
 
-在当前工作区定位 `exec/app/main.py`、`exec/app/routes/route_permission.py` 和 `exec/app/utils/auth.py`，确认是本项目后再使用。以下信息核对于 2026-09-21；路径均相对于仓库根目录，代码优先于历史对话和开发日志。用户的新指令优先于这里保存的设计选择。
+## 工作方式
 
-先查看相关文件及工作区改动，再实施任务。不要因本技能包含安全背景就自动扩大为全面加固、部署或认证审核。讲解代码时，按实际请求路径说明返回值及副作用，区分已经实现的功能和预留能力。
+先检查适用的 AGENTS.md、工作区改动和实际调用入口。用户询问功能时沿请求链解释；用户要求修复或新增时完成实现及必要验证，不停留在建议。旧文档描述和历史故障只作为线索，不直接视为当前缺陷。
+
+定位问题先分清：浏览器 → Nginx → Flask 认证/准入 → 路由 → 数据库或系统脚本 → 服务实际状态。结合 URL、方法、HTTP 状态、响应 code、trace_id 与日志匹配。只有截图或耗时不能证明根因；优先做可区分原因的只读检查，缺失的关键证据再向用户索取。
+
+修改已有接口时核对调用方，保留路径、参数、响应和权限契约，除非用户明确要求调整。新增字段区分可选、默认及错误语义；系统命令或脚本失败保留关键诊断，日志不得泄露密码、私钥、Cookie、CSRF 或真实密钥配置。审计操作人取验证后的 `g.current_user`，不能信任 `operatorName`。
+
+## 按任务读取
+
+- 登录、账号、改密、Session、CSRF、权限：读 [认证参考](references/authentication.md)。
+- CSR、证书、CRL、general/trina、私钥和 TLS：读 [PKI 参考](references/pki.md)。
+- 部署、环境变量、SBOM、性能、升级与测试：读 [运行参考](references/operations.md)。
 
 ## 代码导航
 
 | 位置 | 职责 |
 | --- | --- |
-| `exec/app/main.py` | 主 Flask/Socket.IO 应用，8000 端口；加载 Session 配置、注册认证钩子及三个业务蓝图 |
-| `exec/app/routes/route_permission.py` | 登录、会话查询、退出、用户增删改查及登录日志 |
-| `exec/app/routes/route_g2.py` | 网络、INI、Modbus 请求、系统操作和数据查询 |
-| `exec/app/routes/route_g3.py` | 设备数据、参数、故障及历史记录、升级上传和启动 |
-| `exec/app/utils/auth.py` | MySQL 会话存储、统一认证、CSRF、开发账号禁用策略 |
-| `exec/app/script/session_config.py` | 配置文件初始化、持久密钥、启动配置映射 |
-| `exec/app/config.py`、`utils/ini.py` | 设备配置、角色权限映射、INI 读取和 SQLAlchemy engine 初始化 |
-| `exec/app/utils/operationLog.py` | 操作日志；现有登录日志写入 MySQL |
-| `exec/app/upgrade/upgrade.py` | 独立 9000 服务，查询升级状态 |
-| `exec/app/script/enable_https.sh`、`https_config.py` | 设备 HTTPS/Nginx/证书初始化与维护 |
-| `exec/dist` | 主应用提供的前端构建产物；不要当作前端源码直接重写 |
-| `lc_data`、`logger` | 仓库中的 C/设备配套代码；普通 Flask 修改无需扩展到这里 |
-| `Markdown/YYYYMMDD.md`、`开发进度.md` | 每日进度与模板；仅在任务需要时更新，不将计划当成已完成事实 |
+| `exec/app/main.py` | 8000 主应用、蓝图、Socket.IO；模块导入就创建 app |
+| `routes/route_permission.py`、`utils/auth.py` | 账号路由、会话、准入、CSRF |
+| `utils/security_store.py`、`security_audit.py` | 安全状态、密码策略、审计及统一错误响应 |
+| `routes/route_security.py`、`route_system.py` | 安全中心、组件清单、资源监控 |
+| `routes/route_cert.py`、`script/custom_pki.py` | 证书接口、定制批次暂存及应用 |
+| `script/pki_common.py`、`crl_store.py`、`https_certificates.py` | PKI 公共校验、吊销、HTTPS 身份 |
+| `script/enable_https.sh`、`https_config.py` | Nginx/HTTPS 部署和维护 |
+| `script/session_config.py`、`security_config.py` | 两套启动 JSON 配置入口 |
+| `routes/route_g2.py`、`route_g3.py`、`utils/method.py` | INI、网络、设备业务、数据及升级入口 |
+| `upgrade/upgrade.py`、`script/upgrade.sh`、`rollback.sh` | 独立 9000 查询、更新及回滚 |
+| `config.py`、`utils/ini.py` | 数据库连接池、设备 INI 和角色配置 |
+| `exec/dist` | 前端构建产物；先找前端源码，不直接重写压缩产物 |
+| `logger`、`lc_data`、`goose` | 设备 C/C++ 配套模块，后端任务按实际依赖扩展范围 |
 
-认证或配置任务阅读 [认证与配置参考](references/authentication.md)。HTTPS、升级查询或验证任务阅读 [运行与验证参考](references/operations.md)。项目自身的 `exec/app/SESSION.md` 和 `exec/app/script/HTTPS.md` 有部署说明，使用前与当前代码核对。
+表中省略前缀的路径相对于 `exec/app/`。
 
-## 需要保持的项目选择
+## 项目边界
 
-- 会话使用现有 MySQL `config.engine`，不要悄悄恢复 SQLite 或引入 Redis/JWT。测试中的 SQLite 仅为数据库替身。
-- 以经过验证的 `g.current_user["username"]` 作为操作人；客户端 `operatorName` 不作为权限或审计依据。目标用户 `username` 与操作人是不同概念。
-- 开发账号明确为 `trinastorage`。按配置名单禁用，不按最高权限等级批量禁用个人账号；现行方案不增加账号启停接口或数据库 disabled 字段。
-- 9000 查询服务保留独立、免 Session 的设计，便于主服务升级重启时查询进度。不要把免认证推广到升级上传、启动、回滚或其他写操作。
-- 多级权限分配、身份认证、角色授权、审计是不同功能。全局 Session 钩子不代表每个业务接口已经正确授权。
-- 当前允许同一账号在不同浏览器持有多个会话，没有按用户限制并发数。用户唯一标识不等同单会话登录；涉及 IEC 62443-4-2 判断时核对目标等级、版本与 CR 1.1 RE(1)/CR 2.7 等实际条款，不能据此技能宣称合规。
+- 账号和 Session 使用现有 MySQL 连接池；测试可用 SQLite 替身，不擅自换 Redis/JWT 或真实数据库。
+- 开发账号策略、账号 enabled 状态和角色权限分别核对；不要按管理员等级批量禁用账号。
+- 独立 9000 升级状态查询保留免 Session 设计；不能扩展成升级写操作免认证。
+- 不为读配置导入完整主应用或设备模块，可能初始化 MySQL、目录与连接。使用源码检查和隔离替身。
+- 普通开发任务不自动包含设备部署、重启、网络变更、密钥删除或数据库迁移。已明确授权的操作继续执行；先完成本地可验证工作。
+- 设备与开发机、运行目录与仓库、系统安装副本与 app 副本要明确区分。不把暂存目录、工具版本或服务名当成所有设备的固定事实。
 
 ## 验证与交付
 
-优先运行与修改相关的测试，明确哪些使用替身、哪些经过实机验证。历史上认证与配置测试曾通过，但不是当前版本永远通过的保证。不要仅为读配置而直接导入完整主应用：模块导入可能初始化 MySQL、目录或设备依赖。
-
-保留用户尚未提交的改动，注意旧 Python 文件常用 CRLF、新文件多用 LF，避免无关换行重写。不复制真实密码、密钥、Cookie 或生成的配置到技能、日志或提交中。
-
-交付时说明行为变化、相关文件、测试结果，以及必要的重启/配置迁移事项。设备部署脚本会修改系统服务和网络入口；普通代码任务不意味着要执行部署。
+按变更挑选现有测试及必要回归，确认依赖和副作用再运行。检查相关 diff 与 CRLF，保留用户改动。说明行为变化、测试范围和部署文件；本地通过不代表实机通过，历史测试数字不作为本次结果。前后端反馈文档写清路径、参数、响应、错误码及前端是否需改，区分已实现、建议与待验证事项。

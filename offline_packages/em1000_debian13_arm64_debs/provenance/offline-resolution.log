@@ -1,0 +1,126 @@
+注意：这只是一次模拟！
+　　　apt-get 需要 root 特权进行实际的执行。
+　　　同时请记住此时并未锁定，所以请勿完全相信当前的情况！
+正在读取软件包列表...
+正在分析软件包的依赖关系树...
+将会同时安装下列软件：
+  ca-certificates debconf dpkg gcc-14-base libacl1 libbz2-1.0 libc6
+  libdb5.3t64 libexpat1 libffi8 libgcc-s1 liblzma5 libmd0 libncursesw6
+  libpcre2-8-0 libpython3-stdlib libreadline8t64 libselinux1 libsqlite3-0
+  libssl3t64 libtinfo6 libuuid1 libzstd1 media-types netbase openssl
+  openssl-provider-legacy python3-minimal python3-packaging
+  python3-setuptools-whl python3-wheel readline-common tar tzdata zlib1g
+建议安装：
+  debconf-doc debconf-kde-helper debconf-utils libgtk3-perl libnet-ldap-perl
+  libterm-readline-gnu-perl perl whiptail | dialog apt debsig-verify glibc-doc
+  libc-l10n locales libnss-nis libnss-nisplus uuid-runtime python3-doc
+  python3-tk python3-setuptools python3.13-doc binutils binfmt-support
+  readline-doc bzip2 ncompress xz-utils tar-scripts tar-doc
+推荐安装：
+  apt | apt-utils debconf-i18n libidn2-0 libgpm2 build-essential python3-dev
+  libjs-sphinxdoc ssh-client
+下列【新】软件包将被安装：
+  ca-certificates debconf dpkg gcc-14-base libacl1 libbz2-1.0 libc6
+  libdb5.3t64 libexpat1 libffi8 libgcc-s1 liblzma5 libmd0 libncursesw6
+  libpcre2-8-0 libpython3-stdlib libpython3.13 libpython3.13-minimal
+  libpython3.13-stdlib libreadline8t64 libselinux1 libsqlite3-0 libssl3t64
+  libtinfo6 libuuid1 libzstd1 media-types netbase openssl
+  openssl-provider-legacy python3 python3-minimal python3-packaging
+  python3-pip python3-pip-whl python3-setuptools-whl python3-venv
+  python3-wheel python3.13 python3.13-minimal python3.13-venv readline-common
+  sshpass tar tzdata zlib1g
+升级了 0 个软件包，新安装了 46 个软件包，要卸载 0 个软件包，有 0 个软件包未被升级。
+Inst gcc-14-base (14.2.0-19 localhost [arm64])
+Conf gcc-14-base (14.2.0-19 localhost [arm64])
+Inst libc6 (2.41-12+deb13u4 localhost [arm64]) []
+Inst libgcc-s1 (14.2.0-19 localhost [arm64])
+Conf libgcc-s1 (14.2.0-19 localhost [arm64])
+Conf libc6 (2.41-12+deb13u4 localhost [arm64])
+Inst libbz2-1.0 (1.0.8-6 localhost [arm64])
+Conf libbz2-1.0 (1.0.8-6 localhost [arm64])
+Inst liblzma5 (5.8.1-1+deb13u2 localhost [arm64])
+Conf liblzma5 (5.8.1-1+deb13u2 localhost [arm64])
+Inst libmd0 (1.1.0-2+b1 localhost [arm64])
+Conf libmd0 (1.1.0-2+b1 localhost [arm64])
+Inst libpcre2-8-0 (10.46-1~deb13u3 localhost [arm64])
+Conf libpcre2-8-0 (10.46-1~deb13u3 localhost [arm64])
+Inst libselinux1 (3.8.1-1 localhost [arm64])
+Conf libselinux1 (3.8.1-1 localhost [arm64])
+Inst libzstd1 (1.5.7+dfsg-1 localhost [arm64])
+Conf libzstd1 (1.5.7+dfsg-1 localhost [arm64])
+Inst zlib1g (1:1.3.dfsg+really1.3.1-1+deb13u1 localhost [arm64])
+Conf zlib1g (1:1.3.dfsg+really1.3.1-1+deb13u1 localhost [arm64])
+Inst libacl1 (2.3.2-2+b1 localhost [arm64])
+Conf libacl1 (2.3.2-2+b1 localhost [arm64])
+Inst tar (1.35+dfsg-3.1 localhost [arm64])
+Conf tar (1.35+dfsg-3.1 localhost [arm64])
+Inst dpkg (1.22.22 localhost [arm64])
+Conf dpkg (1.22.22 localhost [arm64])
+Inst libexpat1 (2.9.0-1~deb13u1 localhost [arm64])
+Inst openssl-provider-legacy (3.5.7-1~deb13u3 localhost [arm64]) []
+Inst libssl3t64 (3.5.7-1~deb13u3 localhost [arm64])
+Inst libpython3.13-minimal (3.13.5-2+deb13u5 localhost [arm64])
+Inst python3.13-minimal (3.13.5-2+deb13u5 localhost [arm64])
+Conf openssl-provider-legacy (3.5.7-1~deb13u3 localhost [arm64])
+Conf libssl3t64 (3.5.7-1~deb13u3 localhost [arm64])
+Conf libpython3.13-minimal (3.13.5-2+deb13u5 localhost [arm64])
+Conf libexpat1 (2.9.0-1~deb13u1 localhost [arm64])
+Conf python3.13-minimal (3.13.5-2+deb13u5 localhost [arm64])
+Inst python3-minimal (3.13.5-1 localhost [arm64])
+Inst media-types (13.0.0 localhost [all])
+Inst netbase (6.5 localhost [all])
+Inst debconf (1.5.91 localhost [all])
+Inst tzdata (2026f-0+deb13u1 localhost [all])
+Inst libdb5.3t64 (5.3.28+dfsg2-9 localhost [arm64])
+Inst libffi8 (3.4.8-2 localhost [arm64])
+Inst libtinfo6 (6.5+20250216-2 localhost [arm64])
+Inst libncursesw6 (6.5+20250216-2 localhost [arm64])
+Inst readline-common (8.2-6 localhost [all])
+Inst libreadline8t64 (8.2-6 localhost [arm64])
+Inst libsqlite3-0 (3.46.1-7+deb13u2 localhost [arm64])
+Inst libuuid1 (2.41.5-0+deb13u1 localhost [arm64])
+Inst libpython3.13-stdlib (3.13.5-2+deb13u5 localhost [arm64])
+Inst python3.13 (3.13.5-2+deb13u5 localhost [arm64])
+Inst libpython3-stdlib (3.13.5-1 localhost [arm64])
+Conf python3-minimal (3.13.5-1 localhost [arm64])
+Inst python3 (3.13.5-1 localhost [arm64])
+Inst openssl (3.5.7-1~deb13u3 localhost [arm64])
+Inst ca-certificates (20250419+deb13u1 localhost [all])
+Inst libpython3.13 (3.13.5-2+deb13u5 localhost [arm64])
+Inst python3-packaging (25.0-1 localhost [all])
+Inst python3-wheel (0.46.1-2 localhost [all])
+Inst python3-pip (25.1.1+dfsg-1 localhost [all])
+Inst python3-pip-whl (25.1.1+dfsg-1 localhost [all])
+Inst python3-setuptools-whl (78.1.1-0.1 localhost [all])
+Inst python3.13-venv (3.13.5-2+deb13u5 localhost [arm64])
+Inst python3-venv (3.13.5-1 localhost [arm64])
+Inst sshpass (1.10-0.1+b1 localhost [arm64])
+Conf media-types (13.0.0 localhost [all])
+Conf netbase (6.5 localhost [all])
+Conf debconf (1.5.91 localhost [all])
+Conf tzdata (2026f-0+deb13u1 localhost [all])
+Conf libdb5.3t64 (5.3.28+dfsg2-9 localhost [arm64])
+Conf libffi8 (3.4.8-2 localhost [arm64])
+Conf libtinfo6 (6.5+20250216-2 localhost [arm64])
+Conf libncursesw6 (6.5+20250216-2 localhost [arm64])
+Conf readline-common (8.2-6 localhost [all])
+Conf libreadline8t64 (8.2-6 localhost [arm64])
+Conf libsqlite3-0 (3.46.1-7+deb13u2 localhost [arm64])
+Conf libuuid1 (2.41.5-0+deb13u1 localhost [arm64])
+Conf libpython3.13-stdlib (3.13.5-2+deb13u5 localhost [arm64])
+Conf python3.13 (3.13.5-2+deb13u5 localhost [arm64])
+Conf libpython3-stdlib (3.13.5-1 localhost [arm64])
+Conf python3 (3.13.5-1 localhost [arm64])
+Conf openssl (3.5.7-1~deb13u3 localhost [arm64])
+Conf ca-certificates (20250419+deb13u1 localhost [all])
+Conf libpython3.13 (3.13.5-2+deb13u5 localhost [arm64])
+Conf python3-packaging (25.0-1 localhost [all])
+Conf python3-wheel (0.46.1-2 localhost [all])
+Conf python3-pip (25.1.1+dfsg-1 localhost [all])
+Conf python3-pip-whl (25.1.1+dfsg-1 localhost [all])
+Conf python3-setuptools-whl (78.1.1-0.1 localhost [all])
+Conf python3.13-venv (3.13.5-2+deb13u5 localhost [arm64])
+Conf python3-venv (3.13.5-1 localhost [arm64])
+Conf sshpass (1.10-0.1+b1 localhost [arm64])
+W: 无法读取 /tmp/em1000-debian13-apt/offline-verify/aptparts/ - DirectoryExists (2: 没有那个文件或目录)
+W: 无法读取 /tmp/em1000-debian13-apt/offline-verify/preferencesparts/ - DirectoryExists (2: 没有那个文件或目录)

@@ -1,0 +1,24 @@
+Ubuntu 20.04 ARM64 清单 -> Debian 13 trixie 对应项
+curl -> curl
+libcurl4 -> libcurl4t64
+libgd3 -> libgd3
+libjbig0 -> libjbig0
+libjpeg-turbo8 + libjpeg8 -> libjpeg62-turbo
+libnginx-mod-http-image-filter -> libnginx-mod-http-image-filter
+libnginx-mod-http-xslt-filter -> libnginx-mod-http-xslt-filter
+libnginx-mod-mail -> libnginx-mod-mail
+libnginx-mod-stream -> libnginx-mod-stream
+libtiff5 -> libtiff6
+libwebp6 -> libwebp7
+libxpm4 -> libxpm4
+libxslt1.1 -> libxslt1.1
+nginx-common -> nginx-common (all)
+nginx-core -> nginx-core (all，Debian 元包，附带的模块由依赖解析下载)
+nginx -> nginx (arm64，Debian 主程序)
+
+下载 Debian 13 arm64/all 原生软件包，不混用 Ubuntu 20.04 的旧二进制。
+包名变化按 Debian 组件用途对应；不声称新版库提供旧 SONAME（如 libtiff.so.5/libjpeg.so.8）。
+Nginx 主程序、nginx-common、nginx-core 及所有 Nginx 模块来自同一版本，ABI 由 APT 验证。
+每包的准确版本、架构、来源 URL 和 SHA256 见 manifest.json。
+
+兼容现有旧 Nginx：libpcre.so.3 -> libpcre3_8.39-15_arm64.deb，Debian 12 bookworm 兼容包；保留原 PCRE2 包。

@@ -1,0 +1,8 @@
+获取:1 https://deb.debian.org/debian trixie InRelease [140 kB]
+获取:2 https://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+获取:3 https://deb.debian.org/debian trixie/main arm64 Packages [9614 kB]
+获取:4 https://security.debian.org/debian-security trixie-security InRelease [43.4 kB]
+获取:5 https://security.debian.org/debian-security trixie-security/main arm64 Packages [326 kB]
+获取:6 https://deb.debian.org/debian trixie-updates/main arm64 Packages [1108 B]
+已下载 10.2 MB，耗时 1分 12秒 (142 kB/s)
+正在读取软件包列表...

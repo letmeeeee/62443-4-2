@@ -1,0 +1,18 @@
+Get:1 file:/tmp/em1000-web-stage/offline-repo ./ InRelease
+Ign:1 file:/tmp/em1000-web-stage/offline-repo ./ InRelease
+Get:2 file:/tmp/em1000-web-stage/offline-repo ./ Release
+Ign:2 file:/tmp/em1000-web-stage/offline-repo ./ Release
+Get:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Ign:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Get:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Ign:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Get:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Ign:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Get:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Ign:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Get:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Ign:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Get:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Ign:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages
+Get:3 file:/tmp/em1000-web-stage/offline-repo ./ Packages [94.5 kB]
+Reading package lists...

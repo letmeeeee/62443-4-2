@@ -1,0 +1,11 @@
+libpython3.13
+libpython3.13-minimal
+libpython3.13-stdlib
+python3.13
+python3.13-minimal
+python3.13-venv
+python3-pip-whl
+sshpass
+python3
+python3-venv
+python3-pip
