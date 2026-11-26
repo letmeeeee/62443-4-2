@@ -1,0 +1,37 @@
+/* Native entry bridge. Keep original names while executing a full Standalone.
+ * Resolve /proc/self/exe so old processes keep an immutable release runtime.
+ * Arguments and exit status are preserved by execv; never invoke a shell.
+ */
+#define _POSIX_C_SOURCE 200809L
+#include <errno.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+int main(int argc, char **argv) {
+    char root[PATH_MAX], runtime[PATH_MAX];
+    ssize_t length = readlink("/proc/self/exe", root, sizeof(root) - 1);
+    if (length < 0 || length >= (ssize_t)sizeof(root) - 1) {
+        fprintf(stderr, "[protected] Cannot locate entry: %s\n", strerror(errno));
+        return 126;
+    }
+    root[length] = '\0';
+    for (int i = 0; i < @DEPTH@; ++i) {
+        char *slash = strrchr(root, '/');
+        if (!slash) return 126;
+        *slash = '\0';
+    }
+    int n = snprintf(runtime, sizeof(runtime), "%s/.runtime/ems.dist/ems-runtime", root);
+    if (n < 0 || n >= (int)sizeof(runtime)) return 126;
+    char **arguments = calloc((size_t)argc + 2, sizeof(*arguments));
+    if (!arguments) return 126;
+    arguments[0] = runtime;
+    arguments[1] = @ENTRY@;
+    for (int i = 1; i < argc; ++i) arguments[i + 1] = argv[i];
+    execv(runtime, arguments);
+    fprintf(stderr, "[protected] Cannot execute %s: %s\n", runtime, strerror(errno));
+    free(arguments);
+    return 126;
+}

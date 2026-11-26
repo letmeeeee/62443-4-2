@@ -104,7 +104,7 @@ def validate(data):
     ip = ipaddress.IPv4Address(data['target'])
     if ip.is_unspecified or ip.is_loopback or ip.is_multicast or int(ip) == 0xffffffff:
         raise ValueError('请输入目标设备 net2 的单播 IPv4 地址')
-    if data['mode'] not in ('normal','replay','tamper','plaintext','bad-signature'):
+    if data['mode'] not in ('normal','replay','tamper','tamper-recover','plaintext','bad-signature'):
         raise ValueError('测试模式不合法')
     count, interval = int(data['count']), float(data['interval'])
     if not 1 <= count <= 100000 or not .05 <= interval <= 5:
@@ -165,15 +165,18 @@ def run(data, adapter, stop, log, *, publisher_factory=None, udp_factory=None, e
                 return 'stopped'
             st,sq = (index+1,0) if data.get('change_state') else (1,index)
             packet = publisher.frame(source,values,st,sq,plaintext=data['mode']=='plaintext')
-            if data['mode'] == 'tamper':
+            if data['mode'] in ('tamper','tamper-recover'):
                 ethernet.send(packet[:-1]+bytes([packet[-1]^1]))
+                log('已发送错误 GCM tag 帧 stNum=%d sqNum=%d' % (st,sq))
                 if stop.wait(.05):
                     return 'stopped'
-            ethernet.send(packet)
+            if data['mode'] != 'tamper':
+                ethernet.send(packet)
             if data['mode'] == 'replay':
                 if stop.wait(.05):
                     return 'stopped'
                 ethernet.send(packet)
+                log('已重发完全相同帧 stNum=%d sqNum=%d；原合法帧允许首次业务转发。' % (st,sq))
             if index < 10 or (index+1) % 100 == 0 or index+1 == count:
                 log('已发送 %d/%d：stNum=%d sqNum=%d mode=%s bytes=%d' % (index+1,count,st,sq,data['mode'],len(packet)))
             if index+1 < count and stop.wait(interval):

@@ -76,7 +76,7 @@ def test_adapter_primary_ipv4_fallback_and_exclusion_reasons():
     assert any('不是有效 IPv4' in item for item in logs)
 
 
-@pytest.mark.parametrize('mode',['normal','replay','tamper','plaintext','bad-signature'])
+@pytest.mark.parametrize('mode',['normal','replay','tamper','tamper-recover','plaintext','bad-signature'])
 def test_runner_modes_real_c_peer_and_mocked_driver(material,native,session,tmp_path,monkeypatch,mode):
     pub = publisher(material,tmp_path,verifier=verify_certificate)
     monkeypatch.setattr(runner,'bind_udp',lambda sock,adapter:None)
@@ -115,7 +115,7 @@ def test_runner_modes_real_c_peer_and_mocked_driver(material,native,session,tmp_
     else:
         assert result == 'finished'
         assert accepted == {'normal':[True,True], 'replay':[True,False,True,False],
-                            'tamper':[False,True,False,True], 'plaintext':[False,False]}[mode]
+                            'tamper':[False,False], 'tamper-recover':[False,True,False,True], 'plaintext':[False,False]}[mode]
 
 
 def test_stop_before_handshake_does_not_open_sockets():

@@ -1,0 +1,32 @@
+"""Static Nuitka entry dispatcher; no application imports before selection."""
+import json
+from pathlib import Path
+import sys
+import _ems_runtime
+
+# sys.executable points here in Standalone. Also accept the project's existing
+# [sys.executable, '/home/zlg/app/script/tool.py', ...] subprocess contract.
+_runtime_dir = Path(sys.executable).resolve().parent
+_actual_root = _runtime_dir.parents[1]
+_settings = _runtime_dir / 'logical-root.txt'
+if _settings.is_file():
+    _ems_runtime.logical_root = Path(_settings.read_text().strip())
+if sys.argv[1:] == ['--ems-info']:
+    print(json.dumps(dict(mode='standalone', logical_root=str(_ems_runtime.logical_root),
+                          actual_root=str(_actual_root)), sort_keys=True))
+    raise SystemExit(0)
+if len(sys.argv) < 2:
+    raise SystemExit('Usage: ems-runtime <relative-or-installed-script.py> [arguments...]')
+_requested = Path(sys.argv[1])
+if _requested.is_absolute():
+    for _root in (_ems_runtime.logical_root, _actual_root):
+        try:
+            _requested = _requested.relative_to(_root)
+            break
+        except ValueError:
+            pass
+if _requested.is_absolute() or '..' in _requested.parts:
+    raise SystemExit('Entry must be inside the installed protected app')
+_ems_runtime.entry = _requested.as_posix()
+sys.argv = [str(_ems_runtime.logical_root / _requested), *sys.argv[2:]]
+# Individual static imports follow. Main guards are adapted in the build copy.

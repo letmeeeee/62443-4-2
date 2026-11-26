@@ -329,7 +329,8 @@ typedef struct {
     uint16_t addr;
     uint16_t count;
     uint16_t values[MODBUS_MAX_WRITE_REGS];
-    uint32_t stNum; /* optional for logging */
+    uint32_t stNum;
+    uint32_t sqNum; /* authenticated frame that authorized this write */
 } QueueEntry;
 
 static QueueEntry g_queue[QUEUE_SIZE];
@@ -482,7 +483,7 @@ static void* goose_publisher_thread(void* arg)
     return NULL;
 }
 
-static void queue_push(uint16_t addr, const uint16_t* values, uint16_t count, uint32_t stNum)
+static void queue_push(uint16_t addr, const uint16_t* values, uint16_t count, uint32_t stNum, uint32_t sqNum)
 {
     if (values == NULL || count == 0 || count > MODBUS_MAX_WRITE_REGS)
         return;
@@ -497,6 +498,7 @@ static void queue_push(uint16_t addr, const uint16_t* values, uint16_t count, ui
     g_queue[g_q_tail].count = count;
     memcpy(g_queue[g_q_tail].values, values, count * sizeof(values[0]));
     g_queue[g_q_tail].stNum = stNum;
+    g_queue[g_q_tail].sqNum = sqNum;
     g_q_tail = (g_q_tail + 1) % QUEUE_SIZE;
     g_q_count++;
     pthread_cond_signal(&g_q_cond);
@@ -529,18 +531,18 @@ static void* modbus_sender_thread(void* arg)
         QueueEntry e;
         if (queue_pop(&e) != 0) break;
 
-        /* send via Modbus (function 0x06 single register) */
+        /* Send the batch authorized by a new authenticated GOOSE state. */
         if (modbus_write_registers(e.addr, e.values, e.count) != 0) {
-            fprintf(stderr, "modbus_sender: failed to send addr=%u count=%u stNum=%u\n",
-                (unsigned)e.addr, (unsigned)e.count, (unsigned)e.stNum);
+            fprintf(stderr, "modbus_sender: failed to send addr=%u count=%u stNum=%u sqNum=%u\n",
+                (unsigned)e.addr, (unsigned)e.count, (unsigned)e.stNum, (unsigned)e.sqNum);
             /* Close socket and mark disconnected so ensure_modbus_connected will reconnect */
             if (g_modbus_sock >= 0) {
                 close(g_modbus_sock);
                 g_modbus_sock = -1;
             }
         } else {
-                 printf("[MODBUS SEND] addr=%u count=%u stNum=%u\n",
-                     (unsigned)e.addr, (unsigned)e.count, (unsigned)e.stNum);
+                 printf("[MODBUS SEND] addr=%u count=%u stNum=%u sqNum=%u\n",
+                     (unsigned)e.addr, (unsigned)e.count, (unsigned)e.stNum, (unsigned)e.sqNum);
         }
     }
     return NULL;
@@ -763,6 +765,7 @@ static void onUpperGooseReceived(GooseSubscriber subscriber, void* parameter)
         return;
     }
     uint32_t stNum = GooseSubscriber_getStNum(subscriber);
+    uint32_t sqNum = GooseSubscriber_getSqNum(subscriber);
     bool is_valid = false;
     uint16_t pcs_group = 0;
     uint16_t base_addr = 0;
@@ -801,7 +804,7 @@ static void onUpperGooseReceived(GooseSubscriber subscriber, void* parameter)
 
             /* 地址不连续需分批发送 */
             if (batch_count > 0 && actual_addr != batch_start + batch_count) {
-                queue_push(batch_start, batch_values, batch_count, stNum);
+                queue_push(batch_start, batch_values, batch_count, stNum, sqNum);
                 batch_count = 0;
                 memset(batch_values, 0, sizeof(batch_values));
             }
@@ -832,7 +835,7 @@ static void onUpperGooseReceived(GooseSubscriber subscriber, void* parameter)
 
             /* 地址不连续需分批发送 */
             if (batch_count > 0 && actual_addr != batch_start + batch_count) {
-                queue_push(batch_start, batch_values, batch_count, stNum);
+                queue_push(batch_start, batch_values, batch_count, stNum, sqNum);
                 batch_count = 0;
                 memset(batch_values, 0, sizeof(batch_values));
             }
@@ -848,9 +851,16 @@ static void onUpperGooseReceived(GooseSubscriber subscriber, void* parameter)
     }
 
     if (batch_count > 0) {
-        queue_push(batch_start, batch_values, batch_count, stNum);
+        queue_push(batch_start, batch_values, batch_count, stNum, sqNum);
         memset(batch_values, 0, sizeof(batch_values));
     }
+    /* Consume the state only after authenticated dataset validation and queueing.
+     * sqNum retransmissions refresh the decoder but never repeat business writes.
+     * resetUpstreamSession clears this flag for a genuinely new session key. */
+    g_up.lastUpperStNum = stNum;
+    g_up.lastUpperStNumValid = true;
+    GLOG("INFO", "Authenticated GOOSE state queued for Modbus stNum=%u sqNum=%u",
+         (unsigned)stNum, (unsigned)sqNum);
 }
 
 /* Called only by the secure receive thread before the first frame of a new

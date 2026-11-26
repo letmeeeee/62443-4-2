@@ -167,6 +167,21 @@ sudo systemctl status goose_middle.service --no-pager -l
 
 ## 验证
 
+2026-11-24：修复 `middle.c` 在合法新状态入队后没有更新 `lastUpperStNum`/有效标记的问题，
+同一 stNum、递增 sqNum 的正常重发现在只刷新接收状态，不重复触发 Modbus。入队授权与写入
+日志包含 stNum/sqNum。原 GCM 验签失败和完全相同计数重放仍在解码前丢弃。
+模拟器 `tamper` 现在只发错误 tag，原混合测试改名 `tamper-recover`。
+
+可执行完整业务授权回归（先本机构建 libiec61850）：
+
+```bash
+GOOSE_TEST_LIBIEC=/path/to/native/src/libiec61850.so PYTHONPATH=.:exec/app \
+  python3 -m pytest -q goose/goose_test/tests/test_bridge_authorization.py
+```
+
+此测试运行真实 C 安全层、IEC 解码器、业务回调、队列和 Modbus 报文编码，替换最终
+send/recv 以计数写请求；不创建真实网络连接，不代替设备联调。
+
 真实网卡发布端模拟器：根目录 `goose_publisher.py`，支持 GSEC1 双向认证、加密 GOOSE
 发送及重放/篡改/明文负例。证书准备、PC 与设备 net2 拓扑和操作命令见
 [发布端模拟联调说明](../../tools/goose_publisher/README.md)。默认 8 个整数匹配当前桥接数据集。

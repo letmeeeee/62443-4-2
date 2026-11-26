@@ -21,7 +21,7 @@ def main():
     parser.add_argument('--count', type=int, default=10)
     parser.add_argument('--interval', type=float, default=1.0)
     parser.add_argument('--change-state', action='store_true', help='每帧递增 stNum；默认 stNum=1、sqNum 递增')
-    parser.add_argument('--mode', choices=['normal','replay','tamper','plaintext','bad-signature'], default='normal')
+    parser.add_argument('--mode', choices=['normal','replay','tamper','tamper-recover','plaintext','bad-signature'], default='normal')
     args = parser.parse_args()
     if not sys.platform.startswith('linux'):
         parser.error('此模拟器需要 Linux AF_PACKET 网卡发包能力')
@@ -70,11 +70,13 @@ def main():
         for index in range(args.count):
             st, sq = (index+1,0) if args.change_state else (1,index)
             packet = publisher.frame(source,values,st,sq,plaintext=args.mode=='plaintext')
-            if args.mode == 'tamper':
+            if args.mode in ('tamper','tamper-recover'):
                 damaged = packet[:-1]+bytes([packet[-1]^1])
                 ethernet.send(damaged)
+                print('已发送错误 GCM tag 帧 stNum=%d sqNum=%d' % (st,sq),flush=True)
                 time.sleep(.05)
-            ethernet.send(packet)
+            if args.mode != 'tamper':
+                ethernet.send(packet)
             if args.mode == 'replay':
                 time.sleep(.05)
                 ethernet.send(packet)  # Exact bytes: never re-encrypt with a reused nonce.

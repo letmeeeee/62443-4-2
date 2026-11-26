@@ -1,0 +1,5 @@
+"""Build-only state. Imported by compiled modules before their original code."""
+from pathlib import Path
+
+entry = None
+logical_root = Path('/home/zlg/app')

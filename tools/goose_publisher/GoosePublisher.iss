@@ -2,12 +2,12 @@
 [Setup]
 AppId={{534578A3-1F80-4129-81F0-A4379A53C954}
 AppName=GOOSE Secure Publisher
-AppVersion=2026.11.18
+AppVersion=2026.11.24
 AppPublisher=LC400 Development
 DefaultDirName={autopf}\GoosePublisher
 DefaultGroupName=GOOSE Secure Publisher
 OutputDir=dist
-OutputBaseFilename=GoosePublisher-Setup-2026.11.18
+OutputBaseFilename=GoosePublisher-Setup-2026.11.24
 PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible

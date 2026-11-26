@@ -8,7 +8,7 @@
 
 ```text
 tools\goose_publisher\build_windows.bat       → dist\GoosePublisher.exe
-tools\goose_publisher\build_installer.bat     → dist\GoosePublisher-Setup-2026.11.18.exe
+tools\goose_publisher\build_installer.bat     → dist\GoosePublisher-Setup-2026.11.24.exe
 ```
 
 首次构建需联网下载 Python 依赖；脚本使用独立 `.venv-windows`。也可指定 Python：
@@ -32,6 +32,8 @@ Inno Setup 不在默认位置时，设置 `ISCC_EXE` 为 `ISCC.exe` 完整路径
 设备必须放行 **UDP 30001**，TCP 30001 不能替代。UDP 握手和二层 EtherType `0x88b8` 发包使用同一选定网卡。独立运行之间停止旧发布端并空闲超过 30 秒，或经确认后重启设备服务。
 
 正常、重放、篡改、明文、错误 HELLO 签名的含义见 README。界面显示“已发送”仅代表提交发包；是否收到和解密仍需对照设备的 `GOOSE authenticated`、拒绝日志和抓包。
+
+2026-11-24：篡改模式改为仅发送错误 tag；原来“错误 tag + 原合法帧”的行为移到“篡改恢复”选项。重放模式仍先发一帧合法数据再重复其原始字节，首次合法数据可以入队，重复副本不可以。订阅端需同步部署本次 `middle.c` 去重修复。
 
 ## 排错
 

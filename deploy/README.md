@@ -1,5 +1,16 @@
 # 现有 EM-1000 一键升级
 
+无授权、无需 C 编译的字节码分发可使用 `python3 deploy/build_pyc.py`，见
+[PYC_BUILD.md](PYC_BUILD.md)。支持 x86 生成版本匹配的 ARM64 CPython 字节码，
+但 `.pyc` 不等于强代码混淆。
+
+快速 Python 混淆可使用 `python3 deploy/build_pyarmor.py`，见
+[PYARMOR_BUILD.md](PYARMOR_BUILD.md)；设备继续用 Python 启动，Shell 保留明文。
+
+设备端 Python 代码保护构建见 [PROTECTED_BUILD.md](PROTECTED_BUILD.md)，Shell 保留明文脚本。
+构建入口为 `python3 deploy/build_protected.py`，不改写业务源码或自动部署；
+保护产物与本页的源码升级包格式不同，不能交给现有安装器直接安装。
+
 ## 桌面 GUI
 
 在 Ubuntu 开发机、项目根目录启动：

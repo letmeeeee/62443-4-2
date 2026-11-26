@@ -9,7 +9,8 @@ import webbrowser
 
 from . import runner
 
-MODES = {'正常加密发送':'normal', '重放：合法帧 + 重复帧':'replay', '篡改：错误 tag + 原合法帧':'tamper',
+MODES = {'正常加密发送':'normal', '重放：合法帧 + 重复帧':'replay', '篡改：仅错误 tag':'tamper',
+         '篡改恢复：错误 tag + 原合法帧':'tamper-recover',
          '明文拒绝测试':'plaintext', 'HELLO 错误签名测试':'bad-signature'}
 
 

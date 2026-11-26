@@ -39,10 +39,10 @@ log "HTTPS 脚本开始：mode=$MODE pid=$$ config=$CONFIG_FILE log=$LOG_FILE"
 for tool in python3 openssl nginx flock systemctl; do
     command -v "$tool" >/dev/null || die "缺少依赖: $tool"
 done
-[ -f /home/zlg/app/main.py ] || die "未检测到目标设备 /home/zlg/app/main.py"
+[ -f /home/zlg/app/main.pyc ] || die "未检测到目标设备 /home/zlg/app/main.pyc"
 # 校验配置先于文件修改；配置缺失不猜测 IP、不覆盖原 INI。
-DEVICE_IPS="$(python3 "$SCRIPT_DIR/https_config.py" "$CONFIG_FILE")" || exit 1
-CERTIFICATE_MODE="$(python3 "$SCRIPT_DIR/https_config.py" --certificate-mode "$CONFIG_FILE")" || exit 1
+DEVICE_IPS="$(python3 "$SCRIPT_DIR/https_config.pyc" "$CONFIG_FILE")" || exit 1
+CERTIFICATE_MODE="$(python3 "$SCRIPT_DIR/https_config.pyc" --certificate-mode "$CONFIG_FILE")" || exit 1
 read -r -a IP_ARRAY <<< "$DEVICE_IPS"
 SAN="$(printf 'IP:%s\n' "${IP_ARRAY[@]}" | paste -sd, -)"
 if [ -d /etc/nginx/conf.d ]; then
@@ -55,7 +55,7 @@ fi
 NGINX_CONF="$NGINX_CONF_DIR/g3_https.conf"
 if [ "$MODE" = --check ]; then
     log "INI 设备 IP: $DEVICE_IPS；证书模式: $CERTIFICATE_MODE"
-    python3 "$SCRIPT_DIR/https_certificates.py" --config "$CONFIG_FILE" --dir "$CERT_DIR" check
+    python3 "$SCRIPT_DIR/https_certificates.pyc" --config "$CONFIG_FILE" --dir "$CERT_DIR" check
     openssl x509 -in "$CERT_FILE" -noout -subject -enddate -ext subjectAltName
     nginx -t
     systemctl status --no-pager nginx g3-https.service g3-cert-renew.timer
@@ -91,8 +91,51 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 # Only CA-issued identities may be deployed. Renewal never creates a local leaf certificate.
-python3 "$SCRIPT_DIR/https_certificates.py" --config "$CONFIG_FILE" --dir "$CERT_DIR" reconcile \
-    --renew-window-days "$RENEW_WINDOW_DAYS" || die "CA 证书尚未就绪；请按当前 PKI 流程导入有效身份证书"
+# Revocation remains a strict health/import check, but does not block nginx startup.
+if python3 "$SCRIPT_DIR/https_certificates.pyc" --config "$CONFIG_FILE" --dir "$CERT_DIR" reconcile \
+    --renew-window-days "$RENEW_WINDOW_DAYS"; then
+    :
+else
+    # reconcile hides the underlying error. Only the exact revoked result is allowed.
+    if PKI_CHECK_OUTPUT="$(python3 "$SCRIPT_DIR/https_certificates.pyc" --config "$CONFIG_FILE" --dir "$CERT_DIR" check 2>&1)"; then
+        die "HTTPS reconcile 失败但复查通过；请检查日志后重试"
+    else
+        printf '%s\n' "$PKI_CHECK_OUTPUT"
+        [ "$PKI_CHECK_OUTPUT" = "HTTPS PKI error: Certificate revocation check failed: CERTIFICATE_REVOKED" ] ||
+            die "HTTPS 身份校验失败；请检查上述具体原因"
+    fi
+    # The normal check stops at revocation before checking the key and CN/SAN.
+    # Revalidate all other identity requirements without changing the CRL store.
+    python3 - "$SCRIPT_DIR" "$CONFIG_FILE" "$CERT_DIR" <<'PY_VERIFY' || die "HTTPS 身份存在吊销以外的错误，禁止应用"
+import sys
+import subprocess
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+import pki_common as pki
+from https_certificates import key_public
+from https_config import read_device_ips
+
+try:
+    settings = pki.read_config(Path(sys.argv[2]))
+    directory = Path(sys.argv[3])
+    certificate = directory / 'g3.crt'
+    if settings['mode'] != 'external_ca':
+        raise ValueError('HTTPS CA provisioning requires external_ca mode')
+    if certificate.is_symlink():
+        raise ValueError('Certificate cannot be a symbolic link')
+    leaf, _ = pki.validate_identity(certificate.read_bytes(), None,
+                                  settings['ca_file'], 'sslserver')
+    if pki.public_key(leaf) != key_public(directory / 'g3.key'):
+        raise ValueError('HTTPS certificate does not match the device private key')
+    expected = {('IP', ip) for ip in read_device_ips(settings['config_file'])}
+    if not pki.subject_cn(leaf).startswith('LC400-') or not expected.issubset(pki.san_values(leaf)):
+        raise ValueError('HTTPS certificate CN/SAN does not match the current device configuration')
+except (OSError, ValueError, subprocess.SubprocessError) as error:
+    print('HTTPS PKI error: ' + str(error), file=sys.stderr)
+    sys.exit(1)
+PY_VERIFY
+    log "[WARN] CERTIFICATE_REVOKED：当前 HTTPS 身份已吊销；继续启动 nginx，--check 仍报告失败，请尽快替换证书"
+fi
 CURRENT_CERT_HASH="$(openssl dgst -sha256 -r "$CERT_FILE")"
 CURRENT_CERT_HASH="${CURRENT_CERT_HASH%% *}"
 APPLIED_CERT_HASH="$(cat "$CERT_DIR/.applied-cert.sha256" 2>/dev/null || true)"
@@ -177,10 +220,10 @@ if [ "$MODE" = --install-service ]; then
     install -d -m 755 /usr/local/lib/g3-https
     if [ "$SCRIPT_DIR" != /usr/local/lib/g3-https ]; then
         install -m 755 "$SCRIPT_DIR/enable_https.sh" /usr/local/lib/g3-https/enable_https.sh
-        install -m 644 "$SCRIPT_DIR/https_config.py" /usr/local/lib/g3-https/https_config.py
-        install -m 644 "$SCRIPT_DIR/https_certificates.py" /usr/local/lib/g3-https/https_certificates.py
-        install -m 644 "$SCRIPT_DIR/pki_common.py" /usr/local/lib/g3-https/pki_common.py
-        install -m 644 "$SCRIPT_DIR/crl_store.py" /usr/local/lib/g3-https/crl_store.py
+        install -m 644 "$SCRIPT_DIR/https_config.pyc" /usr/local/lib/g3-https/https_config.py
+        install -m 644 "$SCRIPT_DIR/https_certificates.pyc" /usr/local/lib/g3-https/https_certificates.py
+        install -m 644 "$SCRIPT_DIR/pki_common.pyc" /usr/local/lib/g3-https/pki_common.py
+        install -m 644 "$SCRIPT_DIR/crl_store.pyc" /usr/local/lib/g3-https/crl_store.py
     fi
     if ! systemctl cat nginx.service >/dev/null 2>&1; then
         NGINX_BIN="$(command -v nginx)"
