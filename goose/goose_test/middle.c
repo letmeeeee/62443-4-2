@@ -261,9 +261,18 @@ static int modbus_write_registers(uint16_t addr, const uint16_t* values, uint16_
     }
 
     ssize_t to_send = 13 + count * 2;
+    static uint64_t requests;
+    int trace_request=goose_log_sample(++requests);
+    if (trace_request) {
+        GLOG("INFO","Modbus TX peer=%s:%d fd=%d tid=%u unit=%u func=0x10 addr=%u count=%u bytes=%zd",
+             MODBUS_SERVER_IP,MODBUS_SERVER_PORT,g_modbus_sock,tid,unit,addr,count,to_send);
+        GPACKET("Modbus TX wire",buf,(size_t)to_send);
+    }
     ssize_t n = send(g_modbus_sock, buf, to_send, 0);
     if (n != to_send) {
-        perror("modbus send");
+        int error=n < 0 ? errno : 0;
+        GLOG("ERROR","Modbus TX failed tid=%u addr=%u count=%u expected=%zd sent=%zd errno=%d reason=%s",
+             tid,addr,count,to_send,n,error,error ? strerror(error) : "short send");
         return -1;
     }
 
@@ -271,11 +280,19 @@ static int modbus_write_registers(uint16_t addr, const uint16_t* values, uint16_
     uint8_t resp[64];
     ssize_t r = recv(g_modbus_sock, resp, sizeof(resp), 0);
     if (r < 0) {
-        perror("modbus recv");
+        int error=errno;
+        GLOG("ERROR","Modbus RX failed tid=%u addr=%u count=%u errno=%d reason=%s; check server TLS/plaintext mode and server logs",
+             tid,addr,count,error,strerror(error));
         return -1;
     }
+    if (trace_request || r < 12) {
+        GLOG("INFO","Modbus RX tid=%u addr=%u count=%u bytes=%zd response_func=0x%02x exception=%d",
+             tid,addr,count,r,r>=8 ? resp[7] : 0,r>=9 && resp[7]==0x90 ? resp[8] : -1);
+        GPACKET("Modbus RX wire",resp,(size_t)r);
+    }
     if (r < 12) {
-        fprintf(stderr, "modbus: short response (%zd)\n", r);
+        GLOG("ERROR","Modbus RX incomplete tid=%u addr=%u bytes=%zd reason=%s",
+             tid,addr,r,r==0 ? "peer closed connection" : "short response (possibly exception PDU)");
         return -1;
     }
 
@@ -491,6 +508,8 @@ static void queue_push(uint16_t addr, const uint16_t* values, uint16_t count, ui
     pthread_mutex_lock(&g_q_mutex);
     if (g_q_count == QUEUE_SIZE) {
         /* drop oldest to make room */
+        GLOG("WARNING","Modbus queue full: dropping previously authorized addr=%u stNum=%u sqNum=%u for new stNum=%u sqNum=%u",
+             g_queue[g_q_head].addr,g_queue[g_q_head].stNum,g_queue[g_q_head].sqNum,stNum,sqNum);
         g_q_head = (g_q_head + 1) % QUEUE_SIZE;
         g_q_count--;
     }
@@ -501,8 +520,11 @@ static void queue_push(uint16_t addr, const uint16_t* values, uint16_t count, ui
     g_queue[g_q_tail].sqNum = sqNum;
     g_q_tail = (g_q_tail + 1) % QUEUE_SIZE;
     g_q_count++;
+    int depth=g_q_count;
     pthread_cond_signal(&g_q_cond);
     pthread_mutex_unlock(&g_q_mutex);
+    GLOG("INFO","Modbus batch queued addr=%u count=%u stNum=%u sqNum=%u depth=%d",
+         addr,count,stNum,sqNum,depth);
 }
 
 static int queue_pop(QueueEntry* out)
@@ -564,6 +586,7 @@ typedef struct
     /* 最近一次收到的上层 stNum，用于去重 */
     uint32_t lastUpperStNum;
     bool lastUpperStNumValid;
+    uint64_t stateRetransmissions;
 } UpstreamSubscriber_t;
 
 static UpstreamSubscriber_t  g_up   = {0};
@@ -750,7 +773,7 @@ static bool parseUpperDataset(GooseSubscriber subscriber, GoosePower_t* outpower
         }
         outpower->powerset[i] = MmsValue_toInt32(tmp);
     }
-    printf("Receive data lenth: %d\n", count);
+    // printf("Receive data lenth: %d\n", count);
 
     return true;
 }
@@ -774,6 +797,9 @@ static void onUpperGooseReceived(GooseSubscriber subscriber, void* parameter)
      * 因为同一状态变化后，上层会按 sqNum 重发很多帧
      */
     if (g_up.lastUpperStNumValid && stNum == g_up.lastUpperStNum) {
+        if (goose_log_sample(++g_up.stateRetransmissions))
+            GLOG("INFO","Authenticated GOOSE same-state retransmission ignored: stNum=%u sqNum=%u duplicates=%llu; no Modbus enqueue",
+                 stNum,sqNum,(unsigned long long)g_up.stateRetransmissions);
         return;
     }
 
@@ -878,6 +904,7 @@ static int resetUpstreamSession(void)
     g_up.subscriber = next;
     GooseReceiver_addSubscriber(g_up.receiver, next);
     g_up.lastUpperStNumValid = false;
+    g_up.stateRetransmissions = 0;
     GLOG("INFO", "New authenticated GOOSE session: decoder counters reset");
     return 0;
 }

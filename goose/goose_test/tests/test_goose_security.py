@@ -424,3 +424,32 @@ def test_log_format_and_no_private_key_disclosure(material,native,session,tmp_pa
     import re
     assert re.search(r'\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}\] \[goose_security.c:\d+\] \[\w+\] \[INFO\]',text)
     assert 'PRIVATE KEY' not in text and ems.key.hex() not in text
+
+
+def test_rejection_log_correlates_untrusted_counters(material,native,session,tmp_path):
+    ems=EMS(material); ems.handshake(native,session)
+    packet=ems.frame(st=7,sq=2)
+    receive(native,session,packet[:-1]+bytes([packet[-1]^1]),False)
+    receive(native,session,packet)
+    receive(native,session,packet,False)
+    text=next((tmp_path/'logs').glob('*.log')).read_text()
+    assert 'blocked before decoder/Modbus: reason=GCM tag mismatch' in text
+    assert 'untrusted_stNum=7 untrusted_sqNum=2' in text
+    assert 'last_accepted_stNum=7 last_accepted_sqNum=2' in text
+    assert 'reason=replayed/out-of-order frame' in text
+    assert ems.key.hex() not in text
+
+
+def test_packet_trace_is_opt_in_and_bounded(native,tmp_path,monkeypatch):
+    monkeypatch.setenv('GOOSE_LOG_DIR',str(tmp_path))
+    native.goose_log_packet.argtypes=[ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_char_p,
+                                     ctypes.c_void_p,ctypes.c_size_t]
+    wire=bytes(range(100))
+    monkeypatch.delenv('GOOSE_PACKET_TRACE',raising=False)
+    native.goose_log_packet(b'test.c',1,b'test',b'wire-test',wire,len(wire))
+    assert not list(tmp_path.glob('*.log'))
+    monkeypatch.setenv('GOOSE_PACKET_TRACE','1')
+    native.goose_log_packet(b'test.c',1,b'test',b'wire-test',wire,len(wire))
+    text=next(tmp_path.glob('*.log')).read_text()
+    assert 'bytes=100 shown=64' in text
+    assert '3e 3f ...' in text and '3f 40' not in text

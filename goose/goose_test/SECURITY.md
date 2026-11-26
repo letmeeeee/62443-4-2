@@ -153,6 +153,23 @@ sudo systemctl status goose_middle.service --no-pager -l
 
 日志默认 `/mnt/nvme/goose_log/YYYY-MM-DD.log`，格式与 DPrint 一致：
 
+2026-11-26 补充诊断：默认打印抽样的 HELLO/ACK 来源、长度、以太网源 MAC/APPID、
+认证通过、拒绝原因及未认证 stNum/sqNum、上一接受计数；握手/以太网高频日志首 10 条
+及每 1000 条输出。重复状态明确打印 `no Modbus enqueue`；Modbus 队列记录地址、数量、
+stNum/sqNum/深度，收发记录 tid/功能码/长度、errno、异常码。启动错误包含具体失败阶段。
+
+需要十六进制线缆报文时，在设备执行 `systemctl edit goose_middle.service` 添加：
+
+```ini
+[Service]
+Environment=GOOSE_PACKET_TRACE=1
+```
+
+然后执行 `systemctl daemon-reload` 和 `systemctl restart goose_middle.service`。
+该选项每条最多输出 64 字节，跟随报文元数据抽样；仅用于握手、网卡收到的密文
+及 Modbus 线缆请求/响应，不打印解密后的 GOOSE allData、私钥或会话密钥。
+Modbus 线缆数据包含业务寄存器内容。排障后将该选项改为 `0` 并重启服务。
+
 ```text
 [2026-11-17 15:00:00.123456] [goose_security.c:123] [gsec_hello] [INFO] GOOSE session established...
 ```

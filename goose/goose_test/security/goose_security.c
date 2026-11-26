@@ -38,9 +38,14 @@ static int reject(GooseSecurity *s, const char *reason)
 {
     s->rejected++;
     /* Log first failures and aggregate persistent floods without per-packet disk I/O. */
-    if (s->rejected <= 10 || s->rejected % 1000 == 0)
-        GLOG("WARNING", "GOOSE rejected: %s accepted=%llu rejected=%llu last_cert_error=%d", reason,
-             (unsigned long long)s->accepted, (unsigned long long)s->rejected, s->last_cert_error);
+    if (goose_log_sample(s->rejected)) {
+        char crypto_error[256]="none";
+        unsigned long error=ERR_peek_last_error();
+        if (error) ERR_error_string_n(error,crypto_error,sizeof(crypto_error));
+        GLOG("WARNING", "GOOSE rejected: %s accepted=%llu rejected=%llu last_cert_error=%d cert_reason=%s crypto_error=%s",
+             reason,(unsigned long long)s->accepted,(unsigned long long)s->rejected,
+             s->last_cert_error,X509_verify_cert_error_string(s->last_cert_error),crypto_error);
+    }
     ERR_clear_error();
     return -1;
 }
@@ -410,6 +415,7 @@ int gsec_open_frame(GooseSecurity *s, const uint8_t *frame, size_t size,
     size_t eth = 14, offset, length;
     uint32_t st = 0, sq = 0, ignored, expected_entries=0;
     int out = 0, final = 0, result = -1;
+    int counters_parsed = 0;
     memset(plain,0,GSEC_MAX_FRAME); *new_session = 0;
     if (size < 22 || size > GSEC_MAX_FRAME || memcmp(frame,s->destination,6)) goto done;
     if (frame[12]==0x81 && frame[13]==0) eth = 18;
@@ -441,6 +447,7 @@ int gsec_open_frame(GooseSecurity *s, const uint8_t *frame, size_t size,
         !integer(p,&fields[1],&ignored) || !integer(p,&fields[5],&st) ||
         !integer(p,&fields[6],&sq) || !integer(p,&fields[8],&ignored) ||
         !integer(p,&fields[10],&expected_entries)) goto done;
+    counters_parsed=1;
     if (!ber(p,outer.end,&offset,&security) || security.tag != 0x9c ||
         security.length != 19 || offset != outer.end ||
         memcmp(p+security.value,"\x01\x00\x01",3)) goto done;
@@ -488,12 +495,17 @@ int gsec_open_frame(GooseSecurity *s, const uint8_t *frame, size_t size,
     clock_gettime(CLOCK_MONOTONIC,&s->last_activity);
     *new_session=s->first_frame; s->first_frame=0;
     s->accepted++;
-    if (s->accepted==1 || s->accepted%1000==0)
+    if (goose_log_sample(s->accepted))
         GLOG("INFO","GOOSE authenticated APPID=0x%04x stNum=%u sqNum=%u accepted=%llu rejected=%llu",
              s->appid,st,sq,(unsigned long long)s->accepted,(unsigned long long)s->rejected);
     result=(int)total;
 done:
     EVP_CIPHER_CTX_free(ctx); OPENSSL_cleanse(candidate,sizeof(candidate));
-    if (result<0) return reject(s,reason);
+    if (result<0) {
+        if (goose_log_sample(s->rejected+1))
+            GLOG("WARNING","GOOSE blocked before decoder/Modbus: reason=%s bytes=%zu counters_parsed=%d untrusted_stNum=%u untrusted_sqNum=%u last_accepted_stNum=%u last_accepted_sqNum=%u",
+                 reason,size,counters_parsed,st,sq,s->last_st,s->last_sq);
+        return reject(s,reason);
+    }
     return result;
 }

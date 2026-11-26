@@ -78,6 +78,10 @@ def test_tamper_replay_and_sq_retransmission_do_not_repeat_writes(material,nativ
     assert result < 0 and writes == 2
     result,writes=feed(bridge,session,changed)
     assert result > 0 and writes == 4
+    text=next((tmp_path/'logs').glob('*.log')).read_text()
+    assert 'same-state retransmission ignored: stNum=1 sqNum=1' in text
+    assert 'Modbus batch queued addr=27204 count=4 stNum=1 sqNum=0' in text
+    assert 'Modbus TX peer=127.0.0.1:1502' in text and 'Modbus RX tid=' in text
 
 
 def test_plaintext_and_modified_authenticated_header_never_write(material,native,session,tmp_path,bridge):

@@ -12,6 +12,8 @@ ExecStartPre=/bin/mkdir -p /mnt/nvme/goose_log
 ExecStart=/home/zlg/goose_middle
 Environment=GOOSE_PKI_DIR=/etc/ems/goose
 Environment=GOOSE_LOG_DIR=/mnt/nvme/goose_log
+# Optional bounded wire hex diagnostics; enable only while troubleshooting.
+# Environment=GOOSE_PACKET_TRACE=1
 Restart=on-failure
 RestartSec=5
 KillSignal=SIGTERM

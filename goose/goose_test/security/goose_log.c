@@ -13,6 +13,26 @@
 
 static pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 
+int goose_log_sample(uint64_t count)
+{
+    return count <= 10 || count % 1000 == 0;
+}
+
+void goose_log_packet(const char *file, int line, const char *func,
+                      const char *label, const void *data, size_t size)
+{
+    const char *enabled = getenv("GOOSE_PACKET_TRACE");
+    if (!enabled || strcmp(enabled,"1") || !data) return;
+    const unsigned char *bytes=data;
+    char hex[64*3+1];
+    size_t shown=size < 64 ? size : 64;
+    for (size_t i=0;i<shown;i++)
+        snprintf(hex+i*3,4,"%02x%s",bytes[i],i+1==shown ? "" : " ");
+    if (!shown) hex[0]=0;
+    goose_log_write(file,line,func,"DEBUG","%s bytes=%zu shown=%zu hex=%s%s",
+                    label,size,shown,hex,size>shown ? " ..." : "");
+}
+
 void goose_log_write(const char *file, int line, const char *func,
                      const char *level, const char *format, ...)
 {
