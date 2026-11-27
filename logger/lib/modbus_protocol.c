@@ -195,11 +195,6 @@ void Modbus_TCP_Write_Single(int socket_fd, INT8U device_id, INT8U cmd_type, INT
         return;
     }
     //发送
-    if (addr.D16 == 3004)
-    {
-        led_on();
-        LOG_INFO("putdown active power to PCS, addr:%d,value:%d", addr.D16, val.D16);
-    }
 //    led_on();
     Modbus_Send(socket_fd, SendBuffer, 12);
   //led_off();

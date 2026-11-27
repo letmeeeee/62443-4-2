@@ -334,7 +334,7 @@ int main(int argc, char* argv[])
     log_Init();
     LOG_INFO("本地控制器启动!!");
 
-    led_on();
+    // led_on();
     //读取配置文件init的内容 Read the contents of the configuration file init
     AppConf_Init();
     Output_Init_Log();
