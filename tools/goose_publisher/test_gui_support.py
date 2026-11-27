@@ -1,6 +1,7 @@
 """GUI runner checks with real crypto/C receiver and mocked Windows I/O."""
 import ctypes
 import io
+import json
 from pathlib import Path
 import socket
 import struct
@@ -77,7 +78,8 @@ def test_adapter_primary_ipv4_fallback_and_exclusion_reasons():
 
 
 @pytest.mark.parametrize('mode',['normal','replay','tamper','tamper-recover','plaintext','bad-signature'])
-def test_runner_modes_real_c_peer_and_mocked_driver(material,native,session,tmp_path,monkeypatch,mode):
+@pytest.mark.parametrize('custom',[False,True])
+def test_runner_modes_real_c_peer_and_mocked_driver(material,native,session,tmp_path,monkeypatch,mode,custom):
     pub = publisher(material,tmp_path,verifier=verify_certificate)
     monkeypatch.setattr(runner,'bind_udp',lambda sock,adapter:None)
     sent,accepted,logs = [],[],[]
@@ -106,6 +108,9 @@ def test_runner_modes_real_c_peer_and_mocked_driver(material,native,session,tmp_
     ethernet = Ethernet()
     data = dict(target='192.168.2.136',count='2',interval='1',values='0,0,0,0,0,0,0,0',mode=mode,
                 cert='',key='',ca='',crl='',change_state=False)
+    if custom:
+        data['custom_frames']=json.dumps([dict(stNum=7,sqNum=10,values=list(range(8))),
+                                         dict(stNum=8,sqNum=0,values=list(range(8,16)))])
     adapter = runner.Adapter('Ethernet','Intel','NPF-guid','192.168.2.254','00:11:22:33:44:55',20)
     result = runner.run(data,adapter,Stop(),logs.append,publisher_factory=lambda *args:pub,
                         udp_factory=UDP,ethernet_factory=lambda adapter:ethernet)
@@ -116,6 +121,35 @@ def test_runner_modes_real_c_peer_and_mocked_driver(material,native,session,tmp_
         assert result == 'finished'
         assert accepted == {'normal':[True,True], 'replay':[True,False,True,False],
                             'tamper':[False,False], 'tamper-recover':[False,True,False,True], 'plaintext':[False,False]}[mode]
+
+
+def test_custom_plan_and_counter_overflow():
+    data=dict(count=2,st_start=3,sq_start=10,values='1,2,3,4,5,6,7,8')
+    assert [row[:2] for row in runner.frame_plan(data)] == [(3,10),(3,11)]
+    assert [row[:2] for row in runner.frame_plan(dict(data,change_state=True))] == [(3,10),(4,0)]
+    with pytest.raises(ValueError):
+        runner.frame_plan(dict(data,sq_start=0xffffffff))
+    for rows in ([dict(stNum=1,sqNum=0,values=[0]*8)]*2,
+                 [dict(stNum=1,sqNum=0,values=[0]*7)],
+                 [dict(stNum=True,sqNum=0,values=[0]*8)]):
+        with pytest.raises(ValueError):
+            runner.frame_plan(dict(data,custom_frames=json.dumps(rows)))
+
+
+def test_custom_wire_headers(material,native,session,tmp_path):
+    pub=publisher(material,tmp_path,verifier=verify_certificate)
+    pub.accept_ack(handshake(pub,native,session))
+    options=runner.frame_options(dict(appid='0x1234',reference='custom/LLN0$GO$test',destination='01:0c:cd:01:00:09'))
+    packet=pub.frame(bytes(6),[0]*8,**options)
+    assert packet[:6] == bytes.fromhex('010ccd010009')
+    assert packet[14:16] == b'\x12\x34'
+    assert b'custom/LLN0$GO$test' in packet
+    # The fixed subscriber must reject an unconfigured destination/APPID/reference.
+    output=ctypes.create_string_buffer(2048); first=ctypes.c_int()
+    assert native.gsec_open_frame(session,packet,len(packet),output,ctypes.byref(first)) < 0
+    for data in (dict(appid='65536'),dict(destination='00:11:22:33:44:55'),dict(reference='')):
+        with pytest.raises(ValueError):
+            runner.frame_options(data)
 
 
 def test_stop_before_handshake_does_not_open_sockets():
@@ -139,3 +173,36 @@ def test_buildkit_contains_only_allowlisted_sources(tmp_path,monkeypatch):
         assert len(names) == len(prepare_windows.FILES)+2
         assert not any(name.endswith(('.key','.log','.crt','.pem')) for name in names)
         assert b'\r\n' in archive.read('tools/goose_publisher/build_installer.bat')
+
+
+def test_config_roundtrip_without_display(tmp_path,monkeypatch):
+    from tools.goose_publisher import gui
+    class Value:
+        def __init__(self,value): self.value=value
+        def get(self,*args): return self.value
+        def set(self,value): self.value=value
+        def delete(self,*args): self.value=''
+        def insert(self,index,value): self.value=value
+    app=gui.Application.__new__(gui.Application)
+    app.fields={k:Value(v) for k,v in dict(count='2',interval='1',values='0,0,0,0,0,0,0,0',
+        st_start='1',sq_start='0',appid='0x1234',reference='custom/LLN0$GO$test',
+        destination='01:0c:cd:01:00:09',key='secret-key-path').items()}
+    app.mode=Value(next(iter(gui.MODES)))
+    app.change_state=Value(False)
+    app.use_custom=Value(True)
+    app.frame_editor=Value(json.dumps([dict(stNum=7,sqNum=10,values=list(range(8)))]))
+    logs=[]; errors=[]
+    app.log=logs.append
+    monkeypatch.setattr(gui.messagebox,'showerror',lambda *args:errors.append(args))
+    path=tmp_path/'config.json'
+    monkeypatch.setattr(gui.filedialog,'asksaveasfilename',lambda **kwargs:str(path))
+    monkeypatch.setattr(gui.filedialog,'askopenfilename',lambda **kwargs:str(path))
+    app.export_config()
+    assert 'secret-key-path' not in path.read_text()
+    original=app.packet_config()
+    app.fields['appid'].set('0x1000'); app.use_custom.set(False)
+    app.import_config()
+    assert app.packet_config() == original
+    path.write_text('{"format":"unsupported"}')
+    app.import_config()
+    assert errors and app.packet_config() == original

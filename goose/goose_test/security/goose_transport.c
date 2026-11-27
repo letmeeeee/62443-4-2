@@ -34,6 +34,9 @@ static void *receive_loop(void *arg)
     int wait_logged=0;
     int have_session=0;
     uint64_t hello_count=0,frame_count=0,read_errors=0;
+    double hello_tokens=10.0;
+    struct timespec hello_refill=started;
+    uint64_t hello_limited=0;
     for (;;) {
         fd_set fds;
         FD_ZERO(&fds); FD_SET(t->ethernet,&fds); FD_SET(t->udp,&fds); FD_SET(t->wake[0],&fds);
@@ -53,6 +56,22 @@ static void *receive_loop(void *arg)
             struct sockaddr_in peer={0}; socklen_t peer_len=sizeof(peer);
             ssize_t n=recvfrom(t->udp,packet,GSEC_MAX_HANDSHAKE+1,MSG_TRUNC,(struct sockaddr *)&peer,&peer_len);
             if(n>0 && n<=GSEC_MAX_HANDSHAKE && peer_len==sizeof(peer) && peer.sin_family==AF_INET) {
+                /* Bound expensive X.509/ECDSA work on the shared receive thread. */
+                struct timespec tick;
+                clock_gettime(CLOCK_MONOTONIC, &tick);
+                double elapsed=(double)(tick.tv_sec-hello_refill.tv_sec) +
+                    (double)(tick.tv_nsec-hello_refill.tv_nsec)/1000000000.0;
+                if (elapsed > 0) {
+                    hello_tokens += elapsed * 5.0;
+                    if (hello_tokens > 10.0) hello_tokens=10.0;
+                    hello_refill=tick;
+                }
+                if (hello_tokens < 1.0) {
+                    if (goose_log_sample(++hello_limited))
+                        GLOG("WARNING", "GSEC1 HELLO rate limited dropped=%llu", (unsigned long long)hello_limited);
+                    continue;
+                }
+                hello_tokens -= 1.0;
                 int sampled=goose_log_sample(++hello_count);
                 char address[INET_ADDRSTRLEN]="?";
                 inet_ntop(AF_INET,&peer.sin_addr,address,sizeof(address));

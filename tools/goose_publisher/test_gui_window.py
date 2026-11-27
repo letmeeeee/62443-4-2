@@ -54,6 +54,23 @@ def test_tk_directory_pki_and_background_run(material,tmp_path,monkeypatch):
         app.start(); pump(root,app)
         assert len(calls) == 1 and calls[0][1] == adapter
         assert calls[0][0]['mode'] == 'normal'
+        app.use_custom.set(True)
+        app.fields['appid'].set('0x1234')
+        app.fields['destination'].set('01:0c:cd:01:00:09')
+        app.fields['reference'].set('custom/LLN0$GO$test')
+        config_path=tmp_path/'packets.json'
+        monkeypatch.setattr(gui.filedialog,'asksaveasfilename',lambda **kwargs:str(config_path))
+        app.export_config()
+        assert 'enc.key' not in config_path.read_text()
+        app.fields['appid'].set('0x1000')
+        app.use_custom.set(False)
+        monkeypatch.setattr(gui.filedialog,'askopenfilename',lambda **kwargs:str(config_path))
+        app.import_config()
+        assert app.fields['appid'].get() == '0x1234'
+        assert app.fields['destination'].get() == '01:0c:cd:01:00:09'
+        assert app.fields['reference'].get() == 'custom/LLN0$GO$test'
+        assert app.use_custom.get()
+        assert len(runner.frame_plan(app.data())) == 2
         assert app.status.get() == '发送完成'
         assert str(app.start_button.cget('state')) == 'normal'
         assert str(app.stop_button.cget('state')) == 'disabled'

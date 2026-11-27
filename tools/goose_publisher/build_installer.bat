@@ -12,6 +12,6 @@ if not defined GOOSE_ISCC (
 )
 "%GOOSE_ISCC%" GoosePublisher.iss
 if errorlevel 1 exit /b 1
-if not exist "dist\GoosePublisher-Setup-2026.11.24.exe" exit /b 1
-echo Built: %~dp0dist\GoosePublisher-Setup-2026.11.24.exe
+if not exist "dist\GoosePublisher-Setup-2026.11.26.exe" exit /b 1
+echo Built: %~dp0dist\GoosePublisher-Setup-2026.11.26.exe
 pause

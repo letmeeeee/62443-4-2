@@ -453,3 +453,20 @@ def test_packet_trace_is_opt_in_and_bounded(native,tmp_path,monkeypatch):
     text=next(tmp_path.glob('*.log')).read_text()
     assert 'bytes=100 shown=64' in text
     assert '3e 3f ...' in text and '3f 40' not in text
+
+
+def test_async_log_worker_flushes_on_stop(native,tmp_path,monkeypatch):
+    monkeypatch.setenv('GOOSE_LOG_DIR',str(tmp_path/'async-logs'))
+    native.goose_log_start_async.restype=ctypes.c_int
+    assert native.goose_log_start_async() == 0
+    try:
+        native.goose_log_packet.argtypes=[ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,
+                                         ctypes.c_char_p,ctypes.c_void_p,ctypes.c_size_t]
+        monkeypatch.setenv('GOOSE_PACKET_TRACE','1')
+        for i in range(20):
+            data=bytes([i])
+            native.goose_log_packet(b'test.c',1,b'test',b'async-wire',data,len(data))
+    finally:
+        native.goose_log_stop_async()
+    text=next((tmp_path/'async-logs').glob('*.log')).read_text()
+    assert text.count('async-wire') == 20

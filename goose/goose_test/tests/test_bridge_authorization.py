@@ -4,8 +4,10 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import struct
 
 import pytest
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/'tools/goose_publisher'))
@@ -34,6 +36,7 @@ def bridge_library(tmp_path_factory):
     lib=ctypes.CDLL(str(output))
     lib.bridge_feed.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.c_size_t]
     lib.bridge_write_byte.argtypes=[ctypes.c_uint,ctypes.c_uint]
+    lib.bridge_modbus_response_fault.argtypes=[ctypes.c_int]
     yield lib
 
 
@@ -96,3 +99,47 @@ def test_plaintext_and_modified_authenticated_header_never_write(material,native
     result,writes=feed(bridge,session,bytes(modified))
     assert result < 0 and writes==0
     assert feed(bridge,session,packet)[1]==2
+
+
+@pytest.mark.parametrize('fault', [0, 1, 2, 3, 4])
+def test_modbus_fragmented_response_and_invalid_replies(bridge, fault):
+    bridge.bridge_modbus_response_fault(fault)
+    result=bridge.bridge_modbus_probe()
+    assert (result == 0) == (fault == 0)
+
+
+def _resign_header(packet, key, old, new, st):
+    assert len(old) == len(new) and old in packet
+    frame=bytearray(packet.replace(old,new,1))
+    data=frame.index(b'\xab',22)
+    length=frame[data+1]
+    if length & 0x80:
+        width=length & 0x7f
+        length=int.from_bytes(frame[data+2:data+2+width],'big')
+        start=data+2+width
+    else:
+        start=data+2
+    body=frame.index(b'\x61',22)
+    aad_start=body+2 if frame[body+1]<128 else body+2+(frame[body+1]&0x7f)
+    aad=bytes(frame[aad_start:start])
+    plaintext=AESGCM(key).decrypt(struct.pack('!QI',st,0),packet[start:start+length]+packet[start+length+5:start+length+21],
+                                  bytes(packet[aad_start:start]))
+    sealed=AESGCM(key).encrypt(struct.pack('!QI',st,0),plaintext,aad)
+    frame[start:start+length]=sealed[:-16]
+    frame[start+length+5:start+length+21]=sealed[-16:]
+    return bytes(frame)
+
+
+@pytest.mark.parametrize('old,new', [
+    (b'TEMPLATEPIGO/LLN0$dsGOOSE1',b'TEMPLATEPIGO/LLN0$dsGOOSE2'),
+    (b'\x88\x01\x01',b'\x88\x01\x02'),
+    (b'\x87\x01\x00',b'\x87\x01\x01'),
+    (b'\x89\x01\x00',b'\x89\x01\x01'),
+])
+def test_authenticated_wrong_business_header_never_writes(material,native,session,tmp_path,bridge,old,new):
+    pub=publisher(material,tmp_path)
+    pub.accept_ack(handshake(pub,native,session))
+    packet=pub.frame(bytes(6),[1]*8)
+    modified=_resign_header(packet,pub.key,old,new,1)
+    result,writes=feed(bridge,session,modified)
+    assert result > 0 and writes == 0

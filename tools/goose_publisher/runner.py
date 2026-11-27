@@ -100,23 +100,67 @@ class Ethernet:
         self.socket.close()
 
 
+def frame_options(data):
+    appid_text = str(data.get('appid', '0x1000')).strip()
+    appid = int(appid_text, 16 if appid_text.lower().startswith('0x') else 10)
+    destination = bytes.fromhex(data.get('destination', '01:0c:cd:01:00:00').replace(':', '').replace('-', ''))
+    reference = data.get('reference', 'TEMPLATEPIGO/LLN0$GO$gocb1').encode('utf-8')
+    if not 0 <= appid <= 0xffff or len(destination) != 6 or not destination[0] & 1 or destination == b'\xff'*6:
+        raise ValueError('APPID 须为 uint16；目的 MAC 须为非广播组播 MAC')
+    if not 1 <= len(reference) <= 255 or b'\0' in reference:
+        raise ValueError('goCbRef 须为 1–255 字节且不含 NUL')
+    return dict(appid=appid, destination=destination, reference=reference)
+
+
+def frame_plan(data):
+    """Validate the complete plan before opening sockets or establishing a session."""
+    import json
+    custom = data.get('custom_frames', '').strip()
+    if custom:
+        rows = json.loads(custom)
+        if not isinstance(rows, list) or not 1 <= len(rows) <= 100000:
+            raise ValueError('自定义报文必须是含 1–100000 条记录的 JSON 数组')
+    else:
+        count = int(data['count'])
+        st, sq = int(data.get('st_start', 1)), int(data.get('sq_start', 0))
+        values = [int(item.strip()) for item in data['values'].replace('，', ',').split(',')]
+        if not 1 <= count <= 100000:
+            raise ValueError('帧数须为 1–100000')
+        rows = [dict(stNum=st+i if data.get('change_state') else st,
+                     sqNum=(sq if i == 0 else 0) if data.get('change_state') else sq+i,
+                     values=values) for i in range(count)]
+    plan = []
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise ValueError('第 %d 条报文必须是对象' % (index+1))
+        st, sq, values = row.get('stNum'), row.get('sqNum'), row.get('values')
+        if type(st) is not int or type(sq) is not int or not 1 <= st <= 0xffffffff or not 0 <= sq <= 0xffffffff:
+            raise ValueError('第 %d 条 stNum/sqNum 超出范围' % (index+1))
+        if not isinstance(values, list) or len(values) != 8 or any(type(v) is not int or not -(2**31) <= v < 2**31 for v in values):
+            raise ValueError('第 %d 条数据集必须是 8 个 int32 整数' % (index+1))
+        if plan and (st, sq) <= plan[-1][:2]:
+            raise ValueError('自定义报文计数必须严格递增；重放请使用重放模式，避免重复加密 nonce')
+        plan.append((st, sq, values))
+    return plan
+
+
 def validate(data):
+    frame_options(data)
     ip = ipaddress.IPv4Address(data['target'])
     if ip.is_unspecified or ip.is_loopback or ip.is_multicast or int(ip) == 0xffffffff:
         raise ValueError('请输入目标设备 net2 的单播 IPv4 地址')
     if data['mode'] not in ('normal','replay','tamper','tamper-recover','plaintext','bad-signature'):
         raise ValueError('测试模式不合法')
-    count, interval = int(data['count']), float(data['interval'])
-    if not 1 <= count <= 100000 or not .05 <= interval <= 5:
-        raise ValueError('帧数须为 1–100000；发送间隔为 0.05–5 秒')
-    values = [int(item.strip()) for item in data['values'].replace('，',',').split(',')]
-    if len(values) != 8 or any(not -(2**31) <= value < 2**31 for value in values):
-        raise ValueError('数据集必须是 8 个逗号分隔的 int32 整数')
-    return str(ip), count, interval, values
+    interval = float(data['interval'])
+    if not .05 <= interval <= 5:
+        raise ValueError('发送间隔为 0.05–5 秒')
+    plan = frame_plan(data)
+    return str(ip), len(plan), interval, plan[0][2]
 
 
 def run(data, adapter, stop, log, *, publisher_factory=None, udp_factory=None, ethernet_factory=Ethernet):
     target, count, interval, values = validate(data)
+    plan = frame_plan(data)
     if publisher_factory is None:
         from .trust import verify_certificate
         publisher_factory = lambda cert,key,ca,crl: Publisher(cert,key,ca,crl,verifier=verify_certificate)
@@ -160,11 +204,10 @@ def run(data, adapter, stop, log, *, publisher_factory=None, udp_factory=None, e
                 raise ValueError('错误签名 HELLO 仍收到 ACK，请检查接收端')
             peer = publisher.accept_ack(ack)
             log('ACK 证书链、CRL、签名验证通过；ECDHE/HKDF 完成。对端='+peer)
-        for index in range(count):
+        for index, (st, sq, values) in enumerate(plan):
             if stop.is_set():
                 return 'stopped'
-            st,sq = (index+1,0) if data.get('change_state') else (1,index)
-            packet = publisher.frame(source,values,st,sq,plaintext=data['mode']=='plaintext')
+            packet = publisher.frame(source,values,st,sq,plaintext=data['mode']=='plaintext',**frame_options(data))
             if data['mode'] in ('tamper','tamper-recover'):
                 ethernet.send(packet[:-1]+bytes([packet[-1]^1]))
                 log('已发送错误 GCM tag 帧 stNum=%d sqNum=%d' % (st,sq))

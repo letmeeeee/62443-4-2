@@ -2,6 +2,7 @@
 from datetime import datetime
 from pathlib import Path
 import queue
+import json
 import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext, ttk
@@ -18,7 +19,7 @@ class Application:
     def __init__(self, root):
         self.root = root
         root.title('GOOSE 加密发布端测试工具')
-        root.geometry('1120x870')
+        root.geometry('1120x900')
         root.minsize(900,720)
         self.messages = queue.Queue()
         self.stop_event = threading.Event()
@@ -45,9 +46,16 @@ class Application:
         ttk.Button(self.form,text='选择 PKI 目录（自动填入四文件）',command=self.choose_directory).grid(row=6,column=1,sticky='w',pady=6)
         self.settings = ttk.LabelFrame(root,text='测试参数',padding=12)
         self.settings.pack(fill='x',padx=12,pady=8)
-        self.settings.columnconfigure(1,weight=1)
-        self.field(0,'values','8 个 int32 数据（逗号分隔）','0,0,0,0,0,0,0,0',parent=self.settings)
-        row = ttk.Frame(self.settings)
+        tabs=ttk.Notebook(self.settings)
+        tabs.pack(fill='x')
+        basic=ttk.Frame(tabs,padding=6)
+        advanced=ttk.Frame(tabs,padding=6)
+        tabs.add(basic,text='常规发送')
+        tabs.add(advanced,text='自定义报文 / 配置')
+        basic.columnconfigure(1,weight=1)
+        advanced.columnconfigure(1,weight=1)
+        self.field(0,'values','8 个 int32 数据（逗号分隔）','0,0,0,0,0,0,0,0',parent=basic)
+        row = ttk.Frame(basic)
         row.grid(row=1,column=0,columnspan=3,sticky='ew')
         for index,(name,label,default) in enumerate([('count','帧数','10'),('interval','间隔 / 秒','1')]):
             ttk.Label(row,text=label).grid(row=0,column=index*2,padx=5)
@@ -58,8 +66,23 @@ class Application:
         self.mode.current(0)
         self.mode.grid(row=0,column=5,padx=5)
         self.change_state = tk.BooleanVar(value=False)
-        ttk.Checkbutton(self.settings,text='每帧递增 stNum（用于连续业务转发；默认仅 sqNum 递增）',variable=self.change_state).grid(row=2,column=0,columnspan=3,sticky='w',pady=8)
-        ttk.Label(root,text='APPID 0x1000  |  组播 MAC 01:0c:cd:01:00:00  |  goCbRef TEMPLATEPIGO/LLN0$GO$gocb1').pack(anchor='w',padx=16)
+        ttk.Checkbutton(basic,text='每帧递增 stNum（用于连续业务转发；默认仅 sqNum 递增）',variable=self.change_state).grid(row=2,column=0,columnspan=3,sticky='w',pady=8)
+        for row,(name,label,default) in enumerate([
+            ('st_start','起始 stNum','1'),('sq_start','起始 sqNum','0'),
+            ('appid','APPID（十进制或 0x 十六进制）','0x1000'),
+            ('reference','goCbRef','TEMPLATEPIGO/LLN0$GO$gocb1'),
+            ('destination','目的组播 MAC','01:0c:cd:01:00:00')],0):
+            self.field(row,name,label,default,parent=advanced)
+        self.use_custom = tk.BooleanVar(value=False)
+        ttk.Checkbutton(advanced,text='逐帧编辑（JSON 数组，启用后覆盖帧数、起始计数和统一数据值）',variable=self.use_custom).grid(row=5,column=0,columnspan=3,sticky='w')
+        self.frame_editor = scrolledtext.ScrolledText(advanced,height=4,wrap='none')
+        self.frame_editor.grid(row=6,column=0,columnspan=3,sticky='ew')
+        self.frame_editor.insert('1.0',json.dumps([
+            dict(stNum=1,sqNum=0,values=[0]*8),dict(stNum=2,sqNum=0,values=[1]*8)],ensure_ascii=False,indent=2))
+        config_buttons = ttk.Frame(advanced)
+        config_buttons.grid(row=7,column=0,columnspan=3,sticky='w')
+        ttk.Button(config_buttons,text='导入报文配置',command=self.import_config).pack(side='left',padx=4,pady=4)
+        ttk.Button(config_buttons,text='导出报文配置',command=self.export_config).pack(side='left',padx=4,pady=4)
         ttk.Label(root,text='在隔离测试网络使用：合法数据可能触发 Modbus 写入。独立测试之间需停止发送并空闲超过 30 秒。').pack(anchor='w',padx=16,pady=4)
         controls = ttk.Frame(root,padding=10)
         controls.pack(fill='x')
@@ -106,7 +129,7 @@ class Application:
             self.saved_states = []
             def disable(parent):
                 for widget in parent.winfo_children():
-                    if isinstance(widget,(ttk.Entry,ttk.Combobox,ttk.Button,ttk.Checkbutton)):
+                    if isinstance(widget,(ttk.Entry,ttk.Combobox,ttk.Button,ttk.Checkbutton,tk.Text)):
                         self.saved_states.append((widget,widget.cget('state')))
                         widget.configure(state='disabled')
                     disable(widget)
@@ -148,11 +171,57 @@ class Application:
     def data(self):
         values = {name:value.get().strip() for name,value in self.fields.items()}
         values.update(mode=MODES[self.mode.get()],change_state=self.change_state.get())
+        values['custom_frames'] = self.frame_editor.get('1.0','end-1c') if self.use_custom.get() else ''
+        if self.use_custom.get() and not values['custom_frames'].strip():
+            raise ValueError('逐帧报文列表不能为空')
         for name in ('cert','key','ca','crl'):
             path = Path(values[name])
             if not values[name] or not path.is_file() or path.stat().st_size > 1024*1024:
                 raise ValueError(name+' 请选择不超过 1 MiB 的文件')
         return values
+
+    def packet_config(self):
+        names = ('count','interval','values','st_start','sq_start','appid','reference','destination')
+        data = {name:self.fields[name].get().strip() for name in names}
+        data.update(mode=MODES[self.mode.get()],change_state=self.change_state.get(),
+                    custom_frames=self.frame_editor.get('1.0','end-1c') if self.use_custom.get() else '')
+        runner.validate(dict(data,target='192.168.2.136'))
+        return dict(format='goose-publisher-config-v1',**data)
+
+    def export_config(self):
+        try:
+            data = self.packet_config()
+            path = filedialog.asksaveasfilename(title='导出报文配置（不含 PKI）',defaultextension='.json')
+            if path:
+                Path(path).write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
+                self.log('已导出报文配置：'+path)
+        except Exception as error:
+            messagebox.showerror('导出失败',str(error))
+
+    def import_config(self):
+        path = filedialog.askopenfilename(title='导入报文配置',filetypes=[('JSON','*.json')])
+        if not path:
+            return
+        try:
+            if Path(path).stat().st_size > 4*1024*1024:
+                raise ValueError('配置文件不能超过 4 MiB')
+            data = json.loads(Path(path).read_text(encoding='utf-8-sig'))
+            if not isinstance(data,dict) or data.get('format') != 'goose-publisher-config-v1':
+                raise ValueError('不支持的报文配置格式')
+            names = ('count','interval','values','st_start','sq_start','appid','reference','destination')
+            if any(not isinstance(data.get(name),str) for name in names) or type(data.get('change_state')) is not bool or not isinstance(data.get('custom_frames'),str):
+                raise ValueError('报文配置字段不完整或类型错误')
+            runner.validate(dict(data,target='192.168.2.136'))
+            for name in names:
+                self.fields[name].set(data[name])
+            self.mode.set(next(label for label,mode in MODES.items() if mode == data['mode']))
+            self.change_state.set(data['change_state'])
+            self.use_custom.set(bool(data['custom_frames'].strip()))
+            self.frame_editor.delete('1.0','end')
+            self.frame_editor.insert('1.0',data['custom_frames'])
+            self.log('已导入报文配置：'+path)
+        except Exception as error:
+            messagebox.showerror('导入失败',str(error))
 
     def refresh_adapters(self):
         self.work(lambda:runner.adapters(log=lambda message:self.messages.put(('log','',message))),'adapters')
@@ -179,7 +248,7 @@ class Application:
             runner.validate(data)
         except Exception as error:
             messagebox.showerror('参数错误',str(error)); return
-        if not messagebox.askyesno('确认发送测试数据','目标：'+data['target']+'\n网卡：'+adapter.label+'\n数据：'+data['values']+'\n合法数据可能触发设备 Modbus 写入，确认在测试环境发送？'):
+        if not messagebox.askyesno('确认发送测试数据','目标：'+data['target']+'\n网卡：'+adapter.label+'\nAPPID：'+data['appid']+'\ngoCbRef：'+data['reference']+'\n目的 MAC：'+data['destination']+'\n报文数：'+str(len(runner.frame_plan(data)))+'\n合法数据可能触发设备 Modbus 写入，确认在测试环境发送？'):
             return
         self.work(lambda:runner.run(data,adapter,self.stop_event,lambda message:self.messages.put(('log','',message))),'run')
 

@@ -137,7 +137,8 @@ class Publisher:
         self.ack_accepted = True
         return cert.subject.rfc4514_string()
 
-    def frame(self, source, values, st=1, sq=0, plaintext=False):
+    def frame(self, source, values, st=1, sq=0, plaintext=False, *, appid=0x1000,
+              reference=REFERENCE, destination=DESTINATION):
         if self.key is None:
             raise ValueError('必须先完成已认证握手')
         if not 1 <= st <= 0xffffffff or not 0 <= sq <= 0xffffffff:
@@ -146,10 +147,14 @@ class Publisher:
             raise ValueError('同一会话禁止重复加密 nonce；重放测试须重发缓存帧')
         if not 1 <= len(values) <= 256 or len(source) != 6:
             raise ValueError('数据集长度或源 MAC 不合法')
+        if not 0 <= appid <= 0xffff or len(destination) != 6 or not destination[0] & 1:
+            raise ValueError('APPID 或组播 MAC 不合法')
+        if not isinstance(reference, bytes) or not 1 <= len(reference) <= 255:
+            raise ValueError('goCbRef 必须为 1–255 字节')
         data = b''.join(ber(0x85, signed(value)) for value in values)
         seconds = time.time()
         timestamp = struct.pack('!I', int(seconds))+int((seconds-int(seconds))*2**24).to_bytes(3,'big')+b'\x0a'
-        aad = b''.join(ber(tag,value) for tag,value in [(0x80,REFERENCE), (0x81,unsigned(5000)),
+        aad = b''.join(ber(tag,value) for tag,value in [(0x80,reference), (0x81,unsigned(5000)),
             (0x82,b'TEMPLATEPIGO/LLN0$dsGOOSE1'), (0x83,b'gocb1'), (0x84,timestamp), (0x85,unsigned(st)),
             (0x86,unsigned(sq)), (0x87,b'\0'), (0x88,b'\x01'), (0x89,b'\0'), (0x8a,unsigned(len(values)))])
         aad += b'\xab'+ber_length(len(data))
@@ -159,7 +164,7 @@ class Publisher:
             ciphertext = AESGCM(self.key).encrypt(struct.pack('!QI', st, sq), data, aad)
             body = aad+ciphertext[:-16]+ber(0x9c,b'\x01\x00\x01'+ciphertext[-16:])
         pdu = ber(0x61,body)
-        frame = DESTINATION+source+b'\x88\xb8'+struct.pack('!HHHH',0x1000,len(pdu)+8,0,0)+pdu
+        frame = destination+source+b'\x88\xb8'+struct.pack('!HHHH',appid,len(pdu)+8,0,0)+pdu
         if len(frame) > 1514:
             raise ValueError('帧超过标准以太网 MTU，请减少数据集元素')
         self.last_counter = st,sq

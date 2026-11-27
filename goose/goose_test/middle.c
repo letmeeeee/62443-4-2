@@ -48,6 +48,7 @@ static void onSig(int sig)
 #define MODBUS_SERVER_IP   "127.0.0.1"
 #define MODBUS_SERVER_PORT 1502
 #define MODBUS_UNIT_ID     1
+#define MODBUS_IO_TIMEOUT_SEC 2
 /* starting register address */
 #define MODBUS_ACTIVE_REG_ADDR1    27204
 #define MODBUS_ACTIVE_REG_ADDR2    27205
@@ -64,6 +65,8 @@ static void onSig(int sig)
 #define SUbSCRIBER1_APPID 0x1000
 // #define SUbSCRIBER1_goCbRef "China_PCSPIGO/LLN0$GO$gocb1"
 #define SUbSCRIBER1_goCbRef "TEMPLATEPIGO/LLN0$GO$gocb1"
+#define SUBSCRIBER1_DATASET "TEMPLATEPIGO/LLN0$dsGOOSE1"
+#define SUBSCRIBER1_CONFREV 1
 #define MAX_SUB_NUM 8
 #define MAX_PCS_NUM 4
 #define S_BUS 0
@@ -76,6 +79,12 @@ static void onSig(int sig)
 static int g_modbus_sock = -1;
 static uint16_t BUS_MODE = -1;  /*0: S_BUS, 1: D_BUS*/
 static uint16_t g_modbus_tid = 0;
+static int modbus_set_io_timeout(int fd)
+{
+    struct timeval timeout = { MODBUS_IO_TIMEOUT_SEC, 0 };
+    return setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == 0 &&
+           setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout)) == 0;
+}
 static uint16_t modbus_addr_list_actice[MAX_SUB_NUM / 2];
 static uint16_t modbus_addr_list_reactice[MAX_SUB_NUM / 2];
 
@@ -135,6 +144,7 @@ static int modbus_try_connect(int timeout_ms)
     int rc = connect(s, (struct sockaddr*)&addr, sizeof(addr));
     if (rc == 0) {
         /* connected immediately */
+        if (!modbus_set_io_timeout(s)) { close(s); return -1; }
         fcntl(s, F_SETFL, flags); /* restore blocking */
         g_modbus_sock = s;
         g_modbus_tid = 0;
@@ -173,6 +183,7 @@ static int modbus_try_connect(int timeout_ms)
     }
 
     /* success */
+    if (!modbus_set_io_timeout(s)) { close(s); return -1; }
     fcntl(s, F_SETFL, flags); /* restore blocking */
     g_modbus_sock = s;
     g_modbus_tid = 0;
@@ -268,49 +279,59 @@ static int modbus_write_registers(uint16_t addr, const uint16_t* values, uint16_
              MODBUS_SERVER_IP,MODBUS_SERVER_PORT,g_modbus_sock,tid,unit,addr,count,to_send);
         GPACKET("Modbus TX wire",buf,(size_t)to_send);
     }
-    ssize_t n = send(g_modbus_sock, buf, to_send, 0);
-    if (n != to_send) {
+    size_t sent_total = 0;
+    while (sent_total < (size_t)to_send) {
+        ssize_t n = send(g_modbus_sock, buf + sent_total, (size_t)to_send - sent_total, MSG_NOSIGNAL);
+        if (n > 0) { sent_total += (size_t)n; continue; }
         int error=n < 0 ? errno : 0;
         GLOG("ERROR","Modbus TX failed tid=%u addr=%u count=%u expected=%zd sent=%zd errno=%d reason=%s",
-             tid,addr,count,to_send,n,error,error ? strerror(error) : "short send");
+             tid,addr,count,to_send,(ssize_t)sent_total,error,error ? strerror(error) : "connection closed");
         return -1;
     }
 
-    /* Response: MBAP(7) + function(1) + addr(2) + quantity(2) = 12 bytes. */
-    uint8_t resp[64];
-    ssize_t r = recv(g_modbus_sock, resp, sizeof(resp), 0);
-    if (r < 0) {
-        int error=errno;
-        GLOG("ERROR","Modbus RX failed tid=%u addr=%u count=%u errno=%d reason=%s; check server TLS/plaintext mode and server logs",
-             tid,addr,count,error,strerror(error));
+    /* Read MBAP first, then exactly the advertised PDU. TCP may split either. */
+    uint8_t resp[12];
+    size_t received = 0, target = 7;
+    while (received < target) {
+        ssize_t n = recv(g_modbus_sock, resp + received, target - received, 0);
+        if (n > 0) { received += (size_t)n; continue; }
+        GLOG("ERROR", "Modbus RX failed tid=%u received=%zu expected=%zu errno=%d",
+             tid, received, target, n < 0 ? errno : 0);
         return -1;
     }
-    if (trace_request || r < 12) {
-        GLOG("INFO","Modbus RX tid=%u addr=%u count=%u bytes=%zd response_func=0x%02x exception=%d",
-             tid,addr,count,r,r>=8 ? resp[7] : 0,r>=9 && resp[7]==0x90 ? resp[8] : -1);
-        GPACKET("Modbus RX wire",resp,(size_t)r);
-    }
-    if (r < 12) {
-        GLOG("ERROR","Modbus RX incomplete tid=%u addr=%u bytes=%zd reason=%s",
-             tid,addr,r,r==0 ? "peer closed connection" : "short response (possibly exception PDU)");
+    uint16_t mbap_length = ((uint16_t)resp[4] << 8) | resp[5];
+    if (mbap_length != 3 && mbap_length != 6) {
+        GLOG("ERROR", "Modbus RX invalid MBAP length tid=%u length=%u", tid, mbap_length);
         return -1;
     }
-
-    uint16_t resp_tid = (resp[0] << 8) | resp[1];
-    if (resp_tid != tid) {
-        fprintf(stderr, "modbus: tid mismatch %u!=%u\n", resp_tid, tid);
-    }
-
-    uint8_t func = resp[7];
-    if (func == (0x10 | 0x80)) {
-        fprintf(stderr, "modbus: exception code %u\n", resp[8]);
+    target = 6 + mbap_length;
+    while (received < target) {
+        ssize_t n = recv(g_modbus_sock, resp + received, target - received, 0);
+        if (n > 0) { received += (size_t)n; continue; }
+        GLOG("ERROR", "Modbus RX failed tid=%u received=%zu expected=%zu errno=%d",
+             tid, received, target, n < 0 ? errno : 0);
         return -1;
     }
-    if (func != 0x10) {
-        fprintf(stderr, "modbus: unexpected function %02x\n", func);
+    if (trace_request) {
+        GLOG("INFO", "Modbus RX tid=%u addr=%u count=%u bytes=%zu response_func=0x%02x exception=%d",
+             tid, addr, count, received, resp[7], received == 9 && resp[7] == 0x90 ? resp[8] : -1);
+        GPACKET("Modbus RX wire", resp, received);
+    }
+    if (resp[0] != (uint8_t)(tid >> 8) || resp[1] != (uint8_t)tid ||
+        resp[2] != 0 || resp[3] != 0 || resp[6] != unit) {
+        GLOG("ERROR", "Modbus RX MBAP mismatch tid=%u", tid);
         return -1;
     }
-
+    if (received == 9 && resp[7] == 0x90) {
+        GLOG("ERROR", "Modbus exception tid=%u code=%u", tid, resp[8]);
+        return -1;
+    }
+    if (received != 12 || resp[7] != 0x10 ||
+        resp[8] != (uint8_t)(addr >> 8) || resp[9] != (uint8_t)addr ||
+        resp[10] != (uint8_t)(count >> 8) || resp[11] != (uint8_t)count) {
+        GLOG("ERROR", "Modbus RX response mismatch tid=%u addr=%u count=%u", tid, addr, count);
+        return -1;
+    }
     return 0;
 }
 
@@ -506,10 +527,15 @@ static void queue_push(uint16_t addr, const uint16_t* values, uint16_t count, ui
         return;
 
     pthread_mutex_lock(&g_q_mutex);
+    int dropped = 0;
+    uint16_t dropped_addr = 0;
+    uint32_t dropped_st = 0, dropped_sq = 0;
     if (g_q_count == QUEUE_SIZE) {
         /* drop oldest to make room */
-        GLOG("WARNING","Modbus queue full: dropping previously authorized addr=%u stNum=%u sqNum=%u for new stNum=%u sqNum=%u",
-             g_queue[g_q_head].addr,g_queue[g_q_head].stNum,g_queue[g_q_head].sqNum,stNum,sqNum);
+        dropped = 1;
+        dropped_addr = g_queue[g_q_head].addr;
+        dropped_st = g_queue[g_q_head].stNum;
+        dropped_sq = g_queue[g_q_head].sqNum;
         g_q_head = (g_q_head + 1) % QUEUE_SIZE;
         g_q_count--;
     }
@@ -523,6 +549,9 @@ static void queue_push(uint16_t addr, const uint16_t* values, uint16_t count, ui
     int depth=g_q_count;
     pthread_cond_signal(&g_q_cond);
     pthread_mutex_unlock(&g_q_mutex);
+    if (dropped)
+        GLOG("WARNING","Modbus queue full: dropping previously authorized addr=%u stNum=%u sqNum=%u for new stNum=%u sqNum=%u",
+             dropped_addr,dropped_st,dropped_sq,stNum,sqNum);
     GLOG("INFO","Modbus batch queued addr=%u count=%u stNum=%u sqNum=%u depth=%d",
          addr,count,stNum,sqNum,depth);
 }
@@ -551,7 +580,7 @@ static void* modbus_sender_thread(void* arg)
         /* Ensure connection (will retry with backoff until running==0) */
         if (ensure_modbus_connected() != 0) break;
         QueueEntry e;
-        if (queue_pop(&e) != 0) break;
+        if (queue_pop(&e) != 0) break; /* 没有消息产生会一直停在这，但是不会空转 */
 
         /* Send the batch authorized by a new authenticated GOOSE state. */
         if (modbus_write_registers(e.addr, e.values, e.count) != 0) {
@@ -787,6 +816,13 @@ static void onUpperGooseReceived(GooseSubscriber subscriber, void* parameter)
         GLOG("WARNING", "Authenticated GOOSE rejected by dataset decoder; no Modbus forwarding");
         return;
     }
+    const char *dataset = GooseSubscriber_getDataSet(subscriber);
+    if (!dataset || strcmp(dataset, SUBSCRIBER1_DATASET) != 0 ||
+        GooseSubscriber_getConfRev(subscriber) != SUBSCRIBER1_CONFREV ||
+        GooseSubscriber_isTest(subscriber) || GooseSubscriber_needsCommission(subscriber)) {
+        GLOG("WARNING", "Authenticated GOOSE rejected: dataset/confRev/test/ndsCom mismatch; no Modbus forwarding");
+        return;
+    }
     uint32_t stNum = GooseSubscriber_getStNum(subscriber);
     uint32_t sqNum = GooseSubscriber_getSqNum(subscriber);
     bool is_valid = false;
@@ -972,6 +1008,14 @@ int main(void)
 {
     signal(SIGINT, onSig);
     signal(SIGTERM, onSig);
+    if (goose_log_start_async() != 0) {
+        fputs("GOOSE asynchronous log worker failed to start\n", stderr);
+        return 1;
+    }
+    atexit(goose_log_stop_async);
+
+    printf("=============================================================\n");
+    printf("================== Start Goose Log pthread ==================\n");
 
     // if (initDownstreamPublisher() != 0) {
     //     fprintf(stderr, "initDownstreamPublisher failed\n");

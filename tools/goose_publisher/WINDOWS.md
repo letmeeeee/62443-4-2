@@ -46,3 +46,28 @@ Inno Setup 不在默认位置时，设置 `ISCC_EXE` 为 `ISCC.exe` 完整路径
 当前仓库在 Linux 验证共享密码协议、内置证书校验和 GUI/发送流程；Windows Npcap 驱动交互、EXE 与 Setup 安装需要 Windows 构建和实机验证。
 
 官方参考：[Scapy Windows 安装](https://scapy.readthedocs.io/en/latest/installation.html)、[Npcap 安装说明](https://npcap.com/guide/npcap-users-guide.html)、[pyOpenSSL 证书与 CRL 校验](https://www.pyopenssl.org/en/stable/api/crypto.html)。
+
+2026-11-26 自定义报文功能：在“自定义报文 / 配置”页签可设置起始 stNum、sqNum、
+APPID（十进制或 0x 前缀）、goCbRef、目的组播 MAC。修改这些字段不会修改接收端配置；
+与设备白名单不符时，设备会拒绝报文。
+
+勾选“逐帧编辑”后，JSON 数组覆盖常规页签的帧数、统一数据值和计数策略。
+每条记录指定 stNum、sqNum、8 个 int32 数据；发送间隔和测试模式仍取界面设置。例如：
+
+```json
+[
+  {"stNum": 1, "sqNum": 0, "values": [1,2,3,4,5,6,7,8]},
+  {"stNum": 1, "sqNum": 10, "values": [1,2,3,4,5,6,7,8]},
+  {"stNum": 2, "sqNum": 0, "values": [11,12,13,14,15,16,17,18]}
+]
+```
+
+第一条和第三条是不同状态，第二条是同状态重传。整组计数必须严格递增，
+重复原始帧请选“重放”模式；篡改模式仍仅发送错误 tag 帧。
+未勾选逐帧编辑时，默认从 (1,0) 开始递增 sqNum；勾选每帧递增 stNum 时，
+第一帧使用自定义起始计数，后续帧 stNum 递增、sqNum 重置为 0。
+
+“导出报文配置”保存上述参数、测试模式和逐帧列表；“导入报文配置”可恢复。
+配置不包含 PKI 文件、私钥、网卡或目标 IP。请保存自己的 JSON 配置，升级工具后可重新导入。
+Windows 需重新运行 build_installer.bat，生成 GoosePublisher-Setup-2026.11.26.exe；
+源码构建包本身不是可直接安装的 EXE。
